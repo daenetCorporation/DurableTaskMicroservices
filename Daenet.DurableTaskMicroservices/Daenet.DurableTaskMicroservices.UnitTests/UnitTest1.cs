@@ -13,7 +13,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         private static TaskHubClient m_HubClient;
         private static TaskHubWorker m_TaskHubWorker;
 
-        private static string ServiceBusConnectionString = "Endpoint=sb://homagmdw.servicebus.windows.net/;SharedAccessKeyName=DTF;SharedAccessKey=SDcRR1HGh5Bi+XPqJTFOwj6Rb4nx9f8XA/qLUYgRP00=";
+        private static string ServiceBusConnectionString = "";
         private static string StorageConnectionString = "";
 
 
