@@ -1,4 +1,5 @@
-﻿using DurableTask;
+﻿using Daenet.DurableTask.Microservices;
+using DurableTask;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,18 +9,22 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 {
     public class CounterOrchestration : TaskOrchestration<int, TestOrchestrationInput>
     {
-        public override Task<int> RunTask(OrchestrationContext context, TestOrchestrationInput input)
+        public async override Task<int> RunTask(OrchestrationContext context, TestOrchestrationInput input)
         {
             int cnt = input.Counter;
 
-            while (cnt < 0)
+            while (cnt > 0)
             {
-                cnt++;
-                Console.WriteLine(cnt);
+                cnt--;
+
+                await context.ScheduleTask<Null>(typeof(Task1), ":)");
+
+                await context.ScheduleTask<Null>(typeof(Task2), ":<");
+
                 Task.Delay(input.Delay).Wait();
             }
 
-            return Task.FromResult<int>(cnt);
+            return cnt;
         }
     }
 }

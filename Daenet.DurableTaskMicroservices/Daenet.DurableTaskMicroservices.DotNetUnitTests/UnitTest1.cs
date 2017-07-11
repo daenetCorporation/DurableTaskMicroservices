@@ -8,12 +8,14 @@ using System.Threading;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
+    // AppContext.SetSwitch("Switch.System.IdentityModel.DisableMul‌​tipleDNSEntriesInSAN‌​Certificate", true);
+    // See: https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/mitigation-x509certificateclaimset-findclaims-method
+
     [TestClass]
     public class UnitTest1
     {
         private static string ServiceBusConnectionString = "TODO";
         private static string StorageConnectionString = "TODO";
-
 
         private static ServiceHost createMicroserviceHost()
         {
@@ -67,12 +69,12 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
                         var cnt = host.GetNumOfRunningInstances(service);
 
-                        //if (cnt == 0)
-                        //{
-                        //    mEvent.Set();
-                        //    Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} completed");
-                        //    break;
-                        //}
+                        if (cnt == 0)
+                        {
+                            mEvent.Set();
+                            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} completed.");
+                            break;
+                        }
                     }
                     catch (Exception ex)
                     {
