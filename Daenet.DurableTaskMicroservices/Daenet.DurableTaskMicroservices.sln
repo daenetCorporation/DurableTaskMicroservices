@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26621.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTaskMicroservices", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj", "{25DB235C-2235-4F3D-BDD9-0DF86E0AF846}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTaskMicroservices.UnitTests", "Daenet.DurableTaskMicroservices.UnitTests\Daenet.DurableTaskMicroservices.UnitTests.csproj", "{86C3C222-869F-4E86-A103-15B55E2CF3F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj", "{25DB235C-2235-4F3D-BDD9-0DF86E0AF846}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTaskMicroservices.DotNetUnitTests", "Daenet.DurableTaskMicroservices.DotNetUnitTests\Daenet.DurableTaskMicroservices.DotNetUnitTests.csproj", "{A03DAA2F-4D8D-434B-A3C4-217457FC5569}"
 EndProject
@@ -19,10 +17,6 @@ Global
 		{25DB235C-2235-4F3D-BDD9-0DF86E0AF846}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25DB235C-2235-4F3D-BDD9-0DF86E0AF846}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25DB235C-2235-4F3D-BDD9-0DF86E0AF846}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86C3C222-869F-4E86-A103-15B55E2CF3F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86C3C222-869F-4E86-A103-15B55E2CF3F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86C3C222-869F-4E86-A103-15B55E2CF3F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86C3C222-869F-4E86-A103-15B55E2CF3F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A03DAA2F-4D8D-434B-A3C4-217457FC5569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A03DAA2F-4D8D-434B-A3C4-217457FC5569}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A03DAA2F-4D8D-434B-A3C4-217457FC5569}.Release|Any CPU.ActiveCfg = Release|Any CPU

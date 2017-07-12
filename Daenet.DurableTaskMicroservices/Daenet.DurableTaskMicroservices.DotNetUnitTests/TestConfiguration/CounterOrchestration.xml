@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Microservice xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/DurableTask.Host">
+  <ActivityQNames xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+    <d2p1:string>Daenet.System.Integration.SqlReceiveAdapter`2[[Igus.Integration.LockTypeInterfaces.LockTypeAx40.Entities.LockTypeReceiveTable, Igus.Integration.LockTypeInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[Daenet.System.Integration.Entities.SqlReceiveAdapterConfig, Daenet.System.Integration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Daenet.System.Integration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
+    <d2p1:string>Daenet.System.Integration.DelayTask, Daenet.System.Integration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
+    </ActivityQNames>
+  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/Igus.Integration.LockTypeInterfaces" i:type="d2p1:LockTypeAx40Config">
+    <LogTraceSourceName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">LockTypeAx40Orchestration</LogTraceSourceName>
+   
+    <d2p1:MerlinDosSendAdapterConfig xmlns:d3p1="http://schemas.datacontract.org/2004/07/Igus.Integration.LockTypeInterfaces.LockTypeMerlinDos.Entities">
+      <Data i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities" />
+      <LogTraceSourceName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">LockTypeAx40Orchestration</LogTraceSourceName>
+      <ParentLoggingContext xmlns:d4p1="http://www.daenet.de/diagnostics/entities/2014/04" i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities" />
+      <ValidatorRules i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities" />
+      <FileName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">Id_{0}_lock_AX40Orchestration.csv</FileName>
+      <MapperQualifiedName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">Igus.Integration.LockTypeInterfaces.MerlinDosFileMapper, Igus.Integration.LockTypeInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</MapperQualifiedName>
+      <PropertyName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">Id</PropertyName>
+      <QueueFolder xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">c:\Temp\MerlinDosSendQueue\</QueueFolder>
+      <d3p1:Instance i:nil="true" />
+    </d2p1:MerlinDosSendAdapterConfig>
+    <d2p1:MerlinSqlSendAdapterConfig xmlns:d3p1="http://schemas.datacontract.org/2004/07/Igus.Integration.LockTypeInterfaces.LockTypeAx40.Entities">
+      <Data i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities" />
+      <LogTraceSourceName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">LockTypeAx40Orchestration</LogTraceSourceName>
+      <ParentLoggingContext xmlns:d4p1="http://www.daenet.de/diagnostics/entities/2014/04" i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities" />
+      <ValidatorRules i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities" />
+      <ConnectionString xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">Data Source=ares.daenet.lan;Initial Catalog=IgusDB;Integrated Security=False;User Id=IgusTestUser;Password=123abc?!;MultipleActiveResultSets=True</ConnectionString>
+      <MapperQualifiedName xmlns="http://schemas.datacontract.org/2004/07/Daenet.System.Integration.Entities">Igus.Integration.LockTypeInterfaces.MerlinSqlSendMapper, Igus.Integration.LockTypeInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</MapperQualifiedName>
+      <d3p1:ReceivedData i:nil="true" />
+    </d2p1:MerlinSqlSendAdapterConfig>
+  </InputArgument>
+  <IsSingletone>true</IsSingletone>
+  <Name i:nil="true" />
+  <OrchestrationQName>Igus.Integration.LockTypeInterfaces.LockTypeAx40Orchestration, Igus.Integration.LockTypeInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</OrchestrationQName>
+  <OutputArgument i:nil="true" />
+</Microservice>

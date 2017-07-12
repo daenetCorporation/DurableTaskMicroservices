@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
@@ -86,6 +87,30 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
 
             mEvent.WaitOne();
+        }
+
+
+        [TestMethod]
+        public void LoadFromConfigTest()
+        {
+            var service = UtilsTests.DeserializeService(getPathForFile("SimpleConfig1.xml"));
+
+            var host = createMicroserviceHost();
+
+            host.LoadService(service);
+
+            host.Open();
+
+            var instance = host.StartService(service.OrchestrationQName, service.ServiceConfiguration);
+
+            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
+
+            waitOnInstance(host, service, instance);
+        }
+
+        private static string getPathForFile(string fileName)
+        {
+           return Path.Combine(Environment.CurrentDirectory, $"TestConfigs\\{fileName}");
         }
     }
 }
