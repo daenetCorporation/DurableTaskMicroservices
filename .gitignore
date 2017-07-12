@@ -8,6 +8,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+Daenet.DurableTaskMicroservices/Daenet.DurableTaskMicroservices.DotNetUnitTests/connectionStrings.config
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

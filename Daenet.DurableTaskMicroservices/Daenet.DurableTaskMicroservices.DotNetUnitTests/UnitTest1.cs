@@ -3,6 +3,7 @@ using DurableTask;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Threading;
 
@@ -14,8 +15,8 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     [TestClass]
     public class UnitTest1
     {
-        private static string ServiceBusConnectionString = "TODO";
-        private static string StorageConnectionString = "TODO";
+        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["serviceBus"].ConnectionString;
+        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["storage"].ConnectionString;
 
         private static ServiceHost createMicroserviceHost()
         {
