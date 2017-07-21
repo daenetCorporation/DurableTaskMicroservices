@@ -50,6 +50,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             host.Open();
 
+            // This is client side code.
             var instance = host.StartService(service.OrchestrationQName, service.ServiceConfiguration);
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
