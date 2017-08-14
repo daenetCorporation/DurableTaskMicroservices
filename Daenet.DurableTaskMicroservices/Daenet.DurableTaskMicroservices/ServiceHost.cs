@@ -316,7 +316,6 @@ namespace Daenet.DurableTask.Microservices
                     }
 
                     m_SvcConfigs.Add(svcKey, svcDict);
-
                 }
             }
         }
@@ -585,6 +584,7 @@ namespace Daenet.DurableTask.Microservices
 
             var result = m_HubClient.QueryOrchestrationStates(byNameQuery);
 
+            // TODO: Why count with filter on OrchestrationState, we already filtered in query?
             var cnt = result.Count(svc => svc.OrchestrationStatus == OrchestrationStatus.Running);
 
             return cnt;
@@ -633,12 +633,12 @@ namespace Daenet.DurableTask.Microservices
 
         public void Terminate(MicroserviceInstance svcInst, string reason = "Terminated by host.")
         {
-            m_HubClient.TerminateInstance(svcInst.OrchestrationInstance);
+            m_HubClient.TerminateInstance(svcInst.OrchestrationInstance, reason);
         }
 
         public async void TerminateAasync(MicroserviceInstance svcInst, string reason = "Terminated by host.")
         {
-            await m_HubClient.TerminateInstanceAsync(svcInst.OrchestrationInstance);
+            await m_HubClient.TerminateInstanceAsync(svcInst.OrchestrationInstance, reason);
         }
         
 
