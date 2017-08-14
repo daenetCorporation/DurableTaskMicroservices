@@ -16,7 +16,8 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     public class UtilsTests
     {
         [TestMethod]
-        public void SerializeConfigTest()
+        [DataRow("CounterOrchestrationSvc.xml")]
+        public void SerializeConfigTest(string fileName)
         {
             Microservice service = new Microservice()
             {
@@ -34,12 +35,12 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
                 },
             };
 
-            serializeService(service);
+            serializeService(service, GetPathForFile(fileName));
         }
 
-        private static void serializeService(Microservice svc)
+        private static void serializeService(Microservice svc, string fileName)
         {
-            using (XmlWriter writer = XmlWriter.Create("abc.xml", new XmlWriterSettings() { Indent = true }))
+            using (XmlWriter writer = XmlWriter.Create(fileName, new XmlWriterSettings() { Indent = true }))
             {
                 DataContractSerializerSettings sett = new DataContractSerializerSettings();
                 DataContractSerializer ser = new DataContractSerializer(typeof(Microservice),
@@ -80,6 +81,11 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             }
 
             return types.ToArray();
+        }
+
+        internal static string GetPathForFile(string fileName)
+        {
+            return Path.Combine(Environment.CurrentDirectory, $"TestConfigs\\{fileName}");
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void OpenAndStartServiceHostTest()
         {
             var host = createMicroserviceHost();
 
@@ -93,9 +93,10 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
 
         [TestMethod]
-        public void LoadFromConfigTest()
+        [DataRow("CounterOrchestrationSvc.xml")]
+        public void LoadFromConfigTest(string fileName)
         {
-            var service = UtilsTests.DeserializeService(getPathForFile("SimpleConfig1.xml"));
+            var service = UtilsTests.DeserializeService(UtilsTests.GetPathForFile(fileName));
 
             var host = createMicroserviceHost();
 
@@ -108,11 +109,6 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
             waitOnInstance(host, service, instance);
-        }
-
-        private static string getPathForFile(string fileName)
-        {
-           return Path.Combine(Environment.CurrentDirectory, $"TestConfigs\\{fileName}");
         }
     }
 }
