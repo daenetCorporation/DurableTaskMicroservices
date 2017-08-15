@@ -17,6 +17,10 @@ using System.Threading;
 using System.Linq;
 using DurableTask.Tracking;
 using DurableTask;
+using System.IO;
+using System.Xml;
+using System.Runtime.Serialization;
+using System.Reflection;
 
 namespace Daenet.DurableTask.Microservices
 {
@@ -391,20 +395,6 @@ namespace Daenet.DurableTask.Microservices
             }
 
             return actCfg;
-
-            //if (actCfg.Value != null)
-            //{
-            //    return actCfg.Value;
-            //    //var dict = m_SvcConfigs[key];
-            //    //Microservice svcConfig = dict[key] as Microservice;
-            //    //if (svcConfig == null)
-            //    //    throw new ArgumentException("Specified activity configuration '{0}' type is not registerd.", key);
-            //    //else
-            //    //    return svcConfig;
-            //}
-            //else
-            //    return null;
-            //    throw new ArgumentException(String.Format("Specified activity configuration '{0}' type is not registerd in Orchestration {1}.", activityKey, orchestrationKey));
         }
 
 
@@ -454,6 +444,47 @@ namespace Daenet.DurableTask.Microservices
             return allRunningInstances;
         }
 
+        /// <summary>
+        /// Loads MicroService from JSON file and add it to the TaskHub
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public ICollection<MicroserviceInstance> LoadServiceFromJson(string filePath, out Microservice microservice)
+        {
+            var jsonText = File.ReadAllText(filePath);
+            microservice = Newtonsoft.Json.JsonConvert.DeserializeObject<Microservice>(jsonText);
+
+            return LoadService(microservice);
+        }
+
+        /// <summary>
+        /// Loads MicroService from JSON file and add it to the TaskHub
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public ICollection<MicroserviceInstance> LoadServiceFromXml(string filePath, IEnumerable<Type> knownTypes, out Microservice microservice)
+        {
+            microservice = deserializeService(filePath, knownTypes);
+
+            return LoadService(microservice);
+        }
+
+        /// <summary>
+        /// Loads MicroService from JSON file and add it to the TaskHub
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public ICollection<MicroserviceInstance> LoadServicesFromXml(string[] filePaths, IEnumerable<Type> knownTypes, out ICollection<Microservice> microservices)
+        {
+            microservices = new List<Microservice>();
+            foreach (var filePath in filePaths)
+            {
+                Microservice microservice = deserializeService(filePath, knownTypes);
+                microservices.Add(microservice);
+            }
+
+            return LoadServices(microservices);
+        }
 
         /// <summary>
         /// Adds the service orchestration to task hub worker.
@@ -568,6 +599,16 @@ namespace Daenet.DurableTask.Microservices
             };
 
             return ms;
+        }
+
+        private Microservice deserializeService(string configFile, IEnumerable<Type> knownTypes)
+        {
+            using (XmlReader writer = XmlReader.Create(configFile))
+            {
+                DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), knownTypes);
+                object svc = ser.ReadObject(writer);
+                return svc as Microservice;
+            }
         }
 
 

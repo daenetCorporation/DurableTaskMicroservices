@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Daenet.DurableTaskMicroservices
+namespace Daenet.DurableTask.Microservices
 {
     /// <summary>
     /// Put this attribute in assembly which implements integration Microservices.

@@ -24,7 +24,7 @@ namespace Daenet.DurableTask.Microservices
     /// 
     /// </summary>
     [DataContract]
-    public class Microservice 
+    public class Microservice
     {
         /// <summary>
         /// Creates default instance of the microservice configuration.
@@ -104,29 +104,7 @@ namespace Daenet.DurableTask.Microservices
             get
             {
                 return this.Orchestration;
-            }            
+            }
         }
     }
-
-
-    ///// <summary>
-    ///// Defines the class which describes a Microservice
-    ///// </summary>
-    //[DataContract]
-    //public class Microservice<TIN, TOUT> : Microservice
-    //{      
-
-    //    /// <summary>
-    //    /// Instance of the input argument of orchestration.
-    //    /// </summary>
-    //    [DataMember]
-    //    public new TIN InputArgument { get; set; }
-
-    //    /// <summary>
-    //    /// Instance of the output argument.
-    //    /// </summary>
-    //    [DataMember]
-    //    public new TOUT OutputArgument { get; set; }
-    //}
-
 }
