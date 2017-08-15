@@ -479,7 +479,7 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
-        /// Restars eventually running instance of the microservice service (orchestration).
+        /// Restarts an eventually running instance of the microservice service (orchestration).
         /// </summary>
         /// <param name="orchestrationFullQualifiedName"></param>
         /// <param name="inputArgs">Input arguments.</param>
@@ -572,10 +572,10 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
-        /// Gets the numer of running instances.
+        /// Gets the number of running instances.
         /// </summary>
         /// <param name="microservice"></param>
-        /// <returns>Gets the numer of running instances of the service.</returns>
+        /// <returns>Gets the number of running instances of the service.</returns>
         public int GetNumOfRunningInstances(Microservice microservice)
         {
             var byNameQuery = new OrchestrationStateQuery();
