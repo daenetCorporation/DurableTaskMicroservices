@@ -14,12 +14,19 @@ namespace WindowsServiceHost
         /// </summary>
         static void Main()
         {
+#if DEVELOPMENT
+            var svc =  new WindowServiceHost();
+            svc.RunService();
+            System.Threading.Thread.Sleep(int.MaxValue);
+            
+#else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new WindowServiceHost()
             };
             ServiceBase.Run(ServicesToRun);
+#endif
         }
     }
 }

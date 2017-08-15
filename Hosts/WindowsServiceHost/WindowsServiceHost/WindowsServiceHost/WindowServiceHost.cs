@@ -1,5 +1,4 @@
 ﻿using Daenet.DurableTask.Microservices;
-using Daenet.DurableTaskMicroservices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,15 +18,21 @@ namespace WindowsServiceHost
 {
     public partial class WindowServiceHost : ServiceBase
     {
+
+        #region Private Member variables
         private StringBuilder m_Trace = new StringBuilder();
 
-        private static string ServiceBusConnectionString;
-        private static string StorageConnectionString;
-        private static string SqlStateProviderConnectionString;
-        private static string TaskHubName;
+        private static string m_ServiceBusConnectionString;
+        private static string m_StorageConnectionString;
+        private static string m_SqlStateProviderConnectionString;
+        private static string m_TaskHubName;
 
         private EventLog m_ELog;
         private static string m_SchemaName;
+
+        #endregion
+
+        #region Public/Protected Methods
 
         public WindowServiceHost()
         {
@@ -42,25 +47,17 @@ namespace WindowsServiceHost
 
         protected override void OnStop()
         {
-            m_ELog.WriteEntry("Stopped", EventLogEntryType.Information, 1);
+            m_ELog?.WriteEntry("Stopped", EventLogEntryType.Information, 1);
         }
-
-
 
         internal void RunService()
         {
-            //int a = 1;
-            //while (a > 0)
-            //{
-            //    Thread.Sleep(2500);
-
-            //}
-
-            m_ELog = new EventLog("System", ".", "Dtf");
-
+#if !DEVELOPMENT
+            m_ELog = new EventLog("System", ".", "Daenet.DurableTask.Microservices");
+#endif
             try
             {
-                m_ELog.WriteEntry("Started", EventLogEntryType.Information, 1);
+                m_ELog?.WriteEntry("Started", EventLogEntryType.Information, 1);
                 m_Trace.AppendLine("Service Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
                 string[] configFiles = loadConfigFiles();
@@ -74,60 +71,38 @@ namespace WindowsServiceHost
 
                     List<Microservice> services = new List<Microservice>();
 
-                    foreach (var cfgFile in configFiles)
-                    {
-                        var service = deserializeService(cfgFile);
-                        services.Add(service);
-                        m_Trace.AppendLine(String.Format("Service configuration loaded from '{0}'", cfgFile));
-                    }
-
-                    startServicesFromConfigFile(host, services);
+                    startServicesFromConfigFile(host, configFiles);
                 }
                 else
                 {
-                    m_ELog.WriteEntry("No any *.config.xml file has been found in deployment folder " + Environment.CurrentDirectory,
+                    m_ELog?.WriteEntry("No any *.config.xml file has been found in deployment folder " + Environment.CurrentDirectory,
                         EventLogEntryType.Warning, 2);
 
                     this.Stop();
                 }
 
-                m_ELog.WriteEntry(m_Trace.ToString(), EventLogEntryType.Information, 3);
+                m_ELog?.WriteEntry(m_Trace.ToString(), EventLogEntryType.Information, 3);
             }
             catch (Exception ex)
             {
-                m_Trace.AppendLine("");
                 m_Trace.AppendLine("---------------");
                 m_Trace.AppendLine("Error:");
-                m_Trace.AppendLine(ex.Message);
-                m_Trace.AppendLine(getInnerExceptionText(ex));
-                m_Trace.AppendLine("");
-                m_Trace.AppendLine("Stack Trace:");
-                m_Trace.AppendLine(ex.StackTrace);
+                m_Trace.AppendLine(ex.ToString());
 
-                m_ELog.WriteEntry(m_Trace.ToString(), EventLogEntryType.Error, 4);
+                m_ELog?.WriteEntry(m_Trace.ToString(), EventLogEntryType.Error, 4);
 
                 this.Stop();
             }
         }
 
-        private string getInnerExceptionText(Exception ex)
-        {
-            string text = "";
-            if (ex != null)
-            {
-                if (ex.InnerException != null)
-                {
-                    text = ex.InnerException.Message;
-                    text += getInnerExceptionText(ex.InnerException);
-                }
-            }
+        #endregion
 
-            return text;
-        }
+        #region Private Methods
 
-        private void startServicesFromConfigFile(ServiceHost host, List<Microservice> services)
+        private void startServicesFromConfigFile(ServiceHost host, string[] cfgFiles)
         {
-            host.LoadServices(services.ToArray());
+            var svcInstances = host.LoadServicesFromXml(cfgFiles, loadKnownTypes(), out ICollection<Microservice> services);
+
             m_Trace.AppendLine(String.Format("{0} service(s) have been registered on Service Bus hub", services.Count));
 
             bool isStarted = false;
@@ -144,7 +119,7 @@ namespace WindowsServiceHost
 
                 if (cnt == 0)
                 {
-                    host.StartService(svc.OrchestrationQName,svc.InputArgument);
+                    host.StartService(svc.OrchestrationQName, svc.InputArgument);
                     m_Trace.AppendLine(String.Format("Services {0} has been started.", svc));
                 }
                 else
@@ -154,6 +129,10 @@ namespace WindowsServiceHost
             }
         }
 
+        /// <summary>
+        /// Get all files which matches to *.config.xml
+        /// </summary>
+        /// <returns></returns>
         private string[] loadConfigFiles()
         {
             List<string> configFiles = new List<string>();
@@ -174,28 +153,6 @@ namespace WindowsServiceHost
         {
             return AppDomain.CurrentDomain.BaseDirectory;
         }
-
-        private Microservice deserializeService(string configFile)
-        {
-            m_ELog.WriteEntry(String.Format("DeserializeService config: {0}", configFile), EventLogEntryType.Information, 1);
-
-            using (XmlReader writer = XmlReader.Create(configFile))
-            {
-                DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), loadKnownTypes());
-                object svc = ser.ReadObject(writer);
-                return svc as Microservice;
-            }
-        }
-
-        private void serializeService(Microservice svc, string filePath)
-        {
-            using (XmlWriter writer = XmlWriter.Create(filePath))
-            {
-                DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), loadKnownTypes());
-                ser.WriteObject(writer, (Microservice)svc);
-            }
-        }
-
 
         private Type[] loadKnownTypes()
         {
@@ -228,46 +185,50 @@ namespace WindowsServiceHost
             readConfiguration();
 
             m_Trace.AppendLine(String.Format("SB connection String: '{0}'\r\n Storage Connection String: '{1}', \r\nTaskHub: '{2}'",
-                ServiceBusConnectionString, StorageConnectionString, TaskHubName));
+                m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName));
 
             ServiceHost host;
 
             // StorageConnectionString exists and SqlStateProvider is null
-            if (String.IsNullOrEmpty(SqlStateProviderConnectionString) && String.IsNullOrEmpty(StorageConnectionString) == false)
+            if (String.IsNullOrEmpty(m_SqlStateProviderConnectionString) && String.IsNullOrEmpty(m_StorageConnectionString) == false)
             {
-                host = new ServiceHost(ServiceBusConnectionString, StorageConnectionString, TaskHubName);
+                host = new ServiceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName);
             }
-            else if (String.IsNullOrEmpty(SqlStateProviderConnectionString) == false)
+            else if (String.IsNullOrEmpty(m_SqlStateProviderConnectionString) == false)
             {
                 Dictionary<string, object> services = new Dictionary<string, object>();
                 //services.Add(DurableTask.TaskHubWorker.StateProviderKeyName, new DaenetSqlProvider(TaskHubName, SqlStateProviderConnectionString, m_SchemaName));
+                throw new NotImplementedException("SQLStateProvider loading is not implemented atm!");
 
-                host = new ServiceHost(ServiceBusConnectionString, StorageConnectionString, TaskHubName, false, services);
+                host = new ServiceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName, false, services);
             }
             else
                 throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
 
             return host;
         }
+
         private static void readConfiguration()
         {
-                ServiceBusConnectionString = ConfigurationManager.AppSettings["ServiceBusConnectionString"];
+            m_ServiceBusConnectionString = ConfigurationManager.AppSettings["ServiceBusConnectionString"];
 
-            if (string.IsNullOrEmpty(ServiceBusConnectionString))
+            if (string.IsNullOrEmpty(m_ServiceBusConnectionString))
             {
                 throw new Exception("A ServiceBus connection string must be defined in either an environment variable or in configuration.");
             }
 
-            StorageConnectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
-            SqlStateProviderConnectionString = ConfigurationManager.AppSettings["SqlStateProviderConnectionString"];
+            m_StorageConnectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+            m_SqlStateProviderConnectionString = ConfigurationManager.AppSettings["SqlStateProviderConnectionString"];
             m_SchemaName = ConfigurationManager.AppSettings["SqlStateProviderConnectionString.SchemaName"];
 
-            if (string.IsNullOrEmpty(StorageConnectionString) || String.IsNullOrEmpty(SqlStateProviderConnectionString))
+            if (string.IsNullOrEmpty(m_StorageConnectionString) || String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
             {
                 throw new Exception("A Storage connection string must be defined in either an environment variable or in configuration.");
             }
 
-                TaskHubName = ConfigurationManager.AppSettings.Get("TaskHubName");
+            m_TaskHubName = ConfigurationManager.AppSettings.Get("TaskHubName");
         }
+
+        #endregion
     }
 }
