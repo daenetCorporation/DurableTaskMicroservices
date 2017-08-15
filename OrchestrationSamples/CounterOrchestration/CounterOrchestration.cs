@@ -1,0 +1,30 @@
+﻿using CounterOrchestration.Tasks;
+using DurableTask;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CounterOrchestration
+{
+    public class CounterOrchestration : TaskOrchestration<int, CounterOrchestrationInput>
+    {
+        public async override Task<int> RunTask(OrchestrationContext context, CounterOrchestrationInput input)
+        {
+            int cnt = input.Counter;
+
+            while (cnt > 0)
+            {
+                cnt--;
+
+                await context.ScheduleTask<string>(typeof(Task1), ":)");
+
+                await context.ScheduleTask<string>(typeof(Task2), ":<");
+
+                await context.CreateTimer(DateTime.UtcNow + TimeSpan.FromMilliseconds(input.Delay), "delayTimer");
+            }
+
+            return cnt;
+        }
+    }
+}
