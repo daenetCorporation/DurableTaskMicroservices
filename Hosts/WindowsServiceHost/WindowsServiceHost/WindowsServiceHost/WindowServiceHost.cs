@@ -1,4 +1,5 @@
 ﻿using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -143,7 +144,7 @@ namespace WindowsServiceHost
 
                 if (cnt == 0)
                 {
-                    host.StartService(svc.OrchestrationQName, (OrchestrationInput)svc.InputArgument, null);
+                    host.StartService(svc.OrchestrationQName,svc.InputArgument);
                     m_Trace.AppendLine(String.Format("Services {0} has been started.", svc));
                 }
                 else
@@ -157,7 +158,7 @@ namespace WindowsServiceHost
         {
             List<string> configFiles = new List<string>();
 
-            foreach (var cfgFile in Directory.GetFiles(getActiveDirectory(), "*.config.xml"))
+            foreach (var cfgFile in Directory.GetFiles(getBaseDirectory(), "*.config.xml"))
             {
                 configFiles.Add(cfgFile);
             }
@@ -169,19 +170,10 @@ namespace WindowsServiceHost
         /// Gets the location of service binary.
         /// </summary>
         /// <returns></returns>
-        private string getActiveDirectory()
+        private string getBaseDirectory()
         {
-            //   Debugger.Break();
-            //int s = 1;
-            //while (s > 0)
-            //{
-            //    Thread.Sleep(2500);
-            //}
-
             return AppDomain.CurrentDomain.BaseDirectory;
         }
-
-
 
         private Microservice deserializeService(string configFile)
         {
@@ -195,9 +187,9 @@ namespace WindowsServiceHost
             }
         }
 
-        private void serializeService(Microservice svc)
+        private void serializeService(Microservice svc, string filePath)
         {
-            using (XmlWriter writer = XmlWriter.Create("abc.xml"))
+            using (XmlWriter writer = XmlWriter.Create(filePath))
             {
                 DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), loadKnownTypes());
                 ser.WriteObject(writer, (Microservice)svc);
@@ -209,7 +201,7 @@ namespace WindowsServiceHost
         {
             List<Type> types = new List<Type>();
 
-            foreach (var assemblyFile in Directory.GetFiles(getActiveDirectory(), "*.dll", SearchOption.AllDirectories))
+            foreach (var assemblyFile in Directory.GetFiles(getBaseDirectory(), "*.dll", SearchOption.AllDirectories))
             {
                 //if (assemblyFile.Contains("Igus.Integration.LockTypeInterfaces.dll"))
                 {
@@ -257,8 +249,6 @@ namespace WindowsServiceHost
 
             return host;
         }
-
-
         private static void readConfiguration()
         {
                 ServiceBusConnectionString = ConfigurationManager.AppSettings["ServiceBusConnectionString"];
