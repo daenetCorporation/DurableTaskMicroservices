@@ -221,7 +221,7 @@ namespace WindowsServiceHost
             m_SqlStateProviderConnectionString = ConfigurationManager.AppSettings["SqlStateProviderConnectionString"];
             m_SchemaName = ConfigurationManager.AppSettings["SqlStateProviderConnectionString.SchemaName"];
 
-            if (string.IsNullOrEmpty(m_StorageConnectionString) || String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
+            if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
             {
                 throw new Exception("A Storage connection string must be defined in either an environment variable or in configuration.");
             }
