@@ -34,7 +34,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             var host = createMicroserviceHost();
 
             Microservice service = new Microservice();
-            service.ServiceConfiguration = new TestOrchestrationInput()
+            service.InputArgument = new TestOrchestrationInput()
             {
                 Counter = 3,
                 Delay = 1000,
@@ -51,7 +51,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             host.Open();
 
             // This is client side code.
-            var instance = host.StartService(service.OrchestrationQName, service.ServiceConfiguration);
+            var instance = host.StartService(service.OrchestrationQName, service.InputArgument);
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
@@ -104,7 +104,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             host.Open();
 
-            var instance = host.StartService(service.OrchestrationQName, service.ServiceConfiguration);
+            var instance = host.StartService(service.OrchestrationQName, service.InputArgument);
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 

@@ -595,7 +595,6 @@ namespace Daenet.DurableTask.Microservices
             {
                 OrchestrationInstance = m_HubClient.CreateOrchestrationInstance(orchestration, inputArgs),
             };
-
             return ms;
         }
 
