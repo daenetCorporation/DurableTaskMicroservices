@@ -623,10 +623,7 @@ namespace Daenet.DurableTask.Microservices
 
             var result = m_HubClient.QueryOrchestrationStates(byNameQuery);
 
-            // TODO: Why count with filter on OrchestrationState, we already filtered in query?
-            var cnt = result.Count(svc => svc.OrchestrationStatus == OrchestrationStatus.Running);
-
-            return cnt;
+            return result.Count();
         }
 
 
