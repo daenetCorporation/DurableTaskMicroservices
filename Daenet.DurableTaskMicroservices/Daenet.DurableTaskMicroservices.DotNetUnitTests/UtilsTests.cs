@@ -48,9 +48,10 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
                 OrchestrationQName = typeof(CounterOrchestration).AssemblyQualifiedName,
 
                 ActivityQNames = new string[]
-                            {
-                    typeof(Task1).AssemblyQualifiedName,  typeof(Task2).AssemblyQualifiedName,
-                            },
+                {
+                    typeof(Task1).AssemblyQualifiedName,
+                    typeof(Task2).AssemblyQualifiedName,
+                },
             };
         }
 
