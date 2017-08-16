@@ -119,7 +119,7 @@ namespace WindowsServiceHost
 
                 if (cnt == 0)
                 {
-                    host.StartService(svc.OrchestrationQName, svc.ServiceConfiguration);
+                    host.StartService(svc.OrchestrationQName, svc.InputArgument);
                     m_Trace.AppendLine(String.Format("Services {0} has been started.", svc));
                 }
                 else

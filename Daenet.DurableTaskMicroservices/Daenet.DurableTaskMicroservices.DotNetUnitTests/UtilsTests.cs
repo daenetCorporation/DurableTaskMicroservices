@@ -39,7 +39,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         {
             return new Microservice()
             {
-                ServiceConfiguration = new TestOrchestrationInput()
+                InputArgument = new TestOrchestrationInput()
                 {
                     Counter = 3,
                     Delay = 1000,
