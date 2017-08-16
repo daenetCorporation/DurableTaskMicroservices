@@ -160,18 +160,15 @@ namespace WindowsServiceHost
 
             foreach (var assemblyFile in Directory.GetFiles(getBaseDirectory(), "*.dll", SearchOption.AllDirectories))
             {
-                //if (assemblyFile.Contains("Igus.Integration.LockTypeInterfaces.dll"))
+                Assembly asm = Assembly.LoadFile(assemblyFile);
+                var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
+                if (attr != null)
                 {
-                    Assembly asm = Assembly.LoadFile(assemblyFile);
-                    var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
-                    if (attr != null)
+                    foreach (var type in asm.GetTypes())
                     {
-                        foreach (var type in asm.GetTypes())
+                        if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
                         {
-                            if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
-                            {
-                                types.Add(type);
-                            }
+                            types.Add(type);
                         }
                     }
                 }

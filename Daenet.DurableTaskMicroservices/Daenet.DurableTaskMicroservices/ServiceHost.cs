@@ -27,6 +27,12 @@ namespace Daenet.DurableTask.Microservices
     public class ServiceHost
     {
         #region Private Members
+
+        /// <summary>
+        /// Holds the list of dictionaries of service and activity configurations.
+        /// </summary>
+        private static Dictionary<string, Dictionary<string, object>> m_SvcConfigs = new Dictionary<string, Dictionary<string, object>>();
+
         private TaskHubClient m_HubClient;
         private TaskHubWorker m_TaskHubWorker;
 
@@ -256,12 +262,6 @@ namespace Daenet.DurableTask.Microservices
             }
         }
 
-
-        /// <summary>
-        /// Holds the list of dictionaries of service and activity configurations. 
-        /// </summary>
-        private static Dictionary<string, Dictionary<string, object>> m_SvcConfigs = new Dictionary<string, Dictionary<string, object>>();
-
 //        private static Dictionary<Type, object> m_SvcConfigs = new Dictionary<Type, object>();
 
 
@@ -396,8 +396,6 @@ namespace Daenet.DurableTask.Microservices
 
             return actCfg;
         }
-
-
 
 
         /// <summary>
