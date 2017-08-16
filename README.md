@@ -2,14 +2,22 @@
 
 Microservice Framework based on Durable Task Framework
 
+## Introduction to DurableTaskMicroservices
+
+TODO
+
+### Reasons to use DurableTaskMicroservices
+
+TODO
+
 ## Hosts
 
 This repository contains multiple hosts, you can decide which host fits best to your needs.
-At the moment we have the following hosts are available.
+You are free to implement your own host and contribute it via pull request.
 
 ### WindowsServiceHost
 
-This is a windows service.
+A simple windows service used to host the DurableTaskFramework.
 
 #### How to Install the Service
 
