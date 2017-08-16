@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Daenet.DurableTask.Microservices</RootNamespace>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <PackageId>Daenet.DurableTask.Microservices</PackageId>
+    <Authors>daenet</Authors>
+    <Company>daenet Gesellschaft für Informationstechnologie mbH</Company>
+    <Product>Daenet.DurableTask.Microservices</Product>
+    <RepositoryUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/daenetCorporation/DurableTaskMicroservices/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</PackageProjectUrl>
+    <PackageTags>durabletask</PackageTags>
+    <Description>Microservice Framework based on Durable Task Framework</Description>
   </PropertyGroup>
 
   <ItemGroup>
