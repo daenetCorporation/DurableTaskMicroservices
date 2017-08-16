@@ -17,9 +17,27 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     {
         [TestMethod]
         [DataRow("CounterOrchestrationSvc.xml")]
-        public void SerializeConfigTest(string fileName)
+        public void SerializeXmlConfigTest(string fileName)
         {
-            Microservice service = new Microservice()
+            Microservice service = getMicroService();
+
+            xmlSerializeService(service, GetPathForFile(fileName));
+        }
+
+        [TestMethod]
+        [DataRow("CounterOrchestrationSvc.json")]
+        public void SerializeJsonConfigTest(string fileName)
+        {
+            Microservice service = getMicroService();
+
+            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(service);
+
+            File.WriteAllText(GetPathForFile(fileName), jsonString);
+        }
+
+        private static Microservice getMicroService()
+        {
+            return new Microservice()
             {
                 ServiceConfiguration = new TestOrchestrationInput()
                 {
@@ -30,15 +48,13 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
                 OrchestrationQName = typeof(CounterOrchestration).AssemblyQualifiedName,
 
                 ActivityQNames = new string[]
-                {
+                            {
                     typeof(Task1).AssemblyQualifiedName,  typeof(Task2).AssemblyQualifiedName,
-                },
+                            },
             };
-
-            serializeService(service, GetPathForFile(fileName));
         }
 
-        private static void serializeService(Microservice svc, string fileName)
+        private static void xmlSerializeService(Microservice svc, string fileName)
         {
             using (XmlWriter writer = XmlWriter.Create(fileName, new XmlWriterSettings() { Indent = true }))
             {
