@@ -97,7 +97,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RoutedTaskOrchestration.cs" />
+    <Compile Include="TestOrchestrationInput.cs" />
     <Compile Include="TestOrchestrations\CounterOrchestration\CounterOrchestration.cs" />
     <Compile Include="TestOrchestrations\CounterOrchestration\Task1.cs" />
     <Compile Include="TestOrchestrations\CounterOrchestration\Task2.cs" />
