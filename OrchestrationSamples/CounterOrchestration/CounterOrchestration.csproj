@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="DurableTask" Version="1.0.0.11" />
+    <PackageReference Include="Daenet.DurableTask.Microservices" Version="0.0.1"/>
   </ItemGroup>
 
 </Project>

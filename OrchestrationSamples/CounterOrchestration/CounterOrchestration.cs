@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly: Daenet.DurableTask.Microservices.IntegrationAssemblyAttribute]
+
 namespace CounterOrchestration
 {
     public class CounterOrchestration : TaskOrchestration<int, CounterOrchestrationInput>
@@ -21,7 +23,7 @@ namespace CounterOrchestration
 
                 await context.ScheduleTask<string>(typeof(Task2), ":<");
 
-                await context.CreateTimer(DateTime.UtcNow + TimeSpan.FromMilliseconds(input.Delay), "delayTimer");
+                Task.Delay(input.Delay).Wait();
             }
 
             return cnt;
