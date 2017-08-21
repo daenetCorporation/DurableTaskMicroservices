@@ -21,6 +21,8 @@ You are free to implement your own host and contribute it via pull request.
 
 ### Microservice (Orchestrations) loading
 
+This topic explains how the host loads the orchestration assemblies and the configuration.
+
 1. The *WindowsServiceHost* searches for all `*.config.xml` files in the working directory.
 These files must contain your XML serialized `Microservice`.
 1. Now *WindowsServiceHost* gets all Types which are used in the `Microservices`.
@@ -34,7 +36,6 @@ A simple windows service used to host the DurableTaskFramework.
 #### How to Install the Service
 
 The installation process is quite simple. First you should compile the WindowsServiceHost solution and copy the output into the deployment folder (you should create one).
-Then you should compile your orchestrations project and copy the output dll/config (xml/json) to the deployment folder. For each interface (orchestration) there should be one configuration. For example Test.Orch1.config.xml or Test.Orch2.config.json.
 
 To install the windows service, just run the installservice.ps1.
 The PowerShell script will guide you trough the install process.
