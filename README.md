@@ -4,22 +4,24 @@ Microservice Framework based on Durable Task Framework
 
 ## Introduction to DurableTaskMicroservices
 
-TODO
+The *DurableTaskMicroservices* allows you to serialize/deserialize (save/load) orchestrations and tasks.
 
-### Reasons to use DurableTaskMicroservices
+### Why should I use DurableTaskMicroservices?
 
-TODO
+The idea of *DurableTaskMicroservices* is to split the host and orchestration/task code. The host loads the assemblies of the orchestrations/tasks and their configuration files. This allows to change running orchestrations without changing the host code, just by replacing the assemblies and the configuration.
+
+- host and orchestrations decoupling
+- client and host decoupling
+- dynamic loading of orchestrations (with configuration)
 
 ## Hosts
 
 This repository contains multiple hosts, you can decide which host fits best to your needs.
 You are free to implement your own host and contribute it via pull request.
 
-### WindowsServiceHost
+### Microservice (Orchestrations) loading
 
-A simple windows service used to host the DurableTaskFramework.
-
-#### Orchestrations loading
+This topic explains how the host loads the orchestration assemblies and the configuration.
 
 1. The *WindowsServiceHost* searches for all `*.config.xml` files in the working directory.
 These files must contain your XML serialized `Microservice`.
@@ -27,16 +29,17 @@ These files must contain your XML serialized `Microservice`.
 To do this, the host gets all *.dlls in the working folder and check for the existence of `IntegrationAssemblyAttribute`.
 1. Then the host starts the `TaskHubWorker` and create an `OrchestrationInstance` (if none are running).
 
+### WindowsServiceHost
+
+A simple windows service used to host the DurableTaskFramework.
 
 #### How to Install the Service
 
-The installation process is quite simple. First you should compile the DtfService solution and copy the output into the deployment folder (you should create one).
-Then you should compile your orchestrations project and copy the output dll/config (xml/json) to the deployment folder. For each interface (orchestration) there should be one configuration. For example Test.Orch1.config.xml or Test.Orch2.config.json.
+The installation process is quite simple. First you should compile the WindowsServiceHost solution and copy the output into the deployment folder (you should create one).
 
-Now you should install the service with the installservice.bat file.
-
-`Installservice.bat Orchestration1 "WindowsServiceHost.exePath" "Description of your Windows Server"`
+To install the windows service, just run the installservice.ps1.
+The PowerShell script will guide you trough the install process.
 
 #### How to Uninstall the service
 
-`uninstallservice.bat Orchestration1`
+To uninstall the windows service, just run the uninstallservice.ps1.
