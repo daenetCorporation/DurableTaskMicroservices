@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Daenet.DurableTaskMicroservices.Common.Rules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;

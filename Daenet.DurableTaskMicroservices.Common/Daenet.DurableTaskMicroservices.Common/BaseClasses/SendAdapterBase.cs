@@ -1,5 +1,4 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Daenet.System.Integration.Extensions;
 
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
@@ -32,7 +30,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }          
         }
 
-        protected abstract TAdapterOutput SendData(TaskContext context, TInput input);        
+        protected abstract TAdapterOutput SendData(TaskContext context, TInput input);
 
     }
 }

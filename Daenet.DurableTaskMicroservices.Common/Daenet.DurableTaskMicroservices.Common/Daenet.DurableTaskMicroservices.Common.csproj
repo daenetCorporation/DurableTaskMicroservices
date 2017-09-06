@@ -5,7 +5,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Daenet.Common.Logging" Version="0.0.4" />
+    <PackageReference Include="Daenet.DurableTask.Microservices" Version="0.0.2-preview" />
     <PackageReference Include="DurableTask" Version="1.0.0.11" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DaenetSystemIntegration.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DaenetSystemIntegration.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="DaenetSystemIntegration.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DaenetSystemIntegration.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

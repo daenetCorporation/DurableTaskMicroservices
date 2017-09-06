@@ -1,4 +1,5 @@
-﻿using Daenet.System.Integration.Entities;
+﻿using Daenet.DurableTaskMicroservices.Common.Entities;
+using Daenet.DurableTaskMicroservices.Common.Rules;
 using System;
 using System.Collections.Generic;
 using System.Linq;

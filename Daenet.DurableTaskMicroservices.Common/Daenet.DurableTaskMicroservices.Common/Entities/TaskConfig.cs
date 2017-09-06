@@ -1,6 +1,4 @@
-﻿using Daenet.Diagnostics;
-using DurableTask.Microservices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -30,7 +28,5 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
         /// </summary>
         [DataMember]
         public ICollection<ValidationRuleDescriptor> ValidatorRules { get; set; }
-
-     
     }
 }

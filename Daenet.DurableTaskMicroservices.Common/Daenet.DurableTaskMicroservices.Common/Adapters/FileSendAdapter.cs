@@ -1,7 +1,8 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices.Common;
+using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
-using DurableTask.Microservices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,7 @@ namespace Daenet.System.Integration
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        protected override Null SendData(DurableTask.TaskContext context, TFileSendAdapterInput input)
+        protected override Null SendData(TaskContext context, TFileSendAdapterInput input)
         {
             try
             {

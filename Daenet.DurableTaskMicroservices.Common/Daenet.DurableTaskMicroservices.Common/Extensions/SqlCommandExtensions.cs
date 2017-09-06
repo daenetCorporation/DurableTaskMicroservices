@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
 using System.Data;
-using Daenet.Diagnostics;
+using Daenet.Common.Logging;
 
 namespace Daenet.DurableTaskMicroservices.Common.Extensions
 {

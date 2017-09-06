@@ -1,5 +1,7 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.DurableTaskMicroservices.Common;
+using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Entities;
+using Daenet.DurableTaskMicroservices.Common.Logging;
 using DurableTask;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ namespace Daenet.System.Integration
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        protected override TAdapterOutput ReceiveData(DurableTask.TaskContext context, TaskInput input)
+        protected override TAdapterOutput ReceiveData(TaskContext context, TaskInput input)
         {
             try
             {

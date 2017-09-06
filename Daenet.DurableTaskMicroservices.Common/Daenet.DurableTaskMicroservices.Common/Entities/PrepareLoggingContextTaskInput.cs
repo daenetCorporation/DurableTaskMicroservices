@@ -1,4 +1,4 @@
-﻿using Daenet.Diagnostics;
+﻿using Daenet.Common.Logging;
 using DurableTask;
 using System;
 using System.Collections.Generic;

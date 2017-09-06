@@ -1,5 +1,7 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.DurableTaskMicroservices.Common;
+using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Entities;
+using Daenet.DurableTaskMicroservices.Common.Logging;
 using DurableTask;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Daenet.System.Integration.Extensions;
 
 namespace Daenet.System.Integration
 {
@@ -17,7 +18,7 @@ namespace Daenet.System.Integration
         where TAdapterOutput : class
         where TAdapterInput : TaskInput
     {
-        protected override TAdapterOutput ReceiveData(DurableTask.TaskContext context, TAdapterInput taskInput)
+        protected override TAdapterOutput ReceiveData(TaskContext context, TAdapterInput taskInput)
         {
             SqlReceiveAdapterConfig config = this.GetConfiguration<SqlReceiveAdapterConfig>(taskInput.Orchestration);
 

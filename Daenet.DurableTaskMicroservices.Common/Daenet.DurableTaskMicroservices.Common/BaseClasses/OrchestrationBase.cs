@@ -1,7 +1,9 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.Common.Logging;
+using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices.Common.Entities;
+using Daenet.DurableTaskMicroservices.Common.Logging;
+using Daenet.DurableTaskMicroservices.Common.Rules;
 using DurableTask;
-using DurableTask.Microservices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,7 +138,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 if (this.LogManager == null)
                 {
-                    this.LogManager = new LogManager(this.Configuration.LogTraceSourceName);                 
+                    this.LogManager = new LogManager(this.Configuration.LogTraceSourceName);
                 }
 
                 if (orchestrationInput == null)

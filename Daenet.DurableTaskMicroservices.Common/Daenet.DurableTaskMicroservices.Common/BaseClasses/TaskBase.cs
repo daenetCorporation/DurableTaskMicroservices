@@ -1,13 +1,10 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.Common.Logging;
+using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices.Common.Entities;
+using Daenet.DurableTaskMicroservices.Common.Exceptions;
+using Daenet.DurableTaskMicroservices.Common.Logging;
 using DurableTask;
-using DurableTask.Microservices;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 {
@@ -193,11 +190,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 result = RunTask(context, input);
                 //TODO.. log
             }
-            catch (Daenet.System.Integration.ValidationRuleException validationException)
+            catch (ValidationRuleException validationException)
             {
                 var currentType = this.GetType();
                 string taskType = currentType.Namespace + "." + currentType.Name;
-                var validatedData = new JavaScriptSerializer().Serialize(validationException.ValidatingInstance);
+                var validatedData = Newtonsoft.Json.JsonConvert.SerializeObject(validationException.ValidatingInstance);
                 string validationRulesResult = String.Empty;
                 foreach (var res in validationException.ValidationResult.Results)
                     validationRulesResult += Environment.NewLine + "Rule " + res.Key + "=" + res.Value.ToString();

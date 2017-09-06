@@ -1,7 +1,8 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.Common.Logging;
+using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
-using DurableTask.Microservices;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,13 +42,13 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
 
             switch (input.LoggingAction)
             {
-                case Daenet.System.Integration.Entities.Action.TraceInfo:
+                case Entities.Action.TraceInfo:
                     logManager.TraceMessage(input.TracingLevel, input.EventId, input.FormatedMessage, parameters);
                     break;
-                case Daenet.System.Integration.Entities.Action.TraceWarning:
+                case Entities.Action.TraceWarning:
                     logManager.TraceWarning(input.TracingLevel, input.EventId, input.FormatedMessage, parameters);
                     break;
-                case Daenet.System.Integration.Entities.Action.TraceError:
+                case Entities.Action.TraceError:
                     if (input.Exception != null)
                         logManager.TraceError(input.TracingLevel, input.EventId, input.Exception, input.FormatedMessage, parameters);
                     else

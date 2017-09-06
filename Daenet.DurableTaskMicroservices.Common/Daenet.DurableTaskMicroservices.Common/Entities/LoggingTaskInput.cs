@@ -1,4 +1,4 @@
-﻿using Daenet.Diagnostics;
+﻿using Daenet.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
        public Action LoggingAction { get; set; }
 
        [DataMember]
-       public Diagnostics.TracingLevel TracingLevel { get; set; }
+       public TracingLevel TracingLevel { get; set; }
 
        [DataMember]
         public int EventId { get; set; }

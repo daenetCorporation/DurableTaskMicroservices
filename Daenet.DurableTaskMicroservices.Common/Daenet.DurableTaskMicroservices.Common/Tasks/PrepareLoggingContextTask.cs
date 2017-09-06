@@ -1,7 +1,7 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
+﻿using Daenet.Common.Logging;
+using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
-using DurableTask.Microservices;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

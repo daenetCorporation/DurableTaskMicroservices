@@ -1,6 +1,6 @@
-﻿using Daenet.Diagnostics;
-using Daenet.System.Integration.Entities;
-using DurableTask.Microservices;
+﻿using Daenet.Common.Logging;
+using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,7 +23,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Extensions
 
             var svcCfg = config.ServiceConfiguration as OrchestrationConfig;
             if (svcCfg == null)
-                throw new ConfigurationErrorsException(String.Format("Specified orchestration configuration is not of type 'OrchestrationConfig'. Failed by starting of '{1}' - Specified (invalid) configuration type: '{2}'.", orchestrationQualifiedName, config));
+                throw new ArgumentException(String.Format("Specified orchestration configuration is not of type 'OrchestrationConfig'. Failed by starting of '{1}' - Specified (invalid) configuration type: '{2}'.", orchestrationQualifiedName, config));
 
             if (!String.IsNullOrEmpty(svcCfg.LogTraceSourceName))
             {
