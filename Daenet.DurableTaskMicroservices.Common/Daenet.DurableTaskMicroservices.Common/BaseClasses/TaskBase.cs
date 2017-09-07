@@ -118,8 +118,6 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 string logTraceSourceName = null;
 
-                var type = this.GetType();
-
                 LogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
 
                 LoggingContext parentLoggingContext = null;
@@ -128,7 +126,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 {
                     parentLoggingContext = inputArg.Context["ParentLoggingContext"] as LoggingContext;
 
-                    if (parentLoggingContext.LoggingScopes != null)
+                    if (parentLoggingContext?.LoggingScopes != null)
                     {
                         foreach (var scope in parentLoggingContext.LoggingScopes)
                         {
@@ -151,14 +149,14 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                     parentLoggingContext = new LoggingContext();
 
                 //
-                // If log trace source name is specified in the configuration it will be used even if the context contains a partent logtrace source name.
+                // If log trace source name is specified in the configuration it will be used even if the context contains a parent logtrace source name.
                 var cfg = this.GetConfiguration(inputArg.Orchestration);
                 if (cfg != null)
                     logTraceSourceName = cfg.LogTraceSourceName;
 
                 if (String.IsNullOrEmpty(logTraceSourceName))
                 {
-                    logTraceSourceName = type.Namespace + "." + type.Name;
+                    logTraceSourceName = this.GetType().FullName;
                 }
 
                 m_Log = new LogManager(inputArg.LoggerFactory, logTraceSourceName, parentLogMgr);
