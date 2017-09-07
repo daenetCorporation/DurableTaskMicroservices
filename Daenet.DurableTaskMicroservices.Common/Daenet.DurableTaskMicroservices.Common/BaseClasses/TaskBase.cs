@@ -116,12 +116,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         {
             if (m_Log == null)
             {
-              
                 string logTraceSourceName = null;
 
                 var type = this.GetType();
 
-                LogManager parentLogMgr = new LogManager("not used");
+                LogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
 
                 LoggingContext parentLoggingContext = null;
 
@@ -162,7 +161,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                     logTraceSourceName = type.Namespace + "." + type.Name;
                 }
 
-                m_Log = new LogManager(logTraceSourceName, parentLogMgr);
+                m_Log = new LogManager(inputArg.LoggerFactory, logTraceSourceName, parentLogMgr);
 
                 // With new instance of the LogManager we always create a new SequenceId.
                 m_Log.AddScope("SequenceId", Guid.NewGuid().ToString());

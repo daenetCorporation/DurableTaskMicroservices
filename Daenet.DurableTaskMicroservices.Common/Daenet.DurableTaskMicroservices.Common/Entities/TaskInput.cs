@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -27,6 +28,9 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
         /// </summary>
         [DataMember]
         public object Data { get; set; }
+
+        [DataMember]
+        public ILoggerFactory LoggerFactory { get; set; }
 
         /// <summary>
         /// Dictionary of values which defines context.

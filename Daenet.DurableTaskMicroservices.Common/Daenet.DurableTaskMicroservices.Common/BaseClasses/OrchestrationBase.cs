@@ -138,7 +138,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 if (this.LogManager == null)
                 {
-                    this.LogManager = new LogManager(this.Configuration.LogTraceSourceName);
+                    this.LogManager = new LogManager(orchestrationInput.LoggerFactory, this.Configuration.LogTraceSourceName);
                 }
 
                 if (orchestrationInput == null)
@@ -186,7 +186,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 if (this.LogManager == null)
                 {
-                    this.LogManager = new LogManager("CriticalExceptions");
+                    this.LogManager = new LogManager(orchestrationInput.LoggerFactory, "CriticalExceptions");
 
                     this.LogManager.TraceErrLoggingSystemFailed(context.OrchestrationInstance.InstanceId, context);
                 }
