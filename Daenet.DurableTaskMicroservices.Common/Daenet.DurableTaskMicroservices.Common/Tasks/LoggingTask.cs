@@ -53,7 +53,6 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
                         logManager.TraceError(input.TracingLevel, input.EventId, input.Exception, input.FormatedMessage, parameters);
                     else
                         logManager.TraceError(input.TracingLevel, input.EventId, input.FormatedMessage, parameters);
-
                     break;
             }
 
