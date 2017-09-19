@@ -87,7 +87,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         /// <summary>
         /// Instance of LogManager.
         /// </summary>
-        public LogManager LogManager
+        public ILogManager LogManager
         {
             get
             {
@@ -108,7 +108,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
         #region Private Members
 
-        private LogManager m_Log;
+        private ILogManager m_Log;
 
         //private static List<string> m_TraceSourceInitialized = new List<string>();
 
@@ -118,7 +118,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 string logTraceSourceName = null;
 
-                LogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
+                ILogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
 
                 LoggingContext parentLoggingContext = null;
 

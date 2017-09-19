@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Daenet.Common.Logging" Version="0.0.6" />
+    <PackageReference Include="Daenet.Common.Logging" Version="0.0.9" />
     <PackageReference Include="Daenet.DurableTask.Microservices" Version="0.0.2-preview" />
     <PackageReference Include="DurableTask" Version="1.0.0.11" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />

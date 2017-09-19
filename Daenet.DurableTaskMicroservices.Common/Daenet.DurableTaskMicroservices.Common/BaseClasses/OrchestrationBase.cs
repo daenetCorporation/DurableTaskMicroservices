@@ -72,7 +72,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         /// <summary>
         /// Instance of the daenet's LogManager component.
         /// </summary>
-        protected LogManager LogManager
+        protected ILogManager LogManager
         {
             get
             {
@@ -93,7 +93,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
         #region Private Members
 
-        private LogManager m_Log;
+        private ILogManager m_Log;
 
         #endregion
 

@@ -29,7 +29,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
             LoggingContext parentLoggingContext = input.ParentLoggingContext;
             
             string traceSourceName = this.GetConfiguration(input.Orchestration).LogTraceSourceName;
-            LogManager parentScope = new LogManager(input.LoggerFactory, traceSourceName);
+            ILogManager parentScope = new LogManager(input.LoggerFactory, traceSourceName);
 
             parentScope.AddScope("ParentSequenceId", null);
 

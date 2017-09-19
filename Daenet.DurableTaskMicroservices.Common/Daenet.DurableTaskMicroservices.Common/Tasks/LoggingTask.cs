@@ -31,7 +31,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
                     logTraceSourceName = this.GetType().Namespace + "." + this.GetType().Name;
             }
 
-            LogManager logManager = new LogManager(input.LoggerFactory, logTraceSourceName);
+            ILogManager logManager = new LogManager(input.LoggerFactory, logTraceSourceName);
             foreach (var scope in loggingContext.LoggingScopes)
                 logManager.AddScope(scope.Key, scope.Value);
 

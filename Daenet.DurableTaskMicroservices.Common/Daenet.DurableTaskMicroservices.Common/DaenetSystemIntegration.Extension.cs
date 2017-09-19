@@ -14,7 +14,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="FQNNameOfTheMethod">Full qualified name of the method.</param>
-        public static void TraceInfMethodStarted(this LogManager log, object FQNNameOfTheMethod )
+        public static void TraceInfMethodStarted(this ILogManager log, object FQNNameOfTheMethod )
         {
  
             log.TraceMessage(TracingLevel.Level3, DiagnosticEvents.InfMethodStarted, DaenetSystemIntegration.InfMethodStarted, new object[] {  FQNNameOfTheMethod,  });
@@ -26,7 +26,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="FQNNameOfTheMethod">Full qualified name of the method.</param>
-        public static void TraceInfMethodCompleted(this LogManager log, object FQNNameOfTheMethod )
+        public static void TraceInfMethodCompleted(this ILogManager log, object FQNNameOfTheMethod )
         {
  
             log.TraceMessage(TracingLevel.Level3, DiagnosticEvents.InfMethodCompleted, DaenetSystemIntegration.InfMethodCompleted, new object[] {  FQNNameOfTheMethod,  });
@@ -39,7 +39,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="CheckDataCmdText">SQL Statement defined by CheckDataCmdText.</param>
         /// <param name="CheckDataCmdTextResult">Result delivered by the SQL statement CheckDataCmdText.</param>
-        public static void TraceInfCheckDataCmdTextResults(this LogManager log, object CheckDataCmdText, object CheckDataCmdTextResult )
+        public static void TraceInfCheckDataCmdTextResults(this ILogManager log, object CheckDataCmdText, object CheckDataCmdTextResult )
         {
  
             log.TraceMessage(TracingLevel.Level4, DiagnosticEvents.InfCheckDataCmdTextResults, DaenetSystemIntegration.InfCheckDataCmdTextResults, new object[] {  CheckDataCmdText,  CheckDataCmdTextResult,  });
@@ -52,7 +52,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="FetchDataCmdText">SQL Statement defined by FetchDataCmdText.</param>
         /// <param name="FetchDataCmdTextResult">Result delivered by the SQL statement FetchDataCmdText.</param>
-        public static void TraceInfFetchDataCmdTextResults(this LogManager log, object FetchDataCmdText, object FetchDataCmdTextResult )
+        public static void TraceInfFetchDataCmdTextResults(this ILogManager log, object FetchDataCmdText, object FetchDataCmdTextResult )
         {
  
             log.TraceMessage(TracingLevel.Level4, DiagnosticEvents.InfFetchDataCmdTextResults, DaenetSystemIntegration.InfFetchDataCmdTextResults, new object[] {  FetchDataCmdText,  FetchDataCmdTextResult,  });
@@ -63,7 +63,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// The message string: 'Transaction rollback successfully commited.'
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
-        public static void TraceInfTransactionRolledBack(this LogManager log )
+        public static void TraceInfTransactionRolledBack(this ILogManager log )
         {
  
             log.TraceMessage(TracingLevel.Level4, DiagnosticEvents.InfTransactionRolledBack, DaenetSystemIntegration.InfTransactionRolledBack, new object[] {  });
@@ -75,7 +75,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="FQAdapterName">Full quallified adapter name.</param>
-        public static void TraceErrFailedToCommitTransactionRollback(this LogManager log, object FQAdapterName )
+        public static void TraceErrFailedToCommitTransactionRollback(this ILogManager log, object FQAdapterName )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrFailedToCommitTransactionRollback, DaenetSystemIntegration.ErrFailedToCommitTransactionRollback, new object[] {  FQAdapterName,  });
@@ -87,7 +87,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
 		/// <param name="ex">The exception to log.</param>
         /// <param name="FQAdapterName"></param>
-        public static void TraceErrFailedToCommitTransactionRollback(this LogManager log, Exception ex, object FQAdapterName )
+        public static void TraceErrFailedToCommitTransactionRollback(this ILogManager log, Exception ex, object FQAdapterName )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrFailedToCommitTransactionRollback, ex, DaenetSystemIntegration.ErrFailedToCommitTransactionRollback, new object[] {  FQAdapterName,  });
@@ -98,7 +98,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="param0">FQAdapterName</param>
-        public static void TraceErryAdapterExecution(this LogManager log, object param0 )
+        public static void TraceErryAdapterExecution(this ILogManager log, object param0 )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErryAdapterExecution, DaenetSystemIntegration.ErryAdapterExecution, new object[] {  param0,  });
@@ -110,7 +110,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
 		/// <param name="ex">The exception to log.</param>
         /// <param name="param0"></param>
-        public static void TraceErryAdapterExecution(this LogManager log, Exception ex, object param0 )
+        public static void TraceErryAdapterExecution(this ILogManager log, Exception ex, object param0 )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErryAdapterExecution, ex, DaenetSystemIntegration.ErryAdapterExecution, new object[] {  param0,  });
@@ -123,7 +123,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="TaskType">The parameter 0 for the String format</param>
         /// <param name="ValidationData">The parameter 1 for the String format</param>
         /// <param name="ValidationResults">The parameter 2 for the String format</param>
-        public static void TraceErrValidationRule(this LogManager log, object TaskType, object ValidationData, object ValidationResults )
+        public static void TraceErrValidationRule(this ILogManager log, object TaskType, object ValidationData, object ValidationResults )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrValidationRule, DaenetSystemIntegration.ErrValidationRule, new object[] {  TaskType,  ValidationData,  ValidationResults,  });
@@ -137,7 +137,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="TaskType"></param>
         /// <param name="ValidationData"></param>
         /// <param name="ValidationResults"></param>
-        public static void TraceErrValidationRule(this LogManager log, Exception ex, object TaskType, object ValidationData, object ValidationResults )
+        public static void TraceErrValidationRule(this ILogManager log, Exception ex, object TaskType, object ValidationData, object ValidationResults )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrValidationRule, ex, DaenetSystemIntegration.ErrValidationRule, new object[] {  TaskType,  ValidationData,  ValidationResults,  });
@@ -148,7 +148,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="orchestrationName">Name of the failed orchestration.</param>
-        public static void TraceErrTaskFailedException(this LogManager log, object orchestrationName )
+        public static void TraceErrTaskFailedException(this ILogManager log, object orchestrationName )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrTaskFailedException, DaenetSystemIntegration.ErrTaskFailedException, new object[] {  orchestrationName,  });
@@ -160,7 +160,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
 		/// <param name="ex">The exception to log.</param>
         /// <param name="orchestrationName"></param>
-        public static void TraceErrTaskFailedException(this LogManager log, Exception ex, object orchestrationName )
+        public static void TraceErrTaskFailedException(this ILogManager log, Exception ex, object orchestrationName )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrTaskFailedException, ex, DaenetSystemIntegration.ErrTaskFailedException, new object[] {  orchestrationName,  });
@@ -171,7 +171,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="orchestrationName">Name of the orchestration.</param>
-        public static void TraceErrOrchestrationCompensationFailed(this LogManager log, object orchestrationName )
+        public static void TraceErrOrchestrationCompensationFailed(this ILogManager log, object orchestrationName )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrOrchestrationCompensationFailed, DaenetSystemIntegration.ErrOrchestrationCompensationFailed, new object[] {  orchestrationName,  });
@@ -183,7 +183,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
 		/// <param name="ex">The exception to log.</param>
         /// <param name="orchestrationName"></param>
-        public static void TraceErrOrchestrationCompensationFailed(this LogManager log, Exception ex, object orchestrationName )
+        public static void TraceErrOrchestrationCompensationFailed(this ILogManager log, Exception ex, object orchestrationName )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrOrchestrationCompensationFailed, ex, DaenetSystemIntegration.ErrOrchestrationCompensationFailed, new object[] {  orchestrationName,  });
@@ -195,7 +195,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="param0">The parameter 0 for the String format</param>
         /// <param name="param1">The parameter 1 for the String format</param>
-        public static void TraceErrLoggingSystemFailed(this LogManager log, object param0, object param1 )
+        public static void TraceErrLoggingSystemFailed(this ILogManager log, object param0, object param1 )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrLoggingSystemFailed, DaenetSystemIntegration.ErrLoggingSystemFailed, new object[] {  param0,  param1,  });
@@ -208,7 +208,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
 		/// <param name="ex">The exception to log.</param>
         /// <param name="param0"></param>
         /// <param name="param1"></param>
-        public static void TraceErrLoggingSystemFailed(this LogManager log, Exception ex, object param0, object param1 )
+        public static void TraceErrLoggingSystemFailed(this ILogManager log, Exception ex, object param0, object param1 )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrLoggingSystemFailed, ex, DaenetSystemIntegration.ErrLoggingSystemFailed, new object[] {  param0,  param1,  });
@@ -220,7 +220,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="param0">The parameter 0 for the String format</param>
         /// <param name="param1">The parameter 1 for the String format</param>
-        public static void TraceErrOrchestrationFailed(this LogManager log, object param0, object param1 )
+        public static void TraceErrOrchestrationFailed(this ILogManager log, object param0, object param1 )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrOrchestrationFailed, DaenetSystemIntegration.ErrOrchestrationFailed, new object[] {  param0,  param1,  });
@@ -233,7 +233,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
 		/// <param name="ex">The exception to log.</param>
         /// <param name="param0"></param>
         /// <param name="param1"></param>
-        public static void TraceErrOrchestrationFailed(this LogManager log, Exception ex, object param0, object param1 )
+        public static void TraceErrOrchestrationFailed(this ILogManager log, Exception ex, object param0, object param1 )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrOrchestrationFailed, ex, DaenetSystemIntegration.ErrOrchestrationFailed, new object[] {  param0,  param1,  });
@@ -243,7 +243,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// The message string: 'FileReceiveAdapter Error'
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
-        public static void TraceErrFileReceiveAdapter(this LogManager log )
+        public static void TraceErrFileReceiveAdapter(this ILogManager log )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrFileReceiveAdapter, DaenetSystemIntegration.ErrFileReceiveAdapter, new object[] {  });
@@ -254,7 +254,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
 		/// <param name="ex">The exception to log.</param>
-        public static void TraceErrFileReceiveAdapter(this LogManager log, Exception ex )
+        public static void TraceErrFileReceiveAdapter(this ILogManager log, Exception ex )
         {
  
             log.TraceError(TracingLevel.Level1, DiagnosticEvents.ErrFileReceiveAdapter, ex, DaenetSystemIntegration.ErrFileReceiveAdapter, new object[] {  });
@@ -266,7 +266,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="param0">The parameter 0 for the String format</param>
         /// <param name="param1">The parameter 1 for the String format</param>
-        public static void TraceInfStartFileReceiveAdapter(this LogManager log, object param0, object param1 )
+        public static void TraceInfStartFileReceiveAdapter(this ILogManager log, object param0, object param1 )
         {
  
             log.TraceMessage(TracingLevel.Level4, DiagnosticEvents.InfStartFileReceiveAdapter, DaenetSystemIntegration.InfStartFileReceiveAdapter, new object[] {  param0,  param1,  });
@@ -278,7 +278,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Logging
         /// </summary>
         /// <param name="log">The Log Manager, which will be extended.</param>
         /// <param name="param0">The parameter 0 for the String format</param>
-        public static void TraceInfEndFileReceiveAdapter(this LogManager log, object param0 )
+        public static void TraceInfEndFileReceiveAdapter(this ILogManager log, object param0 )
         {
  
             log.TraceMessage(TracingLevel.Level4, DiagnosticEvents.InfEndFileReceiveAdapter, DaenetSystemIntegration.InfEndFileReceiveAdapter, new object[] {  param0,  });
