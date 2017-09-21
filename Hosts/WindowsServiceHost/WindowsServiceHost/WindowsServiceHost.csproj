@@ -102,15 +102,12 @@
     <PackageReference Include="Daenet.DurableTask.Microservices">
       <Version>0.0.2-preview</Version>
     </PackageReference>
+    <PackageReference Include="Daenet.DurableTaskMicroservices.Host">
+      <Version>0.0.1</Version>
+    </PackageReference>
     <PackageReference Include="WindowsAzure.ServiceBus">
       <Version>4.1.3</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj">
-      <Project>{4446EE37-EC8E-4CB2-AEE3-917B861DAFD5}</Project>
-      <Name>Daenet.DurableTaskMicroservices.Host</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
