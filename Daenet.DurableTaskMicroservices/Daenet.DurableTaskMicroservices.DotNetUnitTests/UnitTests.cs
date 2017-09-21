@@ -14,7 +14,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     // See: https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/mitigation-x509certificateclaimset-findclaims-method
 
     [TestClass]
-    public class UnitTest1
+    public class UnitTests
     {
         private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["serviceBus"].ConnectionString;
         private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["storage"].ConnectionString;
