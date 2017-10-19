@@ -41,7 +41,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Starts the MicroService Host
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
-        public void StartServiceHost(string directory = null)
+        public void StartServiceHost(string directory = null, string searchPattern = "*.xml")
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Daenet.DurableTaskMicroservices.Host
                 if (String.IsNullOrEmpty(directory))
                     directory = Environment.CurrentDirectory;
 
-                string[] configFiles = loadConfigFiles(directory);
+                string[] configFiles = loadConfigFiles(directory, searchPattern);
 
                 if (configFiles.Length > 0)
                 {
@@ -66,8 +66,8 @@ namespace Daenet.DurableTaskMicroservices.Host
                 }
                 else
                 {
-                    m_Logger?.LogInformation("No *.config.xml files found in folder: {folder}.", directory);
-                    throw new Exception(String.Format("No *.config.xml files found in folder: {0}.", directory));
+                    m_Logger?.LogInformation("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
+                    throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
                 }
             }
             catch (Exception ex)
