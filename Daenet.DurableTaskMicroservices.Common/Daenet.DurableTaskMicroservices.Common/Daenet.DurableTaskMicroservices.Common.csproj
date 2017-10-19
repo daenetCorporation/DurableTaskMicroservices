@@ -17,6 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="Daenet.DurableTask.Microservices.IntegrationAssemblyAttribute">
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Daenet.Common.Logging" Version="0.0.9" />
     <PackageReference Include="Daenet.DurableTask.Microservices" Version="0.0.2-preview" />
     <PackageReference Include="DurableTask" Version="1.0.0.11" />
