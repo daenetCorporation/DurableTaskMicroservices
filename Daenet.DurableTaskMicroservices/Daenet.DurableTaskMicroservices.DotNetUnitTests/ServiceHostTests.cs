@@ -1,5 +1,6 @@
 ﻿using Daenet.DurableTask.Microservices;
 using DurableTask;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -31,9 +32,8 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         }
 
         [TestMethod]
-        public void OpenAndStartServiceHostTest()
+        public void SelfHostTest()
         {
-
             Daenet.DurableTaskMicroservices.Host.Host host2 = new Daenet.DurableTaskMicroservices.Host.Host();
 
             host2.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
@@ -41,6 +41,18 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             Thread.Sleep(int.MaxValue);
         }
 
-        
+        [TestMethod]
+        public void SelfHostWithLoggingTest()
+        {
+            ILoggerFactory loggerFactory = new LoggerFactory();
+            loggerFactory.AddDebug();
+            
+            Daenet.DurableTaskMicroservices.Host.Host host2 = new Daenet.DurableTaskMicroservices.Host.Host(loggerFactory);
+
+            host2.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
+
+            Thread.Sleep(int.MaxValue);
+        }
+
     }
 }

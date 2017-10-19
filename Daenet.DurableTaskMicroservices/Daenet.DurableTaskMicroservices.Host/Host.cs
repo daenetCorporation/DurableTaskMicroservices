@@ -92,6 +92,7 @@ namespace Daenet.DurableTaskMicroservices.Host
 
             if (m_IsJsonOrXml)
                 throw new Exception(":(");
+            // TODO..
             //   svcInstances = host.LoadServiceFromJson(cfgFiles.FirstOrDefault(), out services);
             else
             {
