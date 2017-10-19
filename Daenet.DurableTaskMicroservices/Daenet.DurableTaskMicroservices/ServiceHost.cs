@@ -625,11 +625,18 @@ namespace Daenet.DurableTask.Microservices
 
         private Microservice deserializeService(string configFile, IEnumerable<Type> knownTypes)
         {
-            using (XmlReader writer = XmlReader.Create(configFile))
+            try
             {
-                DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), knownTypes);
-                object svc = ser.ReadObject(writer);
-                return svc as Microservice;
+                using (XmlReader writer = XmlReader.Create(configFile))
+                {
+                    DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), knownTypes);
+                    object svc = ser.ReadObject(writer);
+                    return svc as Microservice;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to deserialize file: {configFile}", ex);
             }
         }
 
