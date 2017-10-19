@@ -1,4 +1,4 @@
-
+ 
 # DurableTaskMicroservices
 
 Microservice Framework based on Durable Task Framework.
@@ -33,6 +33,7 @@ The idea of *DurableTaskMicroservices* is to split the host and orchestration/ta
 
 This repository contains multiple hosts, you can decide which host fits best to your needs.
 You are free to implement your own host and contribute it via pull request.
+For more information about hosting, please take a look on this [article](https://github.com/daenetCorporation/DurableTaskMicroservices/wiki/Hosting-DTF-Microservices) 
 
 ### Microservice (Orchestrations) loading
 
