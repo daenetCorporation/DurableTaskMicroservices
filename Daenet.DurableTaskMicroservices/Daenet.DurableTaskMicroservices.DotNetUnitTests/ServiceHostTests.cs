@@ -38,7 +38,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             host2.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
 
-            Thread.Sleep(int.MaxValue);
+            Thread.Sleep(int.MaxValue); //TODO
         }
 
         [TestMethod]
@@ -46,12 +46,12 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
             loggerFactory.AddDebug();
-            
+        
             Daenet.DurableTaskMicroservices.Host.Host host2 = new Daenet.DurableTaskMicroservices.Host.Host(loggerFactory);
 
             host2.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
 
-            Thread.Sleep(int.MaxValue);
+            Thread.Sleep(int.MaxValue); //TODO
         }
 
     }

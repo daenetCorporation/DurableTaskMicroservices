@@ -197,23 +197,32 @@ namespace Daenet.DurableTask.Microservices
         /// <summary>
         /// Checks if at least one orchestration instance is already running.
         /// </summary>
+        /// <remarks>If the instance store is NOT configured this method will always return FALSE.</remarks>
         /// <param name="orchestrationFullName">Full qualified name of orchestration. i.e.: Type.FullName</param>
         /// <param name="runningInstances">Running instances of specified microservice.</param>
         /// <returns>TRUE one or more instances of orchestration are running.</returns>
         private bool loadRunningInstances(string orchestrationFullName, out List<MicroserviceInstance> runningInstances)
         {
-            var oStates = loadStates(orchestrationFullName, true);
+            if (!String.IsNullOrEmpty(this.m_StorageConnectionString))
+            {
+                var oStates = loadStates(orchestrationFullName, true);
 
-            var cntRunning = oStates.Count(o => o.OrchestrationStatus == OrchestrationStatus.Running);
+                var cntRunning = oStates.Count(o => o.OrchestrationStatus == OrchestrationStatus.Running);
 
-            runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running).
-                Select(i => i.OrchestrationInstance).Select(oi => new MicroserviceInstance()
-                {
-                    OrchestrationInstance = oi
-                }).ToList();
+                runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running).
+                    Select(i => i.OrchestrationInstance).Select(oi => new MicroserviceInstance()
+                    {
+                        OrchestrationInstance = oi
+                    }).ToList();
 
 
-            return cntRunning > 0;
+                return cntRunning > 0;
+            }
+            else
+            {
+                runningInstances = null;
+                return false;
+            }
         }
 
         private IEnumerable<OrchestrationState> loadStates(string orchestrationFullName, bool runningOnly = true)
@@ -460,7 +469,9 @@ namespace Daenet.DurableTask.Microservices
             {
                 List<MicroserviceInstance> runningInstances;
                 bool isRunning = loadRunningInstances(svc.OrchestrationQName, out runningInstances);
-                allRunningInstances.AddRange(runningInstances);
+                if(runningInstances != null)
+                    allRunningInstances.AddRange(runningInstances);
+
                 RegisterServiceConfiguration(svc);
             }
 
@@ -638,9 +649,13 @@ namespace Daenet.DurableTask.Microservices
         /// Gets the number of running instances.
         /// </summary>
         /// <param name="microservice"></param>
-        /// <returns>Gets the number of running instances of the service.</returns>
+        /// <returns>Gets the number of running instances of the service.
+        /// If m_StorageConnectionString is not confiogured this method returns 0.</returns>
         public int GetNumOfRunningInstances(Microservice microservice)
         {
+            if (String.IsNullOrEmpty(this.m_StorageConnectionString))
+                return 0;
+
             var byNameQuery = new OrchestrationStateQuery();
             byNameQuery.AddStatusFilter(OrchestrationStatus.Running);
             byNameQuery.AddNameVersionFilter(microservice.Orchestration.FullName);
