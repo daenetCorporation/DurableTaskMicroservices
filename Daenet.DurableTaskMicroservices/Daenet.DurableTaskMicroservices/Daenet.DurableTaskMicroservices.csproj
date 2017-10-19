@@ -14,6 +14,8 @@
     <PackageProjectUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</PackageProjectUrl>
     <PackageTags>durabletask</PackageTags>
     <Description>Microservice Framework based on Durable Task Framework</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.0.3-preview</Version>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
   </PropertyGroup>
 
