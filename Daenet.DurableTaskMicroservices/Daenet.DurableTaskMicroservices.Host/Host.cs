@@ -88,11 +88,19 @@ namespace Daenet.DurableTaskMicroservices.Host
 
             ICollection<MicroserviceInstance> svcInstances;
 
+            List<Type> knownTypes = new List<Type>();
+
             if (m_IsJsonOrXml)
                 throw new Exception(":(");
             //   svcInstances = host.LoadServiceFromJson(cfgFiles.FirstOrDefault(), out services);
             else
-                svcInstances = host.LoadServicesFromXml(cfgFiles, loadKnownTypes(directory), out services);
+            {
+                knownTypes.AddRange(loadKnownTypes(directory));
+                if (directory != AppContext.BaseDirectory)
+                    knownTypes.AddRange(loadKnownTypes(AppContext.BaseDirectory));
+
+                svcInstances = host.LoadServicesFromXml(cfgFiles, knownTypes, out services);
+            }
 
             m_Logger?.LogInformation("{0} service(s) have been registered on Service Bus hub", services.Count);
 
@@ -124,11 +132,11 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Get all files which matches to *.config.xml
         /// </summary>
         /// <returns></returns>
-        private string[] loadConfigFiles(string directory)
+        private string[] loadConfigFiles(string directory, string searchPattern = "*.xml")
         {
             List<string> configFiles = new List<string>();
 
-            foreach (var cfgFile in Directory.GetFiles(directory, "*.config.xml"))
+            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern))
             {
                 configFiles.Add(cfgFile);
             }
@@ -192,15 +200,15 @@ namespace Daenet.DurableTaskMicroservices.Host
 
         private static void readConfiguration()
         {
-            m_ServiceBusConnectionString = ConfigurationManager.AppSettings["ServiceBusConnectionString"];
+            m_ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"]?.ConnectionString;
 
             if (string.IsNullOrEmpty(m_ServiceBusConnectionString))
             {
                 throw new Exception("A ServiceBus connection string must be defined in either an environment variable or in configuration.");
             }
 
-            m_StorageConnectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
-            m_SqlStateProviderConnectionString = ConfigurationManager.AppSettings["SqlStateProviderConnectionString"];
+            m_StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"]?.ConnectionString;
+            m_SqlStateProviderConnectionString = ConfigurationManager.ConnectionStrings["SqlStateProviderConnectionString"]?.ConnectionString;
             m_SchemaName = ConfigurationManager.AppSettings["SqlStateProviderConnectionString.SchemaName"];
 
             //if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))

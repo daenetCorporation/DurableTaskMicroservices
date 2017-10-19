@@ -16,8 +16,8 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     [TestClass]
     public class UnitTests
     {
-        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["serviceBus"].ConnectionString;
-        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["storage"].ConnectionString;
+        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
+        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
 
         private static ServiceHost createMicroserviceHost()
         {

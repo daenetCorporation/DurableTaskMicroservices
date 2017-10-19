@@ -18,8 +18,8 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     [TestClass]
     public class ServiceHostTests
     {
-        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["serviceBus"].ConnectionString;
-        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["storage"].ConnectionString;
+        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
+        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
 
         private static ServiceHost createMicroserviceHost()
         {
@@ -36,7 +36,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             Daenet.DurableTaskMicroservices.Host.Host host2 = new Daenet.DurableTaskMicroservices.Host.Host();
 
-            host2.StartServiceHost();
+            host2.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
 
             Thread.Sleep(int.MaxValue);
         }
