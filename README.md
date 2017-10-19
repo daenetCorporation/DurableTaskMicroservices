@@ -1,3 +1,4 @@
+
 # DurableTaskMicroservices
 
 Microservice Framework based on Durable Task Framework.
@@ -37,7 +38,8 @@ You are free to implement your own host and contribute it via pull request.
 
 This topic explains how the host loads the orchestration assemblies and the configuration.
 
-1. The *WindowsServiceHost* searches for all `*.config.xml` files in the working directory. These files must contain your XML serialized `Microservice`.
+1. The *WindowsServiceHost* searches for all `*.config.xml` files in the working directory. These files must contain your XML serialized `Microservice`. For more information about configuration please see: [Configuration](https://github.com/daenetCorporation/DurableTaskMicroservices/wiki/Configuring-Microservce-Orchestration)
+
 1. Now *WindowsServiceHost* gets all Types which are used in the `Microservices`. To do this, the host gets all *.dlls in the working folder and check for the existence of `IntegrationAssemblyAttribute`.
 1. Then the host starts the `TaskHubWorker` and create an `OrchestrationInstance` (if none are running).
 
