@@ -72,7 +72,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         /// <summary>
         /// Instance of the daenet's LogManager component.
         /// </summary>
-        protected LogManager LogManager
+        protected ILogManager LogManager
         {
             get
             {
@@ -93,7 +93,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
         #region Private Members
 
-        private LogManager m_Log;
+        private ILogManager m_Log;
 
         #endregion
 
@@ -138,7 +138,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 if (this.LogManager == null)
                 {
-                    this.LogManager = new LogManager(this.Configuration.LogTraceSourceName);
+                    this.LogManager = new LogManager(orchestrationInput.LoggerFactory, this.Configuration.LogTraceSourceName);
                 }
 
                 if (orchestrationInput == null)
@@ -186,7 +186,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 if (this.LogManager == null)
                 {
-                    this.LogManager = new LogManager("CriticalExceptions");
+                    this.LogManager = new LogManager(orchestrationInput.LoggerFactory, "CriticalExceptions");
 
                     this.LogManager.TraceErrLoggingSystemFailed(context.OrchestrationInstance.InstanceId, context);
                 }

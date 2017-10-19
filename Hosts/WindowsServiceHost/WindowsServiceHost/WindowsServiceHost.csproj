@@ -102,6 +102,9 @@
     <PackageReference Include="Daenet.DurableTask.Microservices">
       <Version>0.0.2-preview</Version>
     </PackageReference>
+    <PackageReference Include="Daenet.DurableTaskMicroservices.Host">
+      <Version>0.0.1</Version>
+    </PackageReference>
     <PackageReference Include="WindowsAzure.ServiceBus">
       <Version>4.1.3</Version>
     </PackageReference>

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Daenet.System.Integration
 {
     /// <summary>
-    /// Creates a single file in queue folder and invoke sthe mapper which maps the instance to a single text line.
+    /// Creates a single file in queue folder and invoke the mapper which maps the instance to a single text line.
     /// </summary>
     /// <typeparam name="TFileSendAdapterInput"></typeparam>
     public class FileSendAdapter<TFileSendAdapterInput> : SendAdapterBase<TFileSendAdapterInput, Null>

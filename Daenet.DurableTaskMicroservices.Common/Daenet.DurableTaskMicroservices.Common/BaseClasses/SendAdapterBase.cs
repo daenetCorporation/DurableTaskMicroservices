@@ -1,12 +1,6 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
@@ -24,10 +18,10 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 return rcvData;
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 throw;
-            }          
+            }
         }
 
         protected abstract TAdapterOutput SendData(TaskContext context, TInput input);

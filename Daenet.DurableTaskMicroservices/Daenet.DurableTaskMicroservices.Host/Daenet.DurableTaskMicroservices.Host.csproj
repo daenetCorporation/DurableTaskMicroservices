@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.0.1</Version>
+    <Company>daenet Gesellschaft für Informationstechnologie mbH</Company>
+    <RepositoryUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</RepositoryUrl>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/daenetCorporation/DurableTaskMicroservices/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageTags>durabletask</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Daenet.DurableTask.Microservices" Version="0.0.2-preview" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.Configuration.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

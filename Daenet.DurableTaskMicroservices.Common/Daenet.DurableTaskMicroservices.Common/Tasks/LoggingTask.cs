@@ -31,7 +31,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
                     logTraceSourceName = this.GetType().Namespace + "." + this.GetType().Name;
             }
 
-            LogManager logManager = new LogManager(logTraceSourceName);
+            ILogManager logManager = new LogManager(input.LoggerFactory, logTraceSourceName);
             foreach (var scope in loggingContext.LoggingScopes)
                 logManager.AddScope(scope.Key, scope.Value);
 
@@ -53,7 +53,6 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
                         logManager.TraceError(input.TracingLevel, input.EventId, input.Exception, input.FormatedMessage, parameters);
                     else
                         logManager.TraceError(input.TracingLevel, input.EventId, input.FormatedMessage, parameters);
-
                     break;
             }
 

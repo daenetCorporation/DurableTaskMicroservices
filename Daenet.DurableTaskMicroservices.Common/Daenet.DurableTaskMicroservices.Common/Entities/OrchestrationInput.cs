@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -23,7 +24,10 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
         /// </summary>
         [DataMember]
         public Dictionary<string, object> Context { get; set; }
-        
+
+        [DataMember]
+        public ILoggerFactory LoggerFactory { get; set; }
+
         /// <summary>
         /// This property indicates that the internal logging context was already 
         /// initializad (propagated).

@@ -55,7 +55,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Extensions
             return sqlParameter;
         }
 
-        public static void LogSqlStatement(this SqlCommand command, LogManager log, string message)
+        public static void LogSqlStatement(this SqlCommand command, ILogManager log, string message)
         {
             log.TraceMessage(TracingLevel.Level4, 0, "{0}", new Func<string>(() =>
             {
