@@ -41,7 +41,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Starts the MicroService Host
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
-        public void StartServiceHost(string directory = null)
+        public void StartServiceHost(string directory = null, string searchPattern = "*.xml")
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Daenet.DurableTaskMicroservices.Host
                 if (String.IsNullOrEmpty(directory))
                     directory = Environment.CurrentDirectory;
 
-                string[] configFiles = loadConfigFiles(directory);
+                string[] configFiles = loadConfigFiles(directory, searchPattern);
 
                 if (configFiles.Length > 0)
                 {
@@ -66,8 +66,8 @@ namespace Daenet.DurableTaskMicroservices.Host
                 }
                 else
                 {
-                    m_Logger?.LogInformation("No *.config.xml files found in folder: {folder}.", directory);
-                    throw new Exception(String.Format("No *.config.xml files found in folder: {0}.", directory));
+                    m_Logger?.LogInformation("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
+                    throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
                 }
             }
             catch (Exception ex)
@@ -191,7 +191,10 @@ namespace Daenet.DurableTaskMicroservices.Host
                 host = new ServiceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName, false, services);
             }
             else
-                throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
+            {
+                host = new ServiceHost(m_ServiceBusConnectionString, m_TaskHubName);
+                //throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
+            }
 
             return host;
         }
@@ -209,10 +212,10 @@ namespace Daenet.DurableTaskMicroservices.Host
             m_SqlStateProviderConnectionString = ConfigurationManager.ConnectionStrings["SqlStateProviderConnectionString"]?.ConnectionString;
             m_SchemaName = ConfigurationManager.AppSettings["SqlStateProviderConnectionString.SchemaName"];
 
-            if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
-            {
-                throw new Exception("A Storage connection string must be defined in either an environment variable or in configuration.");
-            }
+            //if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
+            //{
+            //    throw new Exception("A Storage connection string must be defined in either an environment variable or in configuration.");
+            //}
 
             m_TaskHubName = ConfigurationManager.AppSettings.Get("TaskHubName");
         }
