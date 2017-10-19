@@ -191,7 +191,7 @@ namespace Daenet.DurableTaskMicroservices.Host
             }
             else
             {
-                new ServiceHost(m_ServiceBusConnectionString, m_TaskHubName);
+                host = new ServiceHost(m_ServiceBusConnectionString, m_TaskHubName);
                 //throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
             }
 
