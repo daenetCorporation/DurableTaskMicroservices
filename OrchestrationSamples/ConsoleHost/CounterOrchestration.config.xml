@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Microservice xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTask.Microservices">
-  <ActivityConfiguration xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  
+  <!-- List of assembly qualified names of activities, which are used in the orchestration. -->
   <ActivityQNames xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
     <d2p1:string>CounterOrchestration.Tasks.Task1, CounterOrchestration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
     <d2p1:string>CounterOrchestration.Tasks.Task2, CounterOrchestration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
   </ActivityQNames>
-  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/CounterOrchestration" i:type="d2p1:CounterOrchestrationInput">
-    <d2p1:Counter>1</d2p1:Counter>
-    <d2p1:Delay>1200</d2p1:Delay>
-  </InputArgument>
-  <IsSingletone>false</IsSingletone>
+  
+  <!-- Assembly Qualified nme of type, wchich imlements orchestration -->
   <OrchestrationQName>CounterOrchestration.CounterOrchestration, CounterOrchestration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</OrchestrationQName>
-  <OutputArgument i:nil="true" />
- 
+  
+  <!-- Start Arguments of CounterOrchestration. -->
+  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/CounterOrchestration" i:type="d2p1:CounterOrchestrationInput">
+    <d2p1:Counter>3</d2p1:Counter>
+    <d2p1:Delay>1000</d2p1:Delay>
+  </InputArgument>
 </Microservice>

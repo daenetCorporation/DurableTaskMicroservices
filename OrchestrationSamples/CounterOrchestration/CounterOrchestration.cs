@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly: Daenet.DurableTask.Microservices.IntegrationAssemblyAttribute]
+
 
 namespace CounterOrchestration
 {

@@ -303,6 +303,9 @@ namespace Daenet.DurableTask.Microservices
                     
                     svcDict.Add(svcKey, service);
 
+                    if (service.ActivityConfiguration == null)
+                        service.ActivityConfiguration = new Dictionary<string, object>();
+                    
                     foreach (var activityConfig in service.ActivityConfiguration)
                     {
                         Type actTp = Type.GetType(activityConfig.Key);
@@ -456,7 +459,7 @@ namespace Daenet.DurableTask.Microservices
         }
 
         /// <summary>
-        /// Loads MicroService from JSON file and add it to the TaskHub
+        /// Loads MicroService from XML file and add it to the TaskHub
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -468,14 +471,14 @@ namespace Daenet.DurableTask.Microservices
         }
 
         /// <summary>
-        /// Loads MicroService from JSON file and add it to the TaskHub
+        /// Loads MicroService from XML file and add it to the TaskHub
         /// </summary>
-        /// <param name="filePath"></param>
+        /// <param name="configFiles">List of configuration files for services.</param>
         /// <returns></returns>
-        public ICollection<MicroserviceInstance> LoadServicesFromXml(string[] filePaths, IEnumerable<Type> knownTypes, out ICollection<Microservice> microservices)
+        public ICollection<MicroserviceInstance> LoadServicesFromXml(string[] configFiles, IEnumerable<Type> knownTypes, out ICollection<Microservice> microservices)
         {
             microservices = new List<Microservice>();
-            foreach (var filePath in filePaths)
+            foreach (var filePath in configFiles)
             {
                 Microservice microservice = deserializeService(filePath, knownTypes);
                 microservices.Add(microservice);

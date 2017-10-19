@@ -58,6 +58,25 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             waitOnInstance(host, service, instance);
         }
 
+
+        [TestMethod]
+        [DataRow("CounterOrchestrationSvc.xml")]
+        public void LoadServiceFromXml(string fileName)
+        {
+            Microservice microSvc;
+
+            var host = createMicroserviceHost();
+       
+            var instances = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
+                new List<Type>(){ typeof(TestOrchestrationInput) }, out microSvc);
+
+            var instance = host.StartService(microSvc.OrchestrationQName, microSvc.InputArgument);
+
+            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
+
+            waitOnInstance(host, microSvc, instance);
+        }
+
         private void waitOnInstance(ServiceHost host, Microservice service, MicroserviceInstance instance)
         {
             ManualResetEvent mEvent = new ManualResetEvent(false);
