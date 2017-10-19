@@ -288,9 +288,9 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
-        /// Gets the key, which uniquelly identifies the orchestration (service).
+        /// Gets the key, which uniquely identifies the orchestration (service).
         /// </summary>
-        ///<param name="config">Specifies the instence of activity (task) type.</param>
+        ///<param name="config">Specifies the instance of activity (task) type.</param>
         /// <returns></returns>
         //private static string getConfigKey(IConfig config)
         //{
@@ -299,7 +299,7 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
-        /// Gets the key, which uniquelly identifies the orchestration (service).
+        /// Gets the key, which uniquely identifies the orchestration (service).
         /// </summary>
         ///<param name="typeName">Specifies the type of activity (task) type instance.</param>
         //////<param name="name">Specifies the name of activity (task) type instance.</param>
@@ -389,7 +389,7 @@ namespace Daenet.DurableTask.Microservices
                         return svcConfig;
                 }
                 else
-                    throw new ArgumentException("Specified microservice (orchestration) type is not registerd.");
+                    throw new ArgumentException("Specified microservice (orchestration) type is not registered.");
             }
         }
 
@@ -400,7 +400,7 @@ namespace Daenet.DurableTask.Microservices
         /// <typeparam name="T"></typeparam>
         /// <param name="name">Name of the type instance. Every activity is identified by its type and its name.</param>
         /// <param name="typeName">Type of the activity (task).</param>
-        /// <returns>Untyped instance ofconfiguration.</returns>
+        /// <returns>Untyped instance of configuration.</returns>
         public static object GetActivityConfiguration(string name, Type typeName)
         {
             string activityKey = getConfigKey(String.Empty, typeName);
