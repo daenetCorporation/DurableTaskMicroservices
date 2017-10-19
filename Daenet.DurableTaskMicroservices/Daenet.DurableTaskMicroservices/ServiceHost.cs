@@ -59,12 +59,29 @@ namespace Daenet.DurableTask.Microservices
             initHubs(resetHub);
         }
 
+        public ServiceHost(string sbConnStr, string hubName, bool resetHub = false,
+            Dictionary<string, object> services = null)
+        {
+            this.m_ServiceBusConnectionString = sbConnStr;
+            this.m_TaskHubName = hubName;
+            this.m_Services = services;
+            if (m_Services == null)
+                m_Services = new Dictionary<string, object>();
+
+            initHubs(resetHub);
+        }
+
 
         private void initHubs(bool resetHub = false)
         {
-            m_HubClient = createTaskHubClient();
+            bool createInstanceStore = true;
 
-            m_TaskHubWorker = CreateTaskHubWorker();
+            if (String.IsNullOrEmpty(m_StorageConnectionString))
+                createInstanceStore = false;
+
+            m_HubClient = createTaskHubClient(createInstanceStore);
+
+            m_TaskHubWorker = CreateTaskHubWorker(createInstanceStore);
 
             if (resetHub)
                 m_TaskHubWorker.DeleteHub();
@@ -94,7 +111,12 @@ namespace Daenet.DurableTask.Microservices
             //    return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString, m_StorageConnectionString, settings);
             //}
 
-            return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString, m_StorageConnectionString, settings);
+            if (createInstanceStore)
+            {
+                return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString, m_StorageConnectionString, settings);
+            }
+            else
+                return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString);
         }
 
         public TaskHubWorker CreateTaskHubWorker(bool createInstanceStore = true)
