@@ -60,7 +60,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
 
         [TestMethod]
-        [DataRow("CounterOrchestrationSvc.xml")]
+        [DataRow("CounterOrchestration.xml")]
         public void LoadServiceFromXml(string fileName)
         {
             Microservice microSvc;
@@ -112,7 +112,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
 
         [TestMethod]
-        [DataRow("CounterOrchestrationSvc.xml")]
+        [DataRow("CounterOrchestration.xml")]
         public void LoadFromConfigTest(string fileName)
         {
             var service = UtilsTests.DeserializeService(UtilsTests.GetPathForFile(fileName));

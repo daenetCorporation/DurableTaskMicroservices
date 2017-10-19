@@ -102,7 +102,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
         internal static string GetPathForFile(string fileName)
         {
-            return Path.Combine(Environment.CurrentDirectory, $"TestConfigs\\{fileName}");
+            return Path.Combine(Environment.CurrentDirectory, $"TestConfiguration\\{fileName}");
         }
     }
 }

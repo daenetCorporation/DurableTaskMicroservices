@@ -40,7 +40,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// <summary>
         /// Starts the MicroService Host
         /// </summary>
-        /// <param name="directory">Directory where to search for *.config.xml/assemblies</param>
+        /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
         public void StartServiceHost(string directory = null)
         {
             try
@@ -80,9 +80,19 @@ namespace Daenet.DurableTaskMicroservices.Host
 
         #region Private Methods
 
+        private bool m_IsJsonOrXml = false;
+
         private void startServicesFromConfigFile(ServiceHost host, string[] cfgFiles, string directory)
         {
-            var svcInstances = host.LoadServicesFromXml(cfgFiles, loadKnownTypes(directory), out ICollection<Microservice> services);
+            ICollection<Microservice> services;
+
+            ICollection<MicroserviceInstance> svcInstances;
+
+            if (m_IsJsonOrXml)
+                throw new Exception(":(");
+            //   svcInstances = host.LoadServiceFromJson(cfgFiles.FirstOrDefault(), out services);
+            else
+                svcInstances = host.LoadServicesFromXml(cfgFiles, loadKnownTypes(directory), out services);
 
             m_Logger.LogInformation("{0} service(s) have been registered on Service Bus hub", services.Count);
 
