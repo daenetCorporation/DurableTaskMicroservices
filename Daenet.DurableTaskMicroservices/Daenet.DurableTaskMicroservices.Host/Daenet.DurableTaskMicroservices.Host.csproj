@@ -10,6 +10,7 @@
     <PackageLicenseUrl>https://github.com/daenetCorporation/DurableTaskMicroservices/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>durabletask</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RootNamespace>Daenet.DurableTaskMicroservices</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
