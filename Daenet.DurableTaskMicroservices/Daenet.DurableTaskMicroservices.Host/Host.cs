@@ -94,7 +94,7 @@ namespace Daenet.DurableTaskMicroservices.Host
             else
                 svcInstances = host.LoadServicesFromXml(cfgFiles, loadKnownTypes(directory), out services);
 
-            m_Logger.LogInformation("{0} service(s) have been registered on Service Bus hub", services.Count);
+            m_Logger?.LogInformation("{0} service(s) have been registered on Service Bus hub", services.Count);
 
             bool isStarted = false;
 
@@ -111,11 +111,11 @@ namespace Daenet.DurableTaskMicroservices.Host
                 if (cnt == 0)
                 {
                     host.StartService(svc.OrchestrationQName, svc.InputArgument);
-                    m_Logger.LogInformation("Services {0} has been started.", svc);
+                    m_Logger?.LogInformation("Services {0} has been started.", svc);
                 }
                 else
                 {
-                    m_Logger.LogInformation("{0} instance(s) of service {1} is(are) already running. No action performed", cnt, svc.OrchestrationQName);
+                    m_Logger?.LogInformation("{0} instance(s) of service {1} is(are) already running. No action performed", cnt, svc.OrchestrationQName);
                 }
             }
         }
@@ -163,7 +163,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         {
             readConfiguration();
 
-            m_Logger.LogInformation("SB connection String: '{0}'\r\n Storage Connection String: '{1}', \r\nTaskHub: '{2}'",
+            m_Logger?.LogInformation("SB connection String: '{0}'\r\n Storage Connection String: '{1}', \r\nTaskHub: '{2}'",
                 m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName);
 
             ServiceHost host;
@@ -182,7 +182,10 @@ namespace Daenet.DurableTaskMicroservices.Host
                 host = new ServiceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName, false, services);
             }
             else
-                throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
+            {
+                new ServiceHost(m_ServiceBusConnectionString, m_TaskHubName);
+                //throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
+            }
 
             return host;
         }
@@ -200,10 +203,10 @@ namespace Daenet.DurableTaskMicroservices.Host
             m_SqlStateProviderConnectionString = ConfigurationManager.AppSettings["SqlStateProviderConnectionString"];
             m_SchemaName = ConfigurationManager.AppSettings["SqlStateProviderConnectionString.SchemaName"];
 
-            if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
-            {
-                throw new Exception("A Storage connection string must be defined in either an environment variable or in configuration.");
-            }
+            //if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))
+            //{
+            //    throw new Exception("A Storage connection string must be defined in either an environment variable or in configuration.");
+            //}
 
             m_TaskHubName = ConfigurationManager.AppSettings.Get("TaskHubName");
         }
