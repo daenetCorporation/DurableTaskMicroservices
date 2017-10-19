@@ -94,7 +94,7 @@ namespace Daenet.DurableTaskMicroservices.Host
             else
                 svcInstances = host.LoadServicesFromXml(cfgFiles, loadKnownTypes(directory), out services);
 
-            m_Logger.LogInformation("{0} service(s) have been registered on Service Bus hub", services.Count);
+            m_Logger?.LogInformation("{0} service(s) have been registered on Service Bus hub", services.Count);
 
             bool isStarted = false;
 
@@ -111,11 +111,11 @@ namespace Daenet.DurableTaskMicroservices.Host
                 if (cnt == 0)
                 {
                     host.StartService(svc.OrchestrationQName, svc.InputArgument);
-                    m_Logger.LogInformation("Services {0} has been started.", svc);
+                    m_Logger?.LogInformation("Services {0} has been started.", svc);
                 }
                 else
                 {
-                    m_Logger.LogInformation("{0} instance(s) of service {1} is(are) already running. No action performed", cnt, svc.OrchestrationQName);
+                    m_Logger?.LogInformation("{0} instance(s) of service {1} is(are) already running. No action performed", cnt, svc.OrchestrationQName);
                 }
             }
         }
@@ -124,11 +124,11 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Get all files which matches to *.config.xml
         /// </summary>
         /// <returns></returns>
-        private string[] loadConfigFiles(string directory)
+        private string[] loadConfigFiles(string directory, string searchPattern = "*.xml")
         {
             List<string> configFiles = new List<string>();
 
-            foreach (var cfgFile in Directory.GetFiles(directory, "*.config.xml"))
+            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern))
             {
                 configFiles.Add(cfgFile);
             }
@@ -163,7 +163,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         {
             readConfiguration();
 
-            m_Logger.LogInformation("SB connection String: '{0}'\r\n Storage Connection String: '{1}', \r\nTaskHub: '{2}'",
+            m_Logger?.LogInformation("SB connection String: '{0}'\r\n Storage Connection String: '{1}', \r\nTaskHub: '{2}'",
                 m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName);
 
             ServiceHost host;
@@ -189,15 +189,15 @@ namespace Daenet.DurableTaskMicroservices.Host
 
         private static void readConfiguration()
         {
-            m_ServiceBusConnectionString = ConfigurationManager.AppSettings["ServiceBusConnectionString"];
+            m_ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["serviceBus"]?.ConnectionString;
 
             if (string.IsNullOrEmpty(m_ServiceBusConnectionString))
             {
                 throw new Exception("A ServiceBus connection string must be defined in either an environment variable or in configuration.");
             }
 
-            m_StorageConnectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
-            m_SqlStateProviderConnectionString = ConfigurationManager.AppSettings["SqlStateProviderConnectionString"];
+            m_StorageConnectionString = ConfigurationManager.ConnectionStrings["storage"]?.ConnectionString;
+            m_SqlStateProviderConnectionString = ConfigurationManager.ConnectionStrings["SqlStateProviderConnectionString"]?.ConnectionString;
             m_SchemaName = ConfigurationManager.AppSettings["SqlStateProviderConnectionString.SchemaName"];
 
             if (string.IsNullOrEmpty(m_StorageConnectionString) && String.IsNullOrEmpty(m_SqlStateProviderConnectionString))

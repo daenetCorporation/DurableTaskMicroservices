@@ -36,7 +36,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             Daenet.DurableTaskMicroservices.Host.Host host2 = new Daenet.DurableTaskMicroservices.Host.Host();
 
-            host2.StartServiceHost();
+            host2.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
 
             Thread.Sleep(int.MaxValue);
         }

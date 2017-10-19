@@ -1,3 +1,4 @@
+using Daenet.DurableTask.Microservices;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,6 +15,8 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 [assembly: Guid("a03daa2f-4d8d-434b-a3c4-217457fc5569")]
+
+[assembly:IntegrationAssemblyAttribute]
 
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
