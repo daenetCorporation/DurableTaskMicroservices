@@ -22,7 +22,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
         public RoutingRulesPipeline RoutingRulesPipeline { get; set; }
 
         /// <summary>
-        /// The source name, which will explicitely override source of the parent.
+        /// The source name, which will explicitly override source of the parent.
         /// If this value is not set, the parent source name is used, which is common case.
         /// </summary>
         [DataMember]
