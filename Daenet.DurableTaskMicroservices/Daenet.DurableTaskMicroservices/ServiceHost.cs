@@ -687,7 +687,7 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
-        /// Opens the hosts channels and start execution. 
+        /// Starts HubWorker. 
         /// </summary>
         /// <param name="resetHub"></param>
         public void Open(bool resetHub = false)
