@@ -3,6 +3,7 @@ using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,12 +14,19 @@ using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Common.Tasks
 {
+   
+
     public class LoggingTask<TInput, TAdapterOutput> : TaskBase<TInput, TAdapterOutput>
         where TInput : LoggingTaskInput
         where TAdapterOutput : Null
     {
+        private ILoggerFactory m_LogFactory;
+
         protected override TAdapterOutput RunTask(TaskContext context, TInput input)
         {
+            if (this.m_LogFactory == null)
+                return (TAdapterOutput)new Null();
+
             object[] parameters = input.MessageParams;
             if (parameters == null)
                 parameters = new object[1] { "" };
@@ -31,7 +39,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
                     logTraceSourceName = this.GetType().Namespace + "." + this.GetType().Name;
             }
 
-            ILogManager logManager = new LogManager(input.LoggerFactory, logTraceSourceName);
+            ILogManager logManager = new LogManager(m_LogFactory, logTraceSourceName);
             foreach (var scope in loggingContext.LoggingScopes)
                 logManager.AddScope(scope.Key, scope.Value);
 

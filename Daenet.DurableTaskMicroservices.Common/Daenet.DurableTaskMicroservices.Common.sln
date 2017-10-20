@@ -5,7 +5,11 @@ VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices.Common", "Daenet.DurableTaskMicroservices.Common\Daenet.DurableTaskMicroservices.Common.csproj", "{CA9922C5-C074-4B5E-ADA6-3F2A59E3441A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.Microservice.Common.Test", "Daenet.Microservice.Common.Test\Daenet.Microservice.Common.Test.csproj", "{31347D80-F7A6-47C7-A459-58A5B7138C52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.Microservice.Common.Test", "Daenet.Microservice.Common.Test\Daenet.Microservice.Common.Test.csproj", "{31347D80-F7A6-47C7-A459-58A5B7138C52}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices.Host", "..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj", "{2E5F027E-6116-4F75-BD67-98BF7AD2A7ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices", "..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj", "{B562C7F0-5DF0-4246-AF9A-165BF67E70F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{31347D80-F7A6-47C7-A459-58A5B7138C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31347D80-F7A6-47C7-A459-58A5B7138C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31347D80-F7A6-47C7-A459-58A5B7138C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E5F027E-6116-4F75-BD67-98BF7AD2A7ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E5F027E-6116-4F75-BD67-98BF7AD2A7ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E5F027E-6116-4F75-BD67-98BF7AD2A7ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E5F027E-6116-4F75-BD67-98BF7AD2A7ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B562C7F0-5DF0-4246-AF9A-165BF67E70F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B562C7F0-5DF0-4246-AF9A-165BF67E70F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B562C7F0-5DF0-4246-AF9A-165BF67E70F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B562C7F0-5DF0-4246-AF9A-165BF67E70F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

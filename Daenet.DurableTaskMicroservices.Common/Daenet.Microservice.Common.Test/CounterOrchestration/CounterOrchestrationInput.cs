@@ -1,4 +1,5 @@
 ﻿
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
     [DataContractAttribute]
-    public class CounterOrchetrationInput
+    public class CounterOrchestrationInput : OrchestrationInput
     {
         [DataMember]
         public int Counter { get; set; }

@@ -4,6 +4,7 @@ using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Logging;
 using Daenet.DurableTaskMicroservices.Common.Rules;
 using DurableTask;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,9 +49,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                     m_Config = svc.ServiceConfiguration as OrchestrationConfig;
                     if (m_Config == null)
-                        throw new InvalidOperationException(String.Format("Orchestration '{0}' has configuration defined, but it is NULL or not of type 'OrchestrationConfig'.", this.GetType().Name));
-
-                    return m_Config;
+                        m_Config = new OrchestrationConfig();
                 }
 
                 return m_Config;
@@ -69,6 +68,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         }
 
 
+       
         /// <summary>
         /// Instance of the daenet's LogManager component.
         /// </summary>
@@ -136,9 +136,10 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             try
             {
+                /*
                 if (this.LogManager == null)
-                {
-                    this.LogManager = new LogManager(orchestrationInput.LoggerFactory, this.Configuration.LogTraceSourceName);
+                {  
+                    this.LogManager = new LogManager(this?.Configuration?.LogTraceSourceName);
                 }
 
                 if (orchestrationInput == null)
@@ -175,6 +176,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 if (!orchestrationInput.Context.ContainsKey("ParentLoggingContext"))
                     orchestrationInput.Context.Add("ParentLoggingContext", new LoggingContext() { LoggingScopes = this.LogManager.CurrentScope });
+                */
 
                 m_OrchestrationConext = context;
 
@@ -186,13 +188,13 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 if (this.LogManager == null)
                 {
-                    this.LogManager = new LogManager(orchestrationInput.LoggerFactory, "CriticalExceptions");
+                    //this.LogManager = new LogManager(orchestrationInput.LoggerFactory, "CriticalExceptions");
 
-                    this.LogManager.TraceErrLoggingSystemFailed(context.OrchestrationInstance.InstanceId, context);
+                    //this.LogManager.TraceErrLoggingSystemFailed(context.OrchestrationInstance.InstanceId, context);
                 }
                 else
                 {
-                    this.LogManager.TraceErrOrchestrationFailed(context.OrchestrationInstance.InstanceId, context);
+                    //this.LogManager.TraceErrOrchestrationFailed(context.OrchestrationInstance.InstanceId, context);
                 }
 
                 throw ex;

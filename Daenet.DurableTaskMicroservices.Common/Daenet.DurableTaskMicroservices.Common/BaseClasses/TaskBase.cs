@@ -104,6 +104,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 m_Log = value;
             }
         }
+
         #endregion
 
         #region Private Members
@@ -118,7 +119,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             {
                 string logTraceSourceName = null;
 
-                ILogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
+                /*ILogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
 
                 LoggingContext parentLoggingContext = null;
 
@@ -147,7 +148,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 if (parentLoggingContext == null)
                     parentLoggingContext = new LoggingContext();
-
+                
                 //
                 // If log trace source name is specified in the configuration it will be used even if the context contains a parent logtrace source name.
                 var cfg = this.GetConfiguration(inputArg.Orchestration);
@@ -171,6 +172,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 // Add OrchestrationInstanceId
                 if (!m_Log.CurrentScope.ContainsKey("OrchestrationInstanceId"))
                     m_Log.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
+                    */
             }
         }
 

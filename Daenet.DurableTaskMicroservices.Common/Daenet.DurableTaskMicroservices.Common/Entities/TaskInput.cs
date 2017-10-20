@@ -30,9 +30,6 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
         [DataMember]
         public object Data { get; set; }
 
-        [DataMember]
-        public ILoggerFactory LoggerFactory { get; set; }
-
         /// <summary>
         /// Dictionary of values which defines context.
         /// </summary>

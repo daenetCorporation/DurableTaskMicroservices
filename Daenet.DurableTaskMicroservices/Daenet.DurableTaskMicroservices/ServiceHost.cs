@@ -290,6 +290,8 @@ namespace Daenet.DurableTask.Microservices
                 if (svc.OrchestrationQName != null)
                 {
                     svc.Orchestration = Type.GetType(svc.OrchestrationQName);
+                    if (svc.Orchestration == null)
+                        throw new TypeMissingException($"The type {svc.OrchestrationQName} cannot be found. Please be sure that AssemblyQualifiedName is correctlly specified in the configuration file.");
                 }
             }
         }

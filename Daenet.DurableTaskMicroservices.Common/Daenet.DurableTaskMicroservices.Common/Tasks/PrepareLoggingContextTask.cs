@@ -2,6 +2,7 @@
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +16,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
 {
     public class PrepareLoggingContextTask : TaskBase<PrepareLoggingContextTaskInput, LoggingContext>
     {
+        private ILoggerFactory m_LogFactory;
 
         private static List<string> m_TraceSourceInitialized = new List<string>();
 
@@ -29,7 +31,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
             LoggingContext parentLoggingContext = input.ParentLoggingContext;
             
             string traceSourceName = this.GetConfiguration(input.Orchestration).LogTraceSourceName;
-            ILogManager parentScope = new LogManager(input.LoggerFactory, traceSourceName);
+            ILogManager parentScope = new LogManager(m_LogFactory, traceSourceName);
 
             parentScope.AddScope("ParentSequenceId", null);
 
@@ -43,7 +45,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
                     parentScope.AddScope("ParentSequenceId", parentScope.CurrentScope["SequenceId"]);
             }
 
-            LogManager logManager = new LogManager(input.LoggerFactory, traceSourceName);
+            LogManager logManager = new LogManager(m_LogFactory, traceSourceName);
 
             // With new instance of the LogManager we always create a new SequenceId.
             logManager.AddScope("SequenceId", Guid.NewGuid().ToString());

@@ -17,7 +17,7 @@ namespace Daenet.Microservice.Common.Test
 
             Daenet.DurableTaskMicroservices.Host.Host host = new Daenet.DurableTaskMicroservices.Host.Host(loggerFactory);
 
-            host.StartServiceHost(Path.Combine(AppContext.BaseDirectory, "TestConfiguration"));
+            host.StartServiceHost(Path.Combine());
 
             Thread.Sleep(int.MaxValue);
         }

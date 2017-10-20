@@ -25,9 +25,6 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
         [DataMember]
         public Dictionary<string, object> Context { get; set; }
 
-        [DataMember]
-        public ILoggerFactory LoggerFactory { get; set; }
-
         /// <summary>
         /// This property indicates that the internal logging context was already 
         /// initializad (propagated).
