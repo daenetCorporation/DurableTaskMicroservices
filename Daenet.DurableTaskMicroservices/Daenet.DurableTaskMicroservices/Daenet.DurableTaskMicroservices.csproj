@@ -15,7 +15,7 @@
     <PackageTags>durabletask</PackageTags>
     <Description>Microservice Framework based on Durable Task Framework</Description>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
   </PropertyGroup>
 
