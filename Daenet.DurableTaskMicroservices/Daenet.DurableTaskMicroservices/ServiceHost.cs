@@ -21,6 +21,7 @@ using System.IO;
 using System.Xml;
 using System.Runtime.Serialization;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Daenet.DurableTask.Microservices
 {
@@ -718,7 +719,7 @@ namespace Daenet.DurableTask.Microservices
             m_HubClient.TerminateInstance(svcInst.OrchestrationInstance, reason);
         }
 
-        public async void TerminateAsync(MicroserviceInstance svcInst, string reason = "Terminated by host.")
+        public async Task TerminateAsync(MicroserviceInstance svcInst, string reason = "Terminated by host.")
         {
             await m_HubClient.TerminateInstanceAsync(svcInst.OrchestrationInstance, reason);
         }

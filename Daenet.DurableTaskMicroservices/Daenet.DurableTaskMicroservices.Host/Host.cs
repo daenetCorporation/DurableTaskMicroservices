@@ -1,4 +1,17 @@
-﻿using Daenet.DurableTask.Microservices;
+﻿//  ----------------------------------------------------------------------------------
+//  Copyright daenet Gesellschaft für Informationstechnologie mbH
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//  http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//  ----------------------------------------------------------------------------------
+
+using Daenet.DurableTask.Microservices;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -113,10 +126,13 @@ namespace Daenet.DurableTaskMicroservices.Host
             {
                 int cnt = host.GetNumOfRunningInstances(svc);
 
+                m_Logger?.LogInformation("Running instances of {service}: {instanceCount}", svc.OrchestrationQName, cnt);
+
                 if (isStarted == false)
                 {
                     host.Open();
                     isStarted = true;
+                    m_Logger?.LogInformation("Host has been opened.");
                 }
 
                 if (cnt == 0)
@@ -124,10 +140,10 @@ namespace Daenet.DurableTaskMicroservices.Host
                     if (svc.IsSingletone)
                     {
                         host.StartService(svc.OrchestrationQName, svc.InputArgument);
-                        m_Logger?.LogInformation("Service {0} has been started.", svc);
+                        m_Logger?.LogInformation("Service {service} has been started.", svc.OrchestrationQName);
                     }
                     else
-                        m_Logger?.LogInformation("Service {0} is not declared as singleton. It is loaded, but not started.", svc);
+                        m_Logger?.LogInformation("Service {service} is not declared as singleton. It is loaded, but not started.", svc);
                 }
                 else
                 {
