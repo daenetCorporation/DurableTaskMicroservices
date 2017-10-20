@@ -41,7 +41,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Starts the MicroService Host
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
-        public void StartServiceHost(string directory = null, string searchPattern = "*.xml")
+        public void StartServiceHost(string directory = null, string searchPattern = "*.config.xml")
         {
             try
             {
@@ -133,7 +133,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Get all files which matches to *.config.xml
         /// </summary>
         /// <returns></returns>
-        private string[] loadConfigFiles(string directory, string searchPattern = "*.xml")
+        private string[] loadConfigFiles(string directory, string searchPattern = "*.config.xml")
         {
             List<string> configFiles = new List<string>();
 
