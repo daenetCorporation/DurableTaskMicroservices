@@ -67,7 +67,7 @@ namespace Daenet.DurableTask.Microservices
 
         /// <summary>
         /// If TRUE then it will be automatically started if the instance
-        /// of same orchestration is not already running. Hos ensures
+        /// of same orchestration is not already running. 
         /// </summary>
         [DataMember]
         virtual public bool IsSingletone { get; set; }
