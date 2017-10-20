@@ -126,10 +126,13 @@ namespace Daenet.DurableTaskMicroservices.Host
             {
                 int cnt = host.GetNumOfRunningInstances(svc);
 
+                m_Logger?.LogInformation("Running instances of {service}: {instanceCount}", svc.OrchestrationQName, cnt);
+
                 if (isStarted == false)
                 {
                     host.Open();
                     isStarted = true;
+                    m_Logger?.LogInformation("Host has been opened.");
                 }
 
                 if (cnt == 0)
@@ -137,10 +140,10 @@ namespace Daenet.DurableTaskMicroservices.Host
                     if (svc.IsSingletone)
                     {
                         host.StartService(svc.OrchestrationQName, svc.InputArgument);
-                        m_Logger?.LogInformation("Service {0} has been started.", svc);
+                        m_Logger?.LogInformation("Service {service} has been started.", svc.OrchestrationQName);
                     }
                     else
-                        m_Logger?.LogInformation("Service {0} is not declared as singleton. It is loaded, but not started.", svc);
+                        m_Logger?.LogInformation("Service {service} is not declared as singleton. It is loaded, but not started.", svc);
                 }
                 else
                 {
