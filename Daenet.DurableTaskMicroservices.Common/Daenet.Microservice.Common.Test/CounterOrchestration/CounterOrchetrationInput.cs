@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
     [DataContractAttribute]
-    public class TestOrchestrationInput
+    public class CounterOrchetrationInput
     {
         [DataMember]
         public int Counter { get; set; }

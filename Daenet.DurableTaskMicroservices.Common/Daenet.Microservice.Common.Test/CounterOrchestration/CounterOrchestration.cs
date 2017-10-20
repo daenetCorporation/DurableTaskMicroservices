@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
-    public class CounterOrchestration : TaskOrchestration<int, TestOrchestrationInput>
+    public class CounterOrchestration : TaskOrchestration<int, CounterOrchetrationInput>
     {
-        public async override Task<int> RunTask(OrchestrationContext context, TestOrchestrationInput input)
+        public async override Task<int> RunTask(OrchestrationContext context, CounterOrchetrationInput input)
         {
             int cnt = input.Counter;
 
