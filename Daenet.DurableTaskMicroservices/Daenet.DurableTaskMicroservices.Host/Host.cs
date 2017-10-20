@@ -41,7 +41,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Starts the MicroService Host
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
-        public void StartServiceHost(string directory = null, string searchPattern = "*.xml")
+        public void StartServiceHost(string directory = null, string searchPattern = "*.config.xml")
         {
             try
             {
@@ -80,7 +80,7 @@ namespace Daenet.DurableTaskMicroservices.Host
 
         #region Private Methods
 
-        private bool m_IsJsonOrXml = false;
+        private bool m_IsJson = false;
 
         private void startServicesFromConfigFile(ServiceHost host, string[] cfgFiles, string directory)
         {
@@ -90,10 +90,12 @@ namespace Daenet.DurableTaskMicroservices.Host
 
             List<Type> knownTypes = new List<Type>();
 
-            if (m_IsJsonOrXml)
-                throw new Exception(":(");
-            // TODO..
-            //   svcInstances = host.LoadServiceFromJson(cfgFiles.FirstOrDefault(), out services);
+            if (m_IsJson)
+            {
+                throw new Exception("JSON loading is not supported at the moment.");
+                // TODO..
+                //svcInstances = host.LoadServiceFromJson(cfgFiles.FirstOrDefault(), out services);
+            }
             else
             {
                 knownTypes.AddRange(loadKnownTypes(directory));
@@ -138,7 +140,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         /// Get all files which matches to *.config.xml
         /// </summary>
         /// <returns></returns>
-        private string[] loadConfigFiles(string directory, string searchPattern = "*.xml")
+        private string[] loadConfigFiles(string directory, string searchPattern = "*.config.xml")
         {
             List<string> configFiles = new List<string>();
 
