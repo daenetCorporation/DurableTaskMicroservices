@@ -92,7 +92,7 @@ namespace Daenet.DurableTask.Microservices
 
         public TaskHubClient createTaskHubClient(bool createInstanceStore = true)
         {
-            var settings = getDefaultHubClientSettings();
+            var settings = GetDefaultHubClientSettings();
             //TODO? settings.Services = m_Services;
 
             //var stateProviderSvc = m_Services[TaskHubWorker.StateProviderKeyName] as IStateProvider;
@@ -131,7 +131,7 @@ namespace Daenet.DurableTask.Microservices
             return new TaskHubWorker(m_TaskHubName, m_ServiceBusConnectionString, workerSettings);
         }
 
-        private static TaskHubClientSettings getDefaultHubClientSettings()
+        internal static TaskHubClientSettings GetDefaultHubClientSettings()
         {
             var settings = new TaskHubClientSettings();
             settings.MessageCompressionSettings = new CompressionSettings
@@ -718,7 +718,7 @@ namespace Daenet.DurableTask.Microservices
             m_HubClient.TerminateInstance(svcInst.OrchestrationInstance, reason);
         }
 
-        public async void TerminateAasync(MicroserviceInstance svcInst, string reason = "Terminated by host.")
+        public async void TerminateAsync(MicroserviceInstance svcInst, string reason = "Terminated by host.")
         {
             await m_HubClient.TerminateInstanceAsync(svcInst.OrchestrationInstance, reason);
         }
