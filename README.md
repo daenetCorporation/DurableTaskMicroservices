@@ -1,4 +1,4 @@
- 
+
 # DurableTaskMicroservices
 
 Microservice Framework based on Durable Task Framework.
@@ -16,6 +16,8 @@ Here are the key features of the durable task framework:
 - Async timers, orchestration composition, user aided checkpoints
 
 The framework itself is very light weight and only requires an Azure Service Bus namespace and optionally an Azure Storage account. Running instances of the orchestration and worker nodes are completely hosted by the user. The framework uses a scheduler on top of Azure Service Bus (hosted in Cloud or OnPrem) and it is completely transparent to developer. Developers is not ever required to have any Service Bus know-how.
+
+You can find a good introduction about DTF in following [articles](https://developers.de/blogs/damir_dobric/archive/2015/09/16/introduction-to-durable-task-framework.aspx)
 
 ## Introduction to DurableTaskMicroservices
 
