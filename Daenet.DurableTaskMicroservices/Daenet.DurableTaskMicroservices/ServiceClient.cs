@@ -1,7 +1,9 @@
 ﻿using DurableTask;
+using DurableTask.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Daenet.DurableTask.Microservices
 {
@@ -13,10 +15,6 @@ namespace Daenet.DurableTask.Microservices
     {
         private TaskHubClient m_HubClient;
        
-        private string m_ServiceBusConnectionString;
-        private string m_StorageConnectionString;
-        private string m_TaskHubName;
-
 
         /// <summary>
         /// Creates the instance of ServiceClient, which can be used to act with microservice.
@@ -24,26 +22,22 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="sbConnStr"></param>
         /// <param name="storageConnStr"></param>
         /// <param name="hubName"></param>
-        public ServiceClient(string sbConnStr, string storageConnStr, string hubName)
+        public ServiceClient(IOrchestrationServiceClient orchestrationClient)
         {
-            this.m_ServiceBusConnectionString = sbConnStr;
-            this.m_StorageConnectionString = storageConnStr;
-            this.m_TaskHubName = hubName;
-        
-           this.m_HubClient = createTaskHubClient(!String.IsNullOrEmpty(storageConnStr));
+           this.m_HubClient = new TaskHubClient(orchestrationClient);
         }
 
-        public TaskHubClient createTaskHubClient(bool createInstanceStore = true)
-        {
-            var settings = ServiceHost.GetDefaultHubClientSettings();          
+        //public TaskHubClient createTaskHubClient(bool createInstanceStore = true)
+        //{
+        //    var settings = ServiceHost.GetDefaultHubClientSettings();          
 
-            if (createInstanceStore)
-            {
-                return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString, m_StorageConnectionString, settings);
-            }
-            else
-                return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString);
-        }
+        //    if (createInstanceStore)
+        //    {
+        //        return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString, m_StorageConnectionString, settings);
+        //    }
+        //    else
+        //        return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString);
+        //}
 
 
         /// <summary>
@@ -53,9 +47,9 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public MicroserviceInstance StartService(string orchestrationQualifiedName, object inputArgs)
+        public Task<MicroserviceInstance> StartService(string orchestrationQualifiedName, object inputArgs)
         {
-            return StartService(Type.GetType(orchestrationQualifiedName), inputArgs);
+            return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs);
         }
 
 
@@ -66,18 +60,34 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestration">The type of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public MicroserviceInstance StartService(Type orchestration, object inputArgs)
+        public Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs)
         {
             return createServiceInstance(orchestration, inputArgs);
         }
 
-        private MicroserviceInstance createServiceInstance(Type orchestration, object inputArgs)
+        private async Task<MicroserviceInstance>createServiceInstance(Type orchestration, object inputArgs)
         {
             var ms = new MicroserviceInstance()
             {
-                OrchestrationInstance = m_HubClient.CreateOrchestrationInstance(orchestration, inputArgs),
+                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
             };
             return ms;
+        }
+
+        public async Task Terminate(MicroserviceInstance svcInst, string reason = "Terminated by host.")
+        {
+            await m_HubClient.TerminateInstanceAsync(svcInst.OrchestrationInstance, reason);
+        }
+
+        public async Task TerminateAsync(MicroserviceInstance svcInst, string reason = "Terminated by host.")
+        {
+            await m_HubClient.TerminateInstanceAsync(svcInst.OrchestrationInstance, reason);
+        }
+
+
+        public async Task RaiseEvent(MicroserviceInstance instance, string eventName, string data)
+        {
+            await m_HubClient.RaiseEventAsync(instance.OrchestrationInstance, eventName, data);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj", "{25DB235C-2235-4F3D-BDD9-0DF86E0AF846}"
 EndProject

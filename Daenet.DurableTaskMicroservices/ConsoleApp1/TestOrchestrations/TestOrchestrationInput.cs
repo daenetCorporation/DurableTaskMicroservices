@@ -12,20 +12,25 @@
 //  ----------------------------------------------------------------------------------
 
 using DurableTask;
-using DurableTask.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
-    public class Task1 : TaskActivity<string, Null>
+    [DataContractAttribute]
+    public class TestOrchestrationInput
     {
-        protected override Null Execute(TaskContext context, string input)
-        {
-            Debug.WriteLine($"Executing Task {nameof(Task1)}");
-            return new Null();
-        }
+        [DataMember]
+        public int Counter { get; set; }
+
+        [DataMember]
+        public int Delay { get; set; }
     }
 }

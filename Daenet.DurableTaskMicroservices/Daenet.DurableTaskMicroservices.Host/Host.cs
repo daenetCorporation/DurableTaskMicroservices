@@ -12,6 +12,9 @@
 //  ----------------------------------------------------------------------------------
 
 using Daenet.DurableTask.Microservices;
+using DurableTask.Core;
+using DurableTask.ServiceBus;
+using DurableTask.ServiceBus.Tracking;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,6 +24,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Host
 {
@@ -75,7 +79,7 @@ namespace Daenet.DurableTaskMicroservices.Host
 
                     List<Microservice> services = new List<Microservice>();
 
-                    startServicesFromConfigFile(host, configFiles, directory);
+                    startServicesFromConfigFileAsync(host, configFiles, directory);
                 }
                 else
                 {
@@ -95,7 +99,7 @@ namespace Daenet.DurableTaskMicroservices.Host
 
         private bool m_IsJson = false;
 
-        private void startServicesFromConfigFile(ServiceHost host, string[] cfgFiles, string directory)
+        private async Task startServicesFromConfigFileAsync(ServiceHost host, string[] cfgFiles, string directory)
         {
             ICollection<Microservice> services;
 
@@ -124,13 +128,13 @@ namespace Daenet.DurableTaskMicroservices.Host
 
             foreach (var svc in services)
             {
-                int cnt = host.GetNumOfRunningInstances(svc);
+                int cnt = await host.GetNumOfRunningInstancesAsync(svc);
 
                 m_Logger?.LogInformation("Running instances of {service}: {instanceCount}", svc.OrchestrationQName, cnt);
 
                 if (isStarted == false)
                 {
-                    host.Open();
+                    await host.OpenAsync();
                     isStarted = true;
                     m_Logger?.LogInformation("Host has been opened.");
                 }
@@ -139,7 +143,7 @@ namespace Daenet.DurableTaskMicroservices.Host
                 {
                     if (svc.IsSingletone)
                     {
-                        host.StartService(svc.OrchestrationQName, svc.InputArgument);
+                        await host.StartService(svc.OrchestrationQName, svc.InputArgument);
                         m_Logger?.LogInformation("Service {service} has been started.", svc.OrchestrationQName);
                     }
                     else
@@ -198,12 +202,17 @@ namespace Daenet.DurableTaskMicroservices.Host
             m_Logger?.LogInformation("SB connection String: '{0}'\r\n Storage Connection String: '{1}', \r\nTaskHub: '{2}'",
                 m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName);
 
+            IOrchestrationServiceInstanceStore instanceStore = new AzureTableInstanceStore(m_TaskHubName, m_StorageConnectionString);
+            ServiceBusOrchestrationService orchestrationServiceAndClient =
+               new ServiceBusOrchestrationService(m_ServiceBusConnectionString, m_TaskHubName, instanceStore, null, null);
+
             ServiceHost host;
 
-            // StorageConnectionString exists and SqlStateProvider is null
+            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
+            /* OLD CODE v1
             if (String.IsNullOrEmpty(m_SqlStateProviderConnectionString) && String.IsNullOrEmpty(m_StorageConnectionString) == false)
             {
-                host = new ServiceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName);
+                host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
             }
             else if (String.IsNullOrEmpty(m_SqlStateProviderConnectionString) == false)
             {
@@ -218,7 +227,7 @@ namespace Daenet.DurableTaskMicroservices.Host
                 host = new ServiceHost(m_ServiceBusConnectionString, m_TaskHubName);
                 //throw new Exception("StorageConnectionString and SqlStateProviderConnectionString are not set. Please set one of them in AppSettings!");
             }
-
+            */
             return host;
         }
 
@@ -243,6 +252,6 @@ namespace Daenet.DurableTaskMicroservices.Host
             m_TaskHubName = ConfigurationManager.AppSettings.Get("TaskHubName");
         }
 
-#endregion
+        #endregion
     }
 }

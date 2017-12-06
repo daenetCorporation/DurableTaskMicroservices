@@ -14,8 +14,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Daenet.DurableTask.Microservices" Version="0.0.5" />
+    <PackageReference Include="DurableTask.ServiceBus" Version="2.0.0.4-preview2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj" />
   </ItemGroup>
 
   <ItemGroup>
