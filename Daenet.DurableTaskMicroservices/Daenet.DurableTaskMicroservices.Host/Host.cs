@@ -143,7 +143,7 @@ namespace Daenet.DurableTaskMicroservices.Host
                 {
                     if (svc.IsSingletone)
                     {
-                        await host.StartService(svc.OrchestrationQName, svc.InputArgument);
+                        await host.StartServiceAsync(svc.OrchestrationQName, svc.InputArgument);
                         m_Logger?.LogInformation("Service {service} has been started.", svc.OrchestrationQName);
                     }
                     else

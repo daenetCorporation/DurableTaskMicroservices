@@ -566,7 +566,7 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public Task<MicroserviceInstance> StartService(string orchestrationQualifiedName, object inputArgs)
+        public Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs)
         {
             return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs);
         }
@@ -661,7 +661,7 @@ namespace Daenet.DurableTask.Microservices
         {
             // Includes details of inner exceptions.
             // throw new Ex() from task will be attached as serialized Details property of exception.
-            m_TaskHubWorker.TaskActivityDispatcher.IncludeDetails = true;
+            //m_TaskHubWorker.TaskActivityDispatcher?.IncludeDetails = true;
 
             await m_TaskHubWorker.StartAsync();
         }

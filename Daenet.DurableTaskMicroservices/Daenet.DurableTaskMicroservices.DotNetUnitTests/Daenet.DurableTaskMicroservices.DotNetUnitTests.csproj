@@ -130,8 +130,8 @@
     <Compile Include="TestOrchestrations\CounterOrchestration\Task1.cs" />
     <Compile Include="TestOrchestrations\CounterOrchestration\Task2.cs" />
     <None Include="ServiceHostTests.cs" />
-    <None Include="UnitTests.cs" />
-    <None Include="UtilsTests.cs" />
+    <Compile Include="UnitTests.cs" />
+    <Compile Include="UtilsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -147,6 +147,10 @@
     <ProjectReference Include="..\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj">
       <Project>{3c8dc93d-9e5c-4262-9679-478c90961427}</Project>
       <Name>Daenet.DurableTaskMicroservices.Host</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj">
+      <Project>{25db235c-2235-4f3d-bdd9-0df86e0af846}</Project>
+      <Name>Daenet.DurableTaskMicroservices</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

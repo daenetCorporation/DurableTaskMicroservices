@@ -13,6 +13,9 @@
 
 using Daenet.DurableTask.Microservices;
 using DurableTask;
+using DurableTask.Core;
+using DurableTask.ServiceBus;
+using DurableTask.ServiceBus.Tracking;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -34,9 +37,13 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
         private static ServiceHost createMicroserviceHost()
         {
+            IOrchestrationServiceInstanceStore instanceStore = new AzureTableInstanceStore("UnitTestTmp", StorageConnectionString);
+            ServiceBusOrchestrationService orchestrationServiceAndClient =
+               new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
+
             ServiceHost host;
 
-            host = new ServiceHost(ServiceBusConnectionString, StorageConnectionString, "UnitTestHub");
+            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
 
             return host;
         }
@@ -61,10 +68,10 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             host.LoadService(service);
 
-            host.Open();
+            host.OpenAsync().Wait();
 
             // This is client side code.
-            var instance = host.StartService(service.OrchestrationQName, service.InputArgument);
+            var instance = host.StartServiceAsync(service.OrchestrationQName, service.InputArgument).Result;
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
@@ -83,7 +90,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             var instances = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
                 new List<Type>(){ typeof(TestOrchestrationInput) }, out microSvc);
 
-            var instance = host.StartService(microSvc.OrchestrationQName, microSvc.InputArgument);
+            var instance = host.StartServiceAsync(microSvc.OrchestrationQName, microSvc.InputArgument).Result;
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
@@ -102,7 +109,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
                     {
                         Thread.Sleep(1000);
 
-                        var cnt = host.GetNumOfRunningInstances(service);
+                        var cnt = host.GetNumOfRunningInstancesAsync(service).Result;
 
                         if (cnt == 0)
                         {
@@ -119,7 +126,6 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
                 }
             }).Start();
 
-
             mEvent.WaitOne();
         }
 
@@ -134,9 +140,9 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             host.LoadService(service);
 
-            host.Open();
+            host.OpenAsync().Wait();
 
-            var instance = host.StartService(service.OrchestrationQName, service.InputArgument);
+            var instance = host.StartServiceAsync(service.OrchestrationQName, service.InputArgument).Result;
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
