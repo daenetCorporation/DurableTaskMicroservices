@@ -34,7 +34,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             await context.ScheduleTask<Null>(typeof(Task2), ":<");
 
-            Task.Delay(10000).Wait();
+            Task.Delay(100).Wait();
 
             input.Counter--;
             if (input.Counter > 0)

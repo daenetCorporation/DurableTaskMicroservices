@@ -24,15 +24,13 @@ namespace Daenet.DurableTaskMicroservices.DotNetUnitTests
         private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
         private static string TaskHubName = ConfigurationManager.AppSettings["TaskHubName"];
 
-      
-        [TestMethod]
-        public void OpenAndStartServiceHostTest2()
-        {
-
-        }
-
+    
         static ObservableEventListener eventListener;
 
+        /// <summary>
+        /// This test does not uses any Microservice functionality.
+        /// It runs DTF orchestration nativelly to ensure that is all setup correctlly.
+        /// </summary>
         [TestMethod]
         public void OpenAndStartServiceHostTest()
         {
@@ -60,14 +58,12 @@ namespace Daenet.DurableTaskMicroservices.DotNetUnitTests
             var instance = taskHubClient.CreateOrchestrationInstanceAsync(typeof(CounterOrchestration), Guid.NewGuid().ToString(), new TestOrchestrationInput()).Result;
             
             taskHub.StartAsync().Wait();
-
-            taskHubClient.WaitForOrchestrationAsync(instance, TimeSpan.MaxValue).Wait();
-
+                   
             var state = instanceStore.GetOrchestrationStateAsync(instance.InstanceId, true).Result;
 
             var res = taskHubClient.GetOrchestrationHistoryAsync(instance).Result;
 
-            Thread.Sleep(int.MaxValue);
+            taskHubClient.WaitForOrchestrationAsync(instance, TimeSpan.MaxValue).Wait();
         }
     }
 }
