@@ -177,9 +177,9 @@ namespace Daenet.DurableTask.Microservices
             {
                 var oStates = await loadStatesAsync(orchestrationFullName, true);
 
-                var cntRunning = oStates.Count(o => o.OrchestrationStatus == OrchestrationStatus.Running);
-
-                runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running).
+                runningInstances = oStates.Where(o=> o.OrchestrationStatus == OrchestrationStatus.Running ||
+                o.OrchestrationStatus == OrchestrationStatus.ContinuedAsNew ||
+                o.OrchestrationStatus == OrchestrationStatus.Pending).
                     Select(i => i.OrchestrationInstance).Select(oi => new MicroserviceInstance()
                     {
                         OrchestrationInstance = oi
@@ -625,7 +625,7 @@ namespace Daenet.DurableTask.Microservices
         /// If m_StorageConnectionString is not confiogured this method returns 0.</returns>
         public async Task<int> GetNumOfRunningInstancesAsync(Microservice microservice)
         {
-            if (m_InstanceStoreService != null)
+            if (m_InstanceStoreService == null)
                 return -1;
 
             //var byNameQuery = new OrchestrationStateQuery();
@@ -639,6 +639,10 @@ namespace Daenet.DurableTask.Microservices
             return res.Count;
         }
 
+        public async Task WaitOnInstanceAsync(MicroserviceInstance instance, int wait = int.MaxValue)
+        {
+            await this.m_HubClient.WaitForOrchestrationAsync(instance.OrchestrationInstance, TimeSpan.FromMilliseconds(wait));
+        }
 
         /// <summary>
         /// Gets the list of services and their states in runtime repository.
@@ -662,7 +666,7 @@ namespace Daenet.DurableTask.Microservices
             // Includes details of inner exceptions.
             // throw new Ex() from task will be attached as serialized Details property of exception.
             //m_TaskHubWorker.TaskActivityDispatcher?.IncludeDetails = true;
-
+            
             await m_TaskHubWorker.StartAsync();
         }
 

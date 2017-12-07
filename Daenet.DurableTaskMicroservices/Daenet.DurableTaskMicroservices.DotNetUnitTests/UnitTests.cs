@@ -41,6 +41,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
 
+            instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
             ServiceHost host;
 
             host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
@@ -56,7 +57,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             Microservice service = new Microservice();
             service.InputArgument = new TestOrchestrationInput()
             {
-                Counter = 3,
+                Counter = 2,
                 Delay = 1000,
             };
 
@@ -75,7 +76,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
-            waitOnInstance(host, service, instance);
+            host.WaitOnInstanceAsync(instance).Wait();
         }
 
 
@@ -107,11 +108,11 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
                 {
                     try
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(100);
 
                         var cnt = host.GetNumOfRunningInstancesAsync(service).Result;
 
-                        if (cnt == 0)
+                        if (cnt == 10)
                         {
                             mEvent.Set();
                             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} completed.");
