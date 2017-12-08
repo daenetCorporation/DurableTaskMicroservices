@@ -27,7 +27,7 @@ namespace Daenet.Microservice.Common.Test
             List<OrchestrationState> runningInstances;
 
             ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostWithLoggingTest), true, out runningInstances);
-
+            
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances).Result;
 
             host.WaitOnInstances(host, microservices);

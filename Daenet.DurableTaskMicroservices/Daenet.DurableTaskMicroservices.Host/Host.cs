@@ -254,12 +254,14 @@ namespace Daenet.DurableTaskMicroservices.Host
         public static ServiceHost CreateMicroserviceHost(string ServiceBusConnectionString, string StorageConnectionString, string hubName, 
            bool purgeStore, out List<OrchestrationState> runningInstances)
         {
-            AzureTableInstanceStore instanceStore = new AzureTableInstanceStore("UnitTestTmp", StorageConnectionString);
+            AzureTableInstanceStore instanceStore = new AzureTableInstanceStore(hubName, StorageConnectionString);
             ServiceBusOrchestrationService orchestrationServiceAndClient =
-               new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
+               new ServiceBusOrchestrationService(ServiceBusConnectionString, hubName, instanceStore, null, null);
 
-            if (purgeStore)
-                instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
+            instanceStore.InitializeStoreAsync(purgeStore).Wait();
+
+            //if (purgeStore)
+            //    instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
 
             ServiceHost host;
                         
