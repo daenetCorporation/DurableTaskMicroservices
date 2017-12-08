@@ -258,14 +258,22 @@ namespace Daenet.DurableTaskMicroservices.Host
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                new ServiceBusOrchestrationService(ServiceBusConnectionString, hubName, instanceStore, null, null);
 
-            instanceStore.InitializeStoreAsync(purgeStore).Wait();
+            try
+            {
+                if (purgeStore)
+                    instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
 
-            //if (purgeStore)
-            //    instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
+                runningInstances = instanceStore.GetRunningInstances();
+            }
+            catch (Exception)
+            {
+                runningInstances = new List<OrchestrationState>();
+                // This will fail if the store is not created already
+            }
 
             ServiceHost host;
                         
-            runningInstances = instanceStore.GetRunningInstances();
+           
 
             host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
 
