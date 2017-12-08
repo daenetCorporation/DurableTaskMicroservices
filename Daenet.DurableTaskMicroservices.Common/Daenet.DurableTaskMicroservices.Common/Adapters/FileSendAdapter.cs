@@ -3,6 +3,7 @@ using Daenet.DurableTaskMicroservices.Common;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
+using DurableTask.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;

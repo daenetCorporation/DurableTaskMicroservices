@@ -1,12 +1,6 @@
 ﻿using Daenet.DurableTask.Microservices;
-using DurableTask;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using DurableTask.Core;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Common.Tasks
 {

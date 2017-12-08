@@ -24,6 +24,7 @@ using DurableTask.Core;
 using DurableTask.Core.Settings;
 using DurableTask.Core.Common;
 using DurableTask.Core.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Daenet.DurableTask.Microservices
 {
@@ -39,25 +40,36 @@ namespace Daenet.DurableTask.Microservices
         private TaskHubClient m_HubClient;
         private TaskHubWorker m_TaskHubWorker;
         private IOrchestrationServiceInstanceStore m_InstanceStoreService;
-
-        //private string m_ServiceBusConnectionString;
-        //private string m_StorageConnectionString;
-        //private string m_TaskHubName;
-
-        private Dictionary<string, object> m_Services;
+        private ILogger m_Logger;
+        private static string m_SchemaName;
+        private ILoggerFactory m_LoggerFactory;
 
         #endregion
 
+
+
+        private Dictionary<string, object> m_Services;
+
+
         #region Initialization Code
+
+
 
         public ServiceHost(IOrchestrationService orchestrationService,
             IOrchestrationServiceClient orchestrationClient,
             IOrchestrationServiceInstanceStore instanceStore,
-            bool resetHub = false)
+            bool resetHub = false,
+            ILoggerFactory loggerFactory = null)
         {
             this.m_HubClient = new TaskHubClient(orchestrationClient);
             this.m_TaskHubWorker = new TaskHubWorker(orchestrationService);
             this.m_InstanceStoreService = instanceStore;
+
+            if (loggerFactory != null)
+            {
+                m_LoggerFactory = loggerFactory;
+                m_Logger = m_LoggerFactory.CreateLogger<ServiceHost>();
+            }
 
             if (resetHub)
                 orchestrationService.DeleteAsync().Wait();
@@ -126,7 +138,6 @@ namespace Daenet.DurableTask.Microservices
         //}
         #endregion
 
-
         #region State Transition Listener Implementation
 
         private static Dictionary<string, OrchestrationState> m_Instances = new Dictionary<string, OrchestrationState>();
@@ -177,7 +188,7 @@ namespace Daenet.DurableTask.Microservices
             {
                 var oStates = await loadStatesAsync(orchestrationFullName, true);
 
-                runningInstances = oStates.Where(o=> o.OrchestrationStatus == OrchestrationStatus.Running ||
+                runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running ||
                 o.OrchestrationStatus == OrchestrationStatus.ContinuedAsNew ||
                 o.OrchestrationStatus == OrchestrationStatus.Pending).
                     Select(i => i.OrchestrationInstance).Select(oi => new MicroserviceInstance()
@@ -215,7 +226,7 @@ namespace Daenet.DurableTask.Microservices
 
         #endregion
 
-      
+
         /// <summary>
         /// Loads activity types from Assembly Qualified names.
         /// </summary>
@@ -399,7 +410,7 @@ namespace Daenet.DurableTask.Microservices
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public ICollection<MicroserviceInstance> LoadServices(ICollection<Microservice> services)
+        public void LoadServices(ICollection<Microservice> services)
         {
             loadTypesFromQualifiedNames(services);
 
@@ -438,7 +449,87 @@ namespace Daenet.DurableTask.Microservices
                 RegisterServiceConfiguration(svc);
             }
 
-            return allRunningInstances;
+        }
+
+
+        /// <summary>
+        /// Starts the MicroService Host
+        /// </summary>
+        /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
+        /// <param name="searchPattern">Search pattern for config files.</param>
+        /// <param name="runningInstances">List of currentlly unning instances. In the future ServiceHost will be able to grab the list 
+        /// of running instances. Waiting on DTF team.</param>
+        public async Task<List<MicroserviceInstance>> StartServiceHostAsync(string directory = null, string searchPattern = "*.config.xml", ICollection<OrchestrationState> runningInstances = null)
+        {
+            try
+            {
+                m_Logger?.LogInformation("Service started. Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
+
+                if (String.IsNullOrEmpty(directory))
+                    directory = Environment.CurrentDirectory;
+
+                string[] configFiles = loadConfigFiles(directory, searchPattern);
+
+                List<MicroserviceInstance> instances = new List<MicroserviceInstance>();
+
+                if (configFiles.Length > 0)
+                {
+                    m_Logger?.LogInformation("Loaded {0} configuration files.", configFiles.Length);
+
+                    List<Type> knownTypes = new List<Type>();
+
+                    knownTypes.AddRange(loadKnownTypes(directory));
+                    if (directory != AppContext.BaseDirectory)
+                        knownTypes.AddRange(loadKnownTypes(AppContext.BaseDirectory));
+
+                    List<Microservice> microServices = new List<Microservice>();
+
+                    if (searchPattern.ToLower().EndsWith(".xml"))
+                        microServices = LoadServicesFromXml(configFiles, knownTypes);
+                    else
+                        throw new NotSupportedException("JSON not yet supported!");
+                    //instances = LoadServicesFromJson(configFiles, knownTypes, out microServices);
+
+                  
+                    foreach (var svc in microServices)
+                    {                      
+                        if (runningInstances == null ||
+                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null ||
+                            svc.IsSingletone == false)
+                        {
+                            var newInst = StartServiceAsync(svc.OrchestrationQName, svc.InputArgument).Result;
+
+                            instances.Add(newInst);
+
+                            m_Logger?.LogInformation($"New instance created {newInst.OrchestrationInstance.InstanceId}");
+                        }
+                        else
+                        {
+                            var alreadyRunningInstance = runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName);
+
+                            instances.Add(new MicroserviceInstance() { OrchestrationInstance = alreadyRunningInstance.OrchestrationInstance });
+
+                            m_Logger?.LogInformation($"Service instance of {svc.OrchestrationQName} not started, because it is singleton and it is running already under instanceId = {alreadyRunningInstance.OrchestrationInstance.InstanceId}.");
+                        }
+                    }
+                    await OpenAsync();
+
+                    m_Logger?.LogInformation("Host created successfully.");
+                }
+                else
+                {
+                    m_Logger?.LogInformation("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
+                    throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
+                }
+
+                return instances;
+            }
+            catch (Exception ex)
+            {
+                m_Logger?.LogError(ex, "Failed to start the Host.");
+
+                throw;
+            }
         }
 
 
@@ -447,12 +538,15 @@ namespace Daenet.DurableTask.Microservices
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public ICollection<MicroserviceInstance> LoadServiceFromJson(string filePath, out Microservice microservice)
+        public Microservice LoadServiceFromJson(string filePath)
         {
+            Microservice microservice;
             var jsonText = File.ReadAllText(filePath);
             microservice = Newtonsoft.Json.JsonConvert.DeserializeObject<Microservice>(jsonText);
 
-            return LoadServices(new Microservice[] { microservice });
+            LoadServices(new Microservice[] { microservice });
+
+            return microservice;
         }
 
 
@@ -461,29 +555,35 @@ namespace Daenet.DurableTask.Microservices
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public ICollection<MicroserviceInstance> LoadServiceFromXml(string filePath, IEnumerable<Type> knownTypes, out Microservice microservice)
+        public Microservice LoadServiceFromXml(string filePath, IEnumerable<Type> knownTypes)
         {
-            microservice = deserializeService(filePath, knownTypes);
+            Microservice microservice = deserializeService(filePath, knownTypes);
 
-            return LoadServices(new Microservice[] { microservice });
+            LoadServices(new Microservice[] { microservice });
+
+            return microservice;
         }
+
 
         /// <summary>
         /// Loads MicroService from XML file and add it to the TaskHub
         /// </summary>
         /// <param name="configFiles">List of configuration files for services.</param>
         /// <returns></returns>
-        public ICollection<MicroserviceInstance> LoadServicesFromXml(string[] configFiles, IEnumerable<Type> knownTypes, out ICollection<Microservice> microservices)
+        public List<Microservice> LoadServicesFromXml(string[] configFiles, IEnumerable<Type> knownTypes)
         {
-            microservices = new List<Microservice>();
+            List<Microservice> microservices = new List<Microservice>();
             foreach (var filePath in configFiles)
             {
                 Microservice microservice = deserializeService(filePath, knownTypes);
                 microservices.Add(microservice);
             }
 
-            return LoadServices(microservices);
+            LoadServices(microservices);
+
+            return microservices;
         }
+
 
         /// <summary>
         /// Adds the service orchestration to task hub worker.
@@ -639,10 +739,36 @@ namespace Daenet.DurableTask.Microservices
             return res.Count;
         }
 
+
+        /// <summary>
+        /// Wait on single instance.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="wait"></param>
+        /// <returns></returns>
         public async Task WaitOnInstanceAsync(MicroserviceInstance instance, int wait = int.MaxValue)
         {
             await this.m_HubClient.WaitForOrchestrationAsync(instance.OrchestrationInstance, TimeSpan.FromMilliseconds(wait));
         }
+
+
+        /// <summary>
+        /// Wait on multiple instances.
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="microservices"></param>
+        public void WaitOnInstances(ServiceHost host, List<MicroserviceInstance> microservices)
+        {
+            List<Task> waitingTasks = new List<Task>();
+
+            foreach (var microservice in microservices)
+            {
+                waitingTasks.Add(host.WaitOnInstanceAsync(microservice));
+            }
+
+            Task.WaitAll(waitingTasks.ToArray());
+        }
+
 
         /// <summary>
         /// Gets the list of services and their states in runtime repository.
@@ -666,7 +792,7 @@ namespace Daenet.DurableTask.Microservices
             // Includes details of inner exceptions.
             // throw new Ex() from task will be attached as serialized Details property of exception.
             //m_TaskHubWorker.TaskActivityDispatcher?.IncludeDetails = true;
-            
+
             await m_TaskHubWorker.StartAsync();
         }
 
@@ -689,6 +815,48 @@ namespace Daenet.DurableTask.Microservices
         {
             loadOrchestrationTypes(services);
             loadServiceActivityTypes(services);
+        }
+
+
+        /// <summary>
+        /// Get all files which matches to *.config.xml
+        /// </summary>
+        /// <returns></returns>
+        private string[] loadConfigFiles(string directory, string searchPattern = "*.config.xml")
+        {
+            List<string> configFiles = new List<string>();
+
+            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern))
+            {
+                configFiles.Add(cfgFile);
+            }
+
+            return configFiles.ToArray();
+        }
+
+
+
+        private Type[] loadKnownTypes(string directory)
+        {
+            List<Type> types = new List<Type>();
+
+            foreach (var assemblyFile in Directory.GetFiles(directory, "*.dll", SearchOption.AllDirectories))
+            {
+                Assembly asm = Assembly.LoadFile(assemblyFile);
+                var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
+                if (attr != null)
+                {
+                    foreach (var type in asm.GetTypes())
+                    {
+                        if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
+                        {
+                            types.Add(type);
+                        }
+                    }
+                }
+            }
+
+            return types.ToArray();
         }
     }
 }

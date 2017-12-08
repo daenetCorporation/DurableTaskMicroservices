@@ -1,16 +1,10 @@
 ﻿using Daenet.Common.Logging;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
-using DurableTask;
+using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Common.Tasks
 {

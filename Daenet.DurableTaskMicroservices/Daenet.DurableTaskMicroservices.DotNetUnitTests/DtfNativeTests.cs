@@ -53,7 +53,13 @@ namespace Daenet.DurableTaskMicroservices.DotNetUnitTests
             taskHub.AddTaskOrchestrations(typeof(CounterOrchestration));
             taskHub.AddTaskActivities(typeof(Task1), typeof(Task2));
 
-            var rnts = instanceStore.GetJumpStartEntitiesAsync(1000).Result;
+            var rnts = ((AzureTableInstanceStore)instanceStore).GetJumpStartEntitiesAsync(1000).Result;
+
+            var byNameQuery = new OrchestrationStateQuery();
+            byNameQuery.AddStatusFilter(OrchestrationStatus.Pending);
+            byNameQuery.AddNameVersionFilter(typeof(CounterOrchestration).FullName);
+
+            var results = ((AzureTableInstanceStore)instanceStore).QueryOrchestrationStatesAsync(byNameQuery).Result;
 
             var instance = taskHubClient.CreateOrchestrationInstanceAsync(typeof(CounterOrchestration), Guid.NewGuid().ToString(), new TestOrchestrationInput()).Result;
             

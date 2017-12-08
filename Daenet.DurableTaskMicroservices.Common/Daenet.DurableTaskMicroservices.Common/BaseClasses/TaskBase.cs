@@ -3,7 +3,7 @@ using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Exceptions;
 using Daenet.DurableTaskMicroservices.Common.Logging;
-using DurableTask;
+using DurableTask.Core;
 using System;
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses

@@ -4,6 +4,7 @@ using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Logging;
 using Daenet.DurableTaskMicroservices.Common.Rules;
 using DurableTask;
+using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

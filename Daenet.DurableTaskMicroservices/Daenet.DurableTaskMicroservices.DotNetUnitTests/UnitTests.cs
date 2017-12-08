@@ -84,12 +84,10 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         [DataRow("CounterOrchestration.config.xml")]
         public void RunServiceFromXml(string fileName)
         {
-            Microservice microSvc;
-
             var host = createMicroserviceHost();
-       
-            var instances = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
-                new List<Type>(){ typeof(TestOrchestrationInput) }, out microSvc);
+
+            Microservice microSvc = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
+                new List<Type>(){ typeof(TestOrchestrationInput) });
 
             host.OpenAsync().Wait();
 

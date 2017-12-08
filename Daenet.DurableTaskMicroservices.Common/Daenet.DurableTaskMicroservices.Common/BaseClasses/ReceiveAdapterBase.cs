@@ -1,13 +1,7 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Exceptions;
-using DurableTask;
-using System;
+using DurableTask.Core;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
@@ -17,8 +11,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         where TAdapterOutput : class
     {
   
-        //protected abstract TOutput RunTask(TaskContext context, TInput input);
-
+       
         protected override TAdapterOutput RunTask(TaskContext context, TInput input)
         {
             var rcvData = ReceiveData(context, input);

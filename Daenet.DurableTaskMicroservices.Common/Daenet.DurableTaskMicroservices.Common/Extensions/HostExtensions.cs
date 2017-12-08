@@ -12,7 +12,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Extensions
 {
     public static class HostExtensions
     {
-        public static void StartService(this ServiceHost host, string orchestrationQualifiedName,
+        public static async Task StartServiceAsync(this ServiceHost host, string orchestrationQualifiedName,
             OrchestrationInput inputArgs, string activityId)
         {
             var tp = Type.GetType(orchestrationQualifiedName);
@@ -56,15 +56,15 @@ namespace Daenet.DurableTaskMicroservices.Common.Extensions
             inputArgs.Context.Add("ParentLoggingContext", logCtx);
 
 
-            host.StartService(orchestrationQualifiedName, inputArgs);
+            await host.StartServiceAsync(orchestrationQualifiedName, inputArgs);
         }
 
-        public static void RestartService(this ServiceHost host, string orchestrationQualifiedName,
+        public static async Task RestartService(this ServiceHost host, string orchestrationQualifiedName,
            OrchestrationInput inputArgs, string activityId)
         {
-            host.StopService(orchestrationQualifiedName);
+            await host.StopServiceAsync(orchestrationQualifiedName);
 
-            host.StartService(orchestrationQualifiedName, inputArgs, activityId);
+            await host.StartServiceAsync(orchestrationQualifiedName, inputArgs, activityId);
         }
     }
 }

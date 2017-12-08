@@ -3,6 +3,7 @@ using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
+using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -67,6 +68,6 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
             return (TAdapterOutput)new Null();
         }
 
- 
+     
     }
 }

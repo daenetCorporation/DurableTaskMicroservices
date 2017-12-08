@@ -1,9 +1,6 @@
 ﻿using Daenet.DurableTask.Microservices;
-using DurableTask;
-using System;
-using System.Collections.Generic;
+using DurableTask.Core;
 using System.Diagnostics;
-using System.Text;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {

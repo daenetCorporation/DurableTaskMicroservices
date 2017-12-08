@@ -1,5 +1,5 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.Entities;
-using DurableTask;
+using DurableTask.Core;
 using System;
 
 
