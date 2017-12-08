@@ -3,6 +3,7 @@ using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Logging;
 using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
 
@@ -12,7 +13,7 @@ namespace Daenet.System.Integration
         where TAdapterOutput : class
         where TAdapterInput : TaskInput
     {
-        protected override TAdapterOutput ReceiveData(TaskContext context, TAdapterInput taskInput)
+        protected override TAdapterOutput ReceiveData(TaskContext context, TAdapterInput taskInput, ILogger logger)
         {
             SqlReceiveAdapterConfig config = this.GetConfiguration<SqlReceiveAdapterConfig>(taskInput.Orchestration);
 

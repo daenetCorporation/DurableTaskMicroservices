@@ -4,6 +4,7 @@ using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Exceptions;
 using Daenet.DurableTaskMicroservices.Common.Logging;
 using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
@@ -113,81 +114,85 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
         //private static List<string> m_TraceSourceInitialized = new List<string>();
 
-        private void initializeLog(TaskContext context, TaskInput inputArg)
-        {
-            if (m_Log == null)
-            {
-                string logTraceSourceName = null;
+        //private void initializeLog(TaskContext context, TaskInput inputArg)
+        //{
+        //    if (m_Log == null)
+        //    {
+        //        string logTraceSourceName = null;
 
-                /*ILogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
+        //        /*ILogManager parentLogMgr = new LogManager(inputArg.LoggerFactory, "not-used");
 
-                LoggingContext parentLoggingContext = null;
+        //        LoggingContext parentLoggingContext = null;
 
-                if (inputArg.Context.ContainsKey("ParentLoggingContext"))
-                {
-                    parentLoggingContext = inputArg.Context["ParentLoggingContext"] as LoggingContext;
+        //        if (inputArg.Context.ContainsKey("ParentLoggingContext"))
+        //        {
+        //            parentLoggingContext = inputArg.Context["ParentLoggingContext"] as LoggingContext;
 
-                    if (parentLoggingContext?.LoggingScopes != null)
-                    {
-                        foreach (var scope in parentLoggingContext.LoggingScopes)
-                        {
-                            // If Log Trace Source name is in parent context it will be used.
-                            if (scope.Key == "LogTraceSourceName")
-                                logTraceSourceName = scope.Value;
+        //            if (parentLoggingContext?.LoggingScopes != null)
+        //            {
+        //                foreach (var scope in parentLoggingContext.LoggingScopes)
+        //                {
+        //                    // If Log Trace Source name is in parent context it will be used.
+        //                    if (scope.Key == "LogTraceSourceName")
+        //                        logTraceSourceName = scope.Value;
 
-                            parentLogMgr.AddScope(scope.Key, scope.Value);
-                        }
+        //                    parentLogMgr.AddScope(scope.Key, scope.Value);
+        //                }
 
-                        // Copy the previous SequenceId to ParentSequenceId to keep the track.
-                        if (parentLogMgr.CurrentScope.ContainsKey("SequenceId"))
-                            parentLogMgr.AddScope("ParentSequenceId", parentLogMgr.CurrentScope["SequenceId"]);
-                        else
-                            parentLogMgr.AddScope("ParentSequenceId", null);
-                    }
-                }
+        //                // Copy the previous SequenceId to ParentSequenceId to keep the track.
+        //                if (parentLogMgr.CurrentScope.ContainsKey("SequenceId"))
+        //                    parentLogMgr.AddScope("ParentSequenceId", parentLogMgr.CurrentScope["SequenceId"]);
+        //                else
+        //                    parentLogMgr.AddScope("ParentSequenceId", null);
+        //            }
+        //        }
 
-                if (parentLoggingContext == null)
-                    parentLoggingContext = new LoggingContext();
+        //        if (parentLoggingContext == null)
+        //            parentLoggingContext = new LoggingContext();
                 
-                //
-                // If log trace source name is specified in the configuration it will be used even if the context contains a parent logtrace source name.
-                var cfg = this.GetConfiguration(inputArg.Orchestration);
-                if (cfg != null)
-                    logTraceSourceName = cfg.LogTraceSourceName;
+        //        //
+        //        // If log trace source name is specified in the configuration it will be used even if the context contains a parent logtrace source name.
+        //        var cfg = this.GetConfiguration(inputArg.Orchestration);
+        //        if (cfg != null)
+        //            logTraceSourceName = cfg.LogTraceSourceName;
 
-                if (String.IsNullOrEmpty(logTraceSourceName))
-                {
-                    logTraceSourceName = this.GetType().FullName;
-                }
+        //        if (String.IsNullOrEmpty(logTraceSourceName))
+        //        {
+        //            logTraceSourceName = this.GetType().FullName;
+        //        }
 
-                m_Log = new LogManager(inputArg.LoggerFactory, logTraceSourceName, parentLogMgr);
+        //        m_Log = new LogManager(inputArg.LoggerFactory, logTraceSourceName, parentLogMgr);
 
-                // With new instance of the LogManager we always create a new SequenceId.
-                m_Log.AddScope("SequenceId", Guid.NewGuid().ToString());
+        //        // With new instance of the LogManager we always create a new SequenceId.
+        //        m_Log.AddScope("SequenceId", Guid.NewGuid().ToString());
 
-                // Add an new ActivityId if not existing yet. 
-                if (!m_Log.CurrentScope.ContainsKey("ActivityId"))
-                    m_Log.AddScope("ActivityId", Guid.NewGuid().ToString());
+        //        // Add an new ActivityId if not existing yet. 
+        //        if (!m_Log.CurrentScope.ContainsKey("ActivityId"))
+        //            m_Log.AddScope("ActivityId", Guid.NewGuid().ToString());
 
-                // Add OrchestrationInstanceId
-                if (!m_Log.CurrentScope.ContainsKey("OrchestrationInstanceId"))
-                    m_Log.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
-                    */
-            }
-        }
+        //        // Add OrchestrationInstanceId
+        //        if (!m_Log.CurrentScope.ContainsKey("OrchestrationInstanceId"))
+        //            m_Log.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
+        //            */
+        //    }
+        //}
 
         #endregion
-        protected override TOutput Execute(TaskContext context, TInput input)
+        protected override TOutput Execute(TaskContext context, TInput taskInputArgs)
         {
             TOutput result = null;
 
+            string activityId = ServiceHost.GetActivityIdFromContext(taskInputArgs);
+
+            var logger = ServiceHost.GetLogger(this.GetType(), activityId);
+
             try
             {
-                initializeLog(context, input);
+                logger?.LogDebug("Task {P1} entered", this.GetType().FullName);
 
-                //TODO.. log
-                result = RunTask(context, input);
-                //TODO.. log
+                result = RunTask(context, taskInputArgs, logger);
+
+                logger?.LogDebug("Orchestration {P1} exited successfully", this.GetType().FullName);
             }
             catch (ValidationRuleException validationException)
             {
@@ -204,19 +209,18 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }
             catch (Exception ex)
             {
-                throw;
-                //TODO.. log
+                logger?.LogError($"{ex}");
+                throw;                
             }
             finally
             {
 
-                //TODO.. log
             }
 
             return result;
         }
 
 
-        protected abstract TOutput RunTask(TaskContext context, TInput input);
+        protected abstract TOutput RunTask(TaskContext context, TInput input, ILogger logger);
     }
 }

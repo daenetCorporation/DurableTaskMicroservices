@@ -135,6 +135,10 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         {
             TOutput result = null;
 
+            string activityId = ServiceHost.GetActivityIdFromContext(orchestrationInput);
+
+            var logger = ServiceHost.GetLogger(this.GetType(), activityId);
+
             try
             {
                 /*
@@ -179,37 +183,34 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                     orchestrationInput.Context.Add("ParentLoggingContext", new LoggingContext() { LoggingScopes = this.LogManager.CurrentScope });
                 */
 
+
+                logger?.LogDebug("Orchestration {P1} entered", this.GetType().FullName);
+
                 m_OrchestrationConext = context;
 
                 m_OrchestrationInput = orchestrationInput;
 
-                result = await RunOrchestration(context, orchestrationInput);
+                result = await RunOrchestration(context, orchestrationInput, logger);
+
+                logger?.LogDebug("Orchestration {P1} exited successfully", this.GetType().FullName);
+
             }
             catch (Exception ex)
             {
-                if (this.LogManager == null)
-                {
-                    //this.LogManager = new LogManager(orchestrationInput.LoggerFactory, "CriticalExceptions");
-
-                    //this.LogManager.TraceErrLoggingSystemFailed(context.OrchestrationInstance.InstanceId, context);
-                }
-                else
-                {
-                    //this.LogManager.TraceErrOrchestrationFailed(context.OrchestrationInstance.InstanceId, context);
-                }
-
+                logger?.LogError($"{ex}");
                 throw ex;
             }
             finally
             {
 
-                //TODO.. log
+                //TODO.. log ??
             }
 
             return result;
         }
 
-      
+ 
+
         /// <summary>
         ///  Create a suborchestration of the specified type. Also retry on failure as 
         ///  per supplied policy.
@@ -246,8 +247,9 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         /// </summary>
         /// <param name="context">OrchestrationContext</param>
         /// <param name="input">Orchestration input instance.</param>
+        /// <param name="logger">Logger instance used for logging.</param>
         /// <returns></returns>
-        protected abstract Task<TOutput> RunOrchestration(OrchestrationContext context, TInput input);
+        protected abstract Task<TOutput> RunOrchestration(OrchestrationContext context, TInput input, ILogger logger);
 
 
         /// <summary>

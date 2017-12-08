@@ -4,6 +4,7 @@ using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
 using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +27,7 @@ namespace Daenet.System.Integration
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        protected override Null SendData(TaskContext context, TFileSendAdapterInput input)
+        protected override Null SendData(TaskContext context, TFileSendAdapterInput input, ILogger logger)
         {
             try
             {

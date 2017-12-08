@@ -15,6 +15,7 @@ using Daenet.DurableTask.Microservices;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -252,7 +253,7 @@ namespace Daenet.DurableTaskMicroservices.Host
     public static class HostHelpersExtensions
     {
         public static ServiceHost CreateMicroserviceHost(string ServiceBusConnectionString, string StorageConnectionString, string hubName, 
-           bool purgeStore, out List<OrchestrationState> runningInstances)
+           bool purgeStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null)
         {
             AzureTableInstanceStore instanceStore = new AzureTableInstanceStore(hubName, StorageConnectionString);
             ServiceBusOrchestrationService orchestrationServiceAndClient =
@@ -262,7 +263,7 @@ namespace Daenet.DurableTaskMicroservices.Host
             {
                 if (purgeStore)
                     instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
-
+                
                 runningInstances = instanceStore.GetRunningInstances();
             }
             catch (Exception)
@@ -272,10 +273,8 @@ namespace Daenet.DurableTaskMicroservices.Host
             }
 
             ServiceHost host;
-                        
-           
 
-            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
+            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false, loggerFactory);
 
             return host;
         }

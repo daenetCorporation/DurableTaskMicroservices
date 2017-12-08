@@ -11,20 +11,18 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Linq;
-using System.IO;
-using System.Xml;
-using System.Runtime.Serialization;
-using System.Reflection;
-using System.Threading.Tasks;
 using DurableTask.Core;
-using DurableTask.Core.Settings;
-using DurableTask.Core.Common;
 using DurableTask.Core.Exceptions;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace Daenet.DurableTask.Microservices
 {
@@ -42,7 +40,7 @@ namespace Daenet.DurableTask.Microservices
         private IOrchestrationServiceInstanceStore m_InstanceStoreService;
         private ILogger m_Logger;
         private static string m_SchemaName;
-        private ILoggerFactory m_LoggerFactory;
+        private static ILoggerFactory m_LoggerFactory;
 
         #endregion
 
@@ -52,8 +50,7 @@ namespace Daenet.DurableTask.Microservices
 
 
         #region Initialization Code
-
-
+        
 
         public ServiceHost(IOrchestrationService orchestrationService,
             IOrchestrationServiceClient orchestrationClient,
@@ -61,6 +58,7 @@ namespace Daenet.DurableTask.Microservices
             bool resetHub = false,
             ILoggerFactory loggerFactory = null)
         {
+
             this.m_HubClient = new TaskHubClient(orchestrationClient);
             this.m_TaskHubWorker = new TaskHubWorker(orchestrationService);
             this.m_InstanceStoreService = instanceStore;
@@ -377,6 +375,58 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
+        /// Gets the logger instance.
+        /// </summary>
+        /// <param name="type">Type which defines logger category.</param>
+        /// <param name="activityId">Activity identifier.</param>
+        /// <returns></returns>
+        public static ILogger GetLogger(Type type, string activityId = null)
+        {
+            lock (m_LoggerFactory)
+            {
+                if (m_LoggerFactory != null)
+                {
+                    var logger = m_LoggerFactory.CreateLogger(type.FullName);
+                    if (activityId != null)
+                        logger.BeginScope(activityId);
+
+                    return logger;
+                }
+                else
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the activity identifier from input argument.
+        /// </summary>
+        /// <param name="orchestrationInput"></param>
+        /// <param name="activityId"></param>
+        /// <returns></returns>
+        public static string GetActivityIdFromContext(object orchestrationInput)
+        {
+            string activityId = Guid.NewGuid().ToString();
+            if (orchestrationInput is DurableTaskMicroservices.Common.Entities.OrchestrationInput)
+            {
+                const string ctxName = "ActivityId";
+
+                DurableTaskMicroservices.Common.Entities.OrchestrationInput msIn = (DurableTaskMicroservices.Common.Entities.OrchestrationInput)orchestrationInput;
+                if (msIn.Context == null)
+                    msIn.Context = new Dictionary<string, object>();
+
+                if (msIn.Context.ContainsKey(ctxName))
+                {
+                    activityId = msIn.Context[ctxName] as string;
+                }
+                else
+                    msIn.Context.Add(ctxName, activityId);
+            }
+
+            return activityId;
+        }
+
+
+        /// <summary>
         /// Gets configuration of activity (task).
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -453,13 +503,13 @@ namespace Daenet.DurableTask.Microservices
 
 
         /// <summary>
-        /// Starts the MicroService Host
+        /// Starts the MicroService Host.
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
         /// <param name="searchPattern">Search pattern for config files.</param>
         /// <param name="runningInstances">List of currentlly unning instances. In the future ServiceHost will be able to grab the list 
         /// of running instances. Waiting on DTF team.</param>
-        public async Task<List<MicroserviceInstance>> StartServiceHostAsync(string directory = null, string searchPattern = "*.config.xml", ICollection<OrchestrationState> runningInstances = null)
+        public async Task<List<MicroserviceInstance>> StartServiceHostAsync(string directory = null, string searchPattern = "*.config.xml", ICollection<OrchestrationState> runningInstances = null, Dictionary<string, object> context = null)
         {
             try
             {
@@ -490,14 +540,14 @@ namespace Daenet.DurableTask.Microservices
                         throw new NotSupportedException("JSON not yet supported!");
                     //instances = LoadServicesFromJson(configFiles, knownTypes, out microServices);
 
-                  
+
                     foreach (var svc in microServices)
-                    {                      
+                    {
                         if (runningInstances == null ||
                             runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null ||
                             svc.IsSingletone == false)
                         {
-                            var newInst = StartServiceAsync(svc.OrchestrationQName, svc.InputArgument).Result;
+                            var newInst = StartServiceAsync(svc.OrchestrationQName, svc.InputArgument, context).Result;
 
                             instances.Add(newInst);
 
@@ -614,11 +664,11 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationFullQualifiedName"></param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public async Task<MicroserviceInstance> RestartServiceAsync(string orchestrationFullQualifiedName, object inputArgs)
+        public async Task<MicroserviceInstance> RestartServiceAsync(string orchestrationFullQualifiedName, object inputArgs, Dictionary<string, object> context)
         {
             await StopServiceAsync(orchestrationFullQualifiedName);
 
-            return await createServiceInstanceAsync(orchestrationFullQualifiedName, inputArgs);
+            return await createServiceInstanceAsync(orchestrationFullQualifiedName, inputArgs, context);
         }
 
 
@@ -666,9 +716,9 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs)
+        public Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context = null)
         {
-            return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs);
+            return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
         }
 
 
@@ -679,22 +729,30 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestration">The type of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs)
+        public Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context = null)
         {
-            return createServiceInstanceAsync(orchestration, inputArgs);
+            return createServiceInstanceAsync(orchestration, inputArgs, context);
         }
 
 
-        private Task<MicroserviceInstance> createServiceInstanceAsync(string orchestrationQualifiedName, object inputArgs)
+        private Task<MicroserviceInstance> createServiceInstanceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context)
         {
-            return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs);
+            return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
         }
 
-        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs)
+      
+        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string,object> context)
         {
+            object iArgs = inputArgs;
+
+            if (context != null && inputArgs is DurableTaskMicroservices.Common.Entities.OrchestrationInput)
+            {
+                ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context = context;
+            }
+
             var ms = new MicroserviceInstance()
             {
-                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
+                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, iArgs),
             };
             return ms;
         }

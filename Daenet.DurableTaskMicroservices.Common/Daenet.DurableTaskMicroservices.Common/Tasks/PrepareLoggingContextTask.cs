@@ -14,7 +14,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
 
         private static List<string> m_TraceSourceInitialized = new List<string>();
 
-        protected override LoggingContext RunTask(TaskContext context, PrepareLoggingContextTaskInput input)
+        protected override LoggingContext RunTask(TaskContext context, PrepareLoggingContextTaskInput input, ILogger logger)
         {
             if (String.IsNullOrEmpty(input.LogTraceSourceName) == false)
                 this.GetConfiguration(input.Orchestration).LogTraceSourceName = input.LogTraceSourceName;

@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\OrchestrationInput.cs" />
     <Compile Remove="Entities\TaskInputOfT.cs" />
   </ItemGroup>
 
@@ -26,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Entities\OrchestrationInput.cs" />
     <None Include="Entities\TaskInputOfT.cs" />
   </ItemGroup>
 

@@ -23,7 +23,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
     {
         private ILoggerFactory m_LogFactory;
 
-        protected override TAdapterOutput RunTask(TaskContext context, TInput input)
+        protected override TAdapterOutput RunTask(TaskContext context, TInput input, ILogger logger)
         {
             if (this.m_LogFactory == null)
                 return (TAdapterOutput)new Null();

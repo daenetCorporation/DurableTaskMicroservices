@@ -18,22 +18,29 @@ namespace Daenet.Microservice.Common.Test
         private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
         private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
 
+        private static ILoggerFactory getLoggerFactory()
+        {
+            ILoggerFactory loggerFactory = new LoggerFactory();
+            loggerFactory.AddDebug(LogLevel.Trace);
+
+            return loggerFactory;
+        }
+
+
         [TestMethod]
         public void SelfHostWithLoggingTest()
         {
-            ILoggerFactory loggerFactory = new LoggerFactory();
-            loggerFactory.AddDebug();
+            var loggerFact = getLoggerFactory();
 
             List<OrchestrationState> runningInstances;
 
-            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostWithLoggingTest), true, out runningInstances);
-            
-            var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances).Result;
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostWithLoggingTest), true, out runningInstances, loggerFact);
+
+            var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
             host.WaitOnInstances(host, microservices);
-
         }
 
-      
+    
     }
 }
