@@ -13,6 +13,9 @@
 
 using Daenet.DurableTask.Microservices;
 using DurableTask;
+using DurableTask.Core;
+using DurableTask.ServiceBus;
+using DurableTask.ServiceBus.Tracking;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -34,9 +37,14 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
         private static ServiceHost createMicroserviceHost()
         {
+            IOrchestrationServiceInstanceStore instanceStore = new AzureTableInstanceStore("UnitTestTmp", StorageConnectionString);
+            ServiceBusOrchestrationService orchestrationServiceAndClient =
+               new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
+
+            instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
             ServiceHost host;
 
-            host = new ServiceHost(ServiceBusConnectionString, StorageConnectionString, "UnitTestHub");
+            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
 
             return host;
         }
@@ -49,7 +57,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             Microservice service = new Microservice();
             service.InputArgument = new TestOrchestrationInput()
             {
-                Counter = 3,
+                Counter = 2,
                 Delay = 1000,
             };
 
@@ -61,86 +69,35 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             host.LoadService(service);
 
-            host.Open();
+            host.OpenAsync().Wait();
 
             // This is client side code.
-            var instance = host.StartService(service.OrchestrationQName, service.InputArgument);
+            var instance = host.StartServiceAsync(service.OrchestrationQName, service.InputArgument).Result;
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
-            waitOnInstance(host, service, instance);
+            host.WaitOnInstanceAsync(instance).Wait();
         }
 
 
         [TestMethod]
-        [DataRow("CounterOrchestration.xml")]
-        public void LoadServiceFromXml(string fileName)
+        [DataRow("CounterOrchestration.config.xml")]
+        public void RunServiceFromXml(string fileName)
         {
-            Microservice microSvc;
-
             var host = createMicroserviceHost();
-       
-            var instances = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
-                new List<Type>(){ typeof(TestOrchestrationInput) }, out microSvc);
 
-            var instance = host.StartService(microSvc.OrchestrationQName, microSvc.InputArgument);
+            Microservice microSvc = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
+                new List<Type>(){ typeof(TestOrchestrationInput) });
+
+            host.OpenAsync().Wait();
+
+            var instance = host.StartServiceAsync(microSvc.OrchestrationQName, microSvc.InputArgument).Result;
 
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
-            waitOnInstance(host, microSvc, instance);
+            host.WaitOnInstanceAsync(instance).Wait();
         }
-
-        private void waitOnInstance(ServiceHost host, Microservice service, MicroserviceInstance instance)
-        {
-            ManualResetEvent mEvent = new ManualResetEvent(false);
-
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        Thread.Sleep(1000);
-
-                        var cnt = host.GetNumOfRunningInstances(service);
-
-                        if (cnt == 0)
-                        {
-                            mEvent.Set();
-                            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} completed.");
-                            break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        mEvent.Set();
-                        Assert.Fail(ex.Message);
-                    }
-                }
-            }).Start();
-
-
-            mEvent.WaitOne();
-        }
-
-
-        [TestMethod]
-        [DataRow("CounterOrchestration.xml")]
-        public void LoadFromConfigTest(string fileName)
-        {
-            var service = UtilsTests.DeserializeService(UtilsTests.GetPathForFile(fileName));
-
-            var host = createMicroserviceHost();
-
-            host.LoadService(service);
-
-            host.Open();
-
-            var instance = host.StartService(service.OrchestrationQName, service.InputArgument);
-
-            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
-
-            waitOnInstance(host, service, instance);
-        }
+        
+        
     }
 }

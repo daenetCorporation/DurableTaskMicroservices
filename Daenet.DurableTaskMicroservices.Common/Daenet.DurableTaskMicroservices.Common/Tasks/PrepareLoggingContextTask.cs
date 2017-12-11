@@ -1,16 +1,10 @@
 ﻿using Daenet.Common.Logging;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
-using DurableTask;
+using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Common.Tasks
 {
@@ -20,7 +14,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Tasks
 
         private static List<string> m_TraceSourceInitialized = new List<string>();
 
-        protected override LoggingContext RunTask(TaskContext context, PrepareLoggingContextTaskInput input)
+        protected override LoggingContext RunTask(TaskContext context, PrepareLoggingContextTaskInput input, ILogger logger)
         {
             if (String.IsNullOrEmpty(input.LogTraceSourceName) == false)
                 this.GetConfiguration(input.Orchestration).LogTraceSourceName = input.LogTraceSourceName;

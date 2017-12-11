@@ -1,13 +1,8 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Exceptions;
-using DurableTask;
-using System;
+using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
@@ -17,11 +12,10 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         where TAdapterOutput : class
     {
   
-        //protected abstract TOutput RunTask(TaskContext context, TInput input);
-
-        protected override TAdapterOutput RunTask(TaskContext context, TInput input)
+       
+        protected override TAdapterOutput RunTask(TaskContext context, TInput input, ILogger logger)
         {
-            var rcvData = ReceiveData(context, input);
+            var rcvData = ReceiveData(context, input, logger);
 
             ValidatorRulesResult validationResult;
             if (executeValidationRules(rcvData, this.GetConfiguration(input.Orchestration).ValidatorRules, out validationResult))
@@ -33,7 +27,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }
         }
 
-        protected abstract TAdapterOutput ReceiveData(TaskContext context, TInput input);
+        protected abstract TAdapterOutput ReceiveData(TaskContext context, TInput input, ILogger logger);
 
         /// <summary>
         /// Validation Rules will be executed if they are defined.

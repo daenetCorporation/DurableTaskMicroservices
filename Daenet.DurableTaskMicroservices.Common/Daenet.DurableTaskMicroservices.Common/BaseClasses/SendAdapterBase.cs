@@ -1,5 +1,6 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.Entities;
-using DurableTask;
+using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
 
 
@@ -10,11 +11,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         where TAdapterOutput : class
     {
 
-        protected override TAdapterOutput RunTask(TaskContext context, TInput input)
+        protected override TAdapterOutput RunTask(TaskContext context, TInput input, ILogger logger)
         {
             try
             {
-                var rcvData = SendData(context, input);
+                var rcvData = SendData(context, input, logger);
 
                 return rcvData;
             }
@@ -24,7 +25,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }
         }
 
-        protected abstract TAdapterOutput SendData(TaskContext context, TInput input);
+        protected abstract TAdapterOutput SendData(TaskContext context, TInput input, ILogger logger);
 
     }
 }

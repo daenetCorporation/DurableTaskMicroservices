@@ -2,14 +2,10 @@
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Logging;
-using DurableTask;
+using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Daenet.System.Integration
 {
@@ -22,7 +18,7 @@ namespace Daenet.System.Integration
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        protected override TAdapterOutput ReceiveData(TaskContext context, TaskInput input)
+        protected override TAdapterOutput ReceiveData(TaskContext context, TaskInput input, ILogger logger)
         {
             try
             {

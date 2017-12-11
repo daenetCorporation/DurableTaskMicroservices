@@ -11,21 +11,36 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
+
 using DurableTask;
 using DurableTask.Core;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
-    public class Task1 : TaskActivity<string, Null>
+    public class Null { }
+
+    public class CounterOrchestration : TaskOrchestration<int, TestOrchestrationInput>
     {
-        protected override Null Execute(TaskContext context, string input)
+        public async override Task<int> RunTask(OrchestrationContext context, TestOrchestrationInput input)
         {
-            Debug.WriteLine($"Executing Task {nameof(Task1)}");
-            return new Null();
+            int cnt = input.Counter;
+
+            while (cnt > 0)
+            {
+                cnt--;
+
+                await context.ScheduleTask<Null>(typeof(Task1), ":)");
+
+                await context.ScheduleTask<Null>(typeof(Task2), ":<");
+
+                Task.Delay(input.Delay).Wait();
+            }
+
+            return cnt;
         }
     }
 }

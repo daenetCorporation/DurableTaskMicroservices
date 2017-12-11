@@ -2,14 +2,10 @@
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Logging;
-using DurableTask;
+using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Daenet.System.Integration
 {
@@ -19,7 +15,7 @@ namespace Daenet.System.Integration
     {
 
 
-        protected override TAdapterOutput SendData(TaskContext context, TAdapterInput input)
+        protected override TAdapterOutput SendData(TaskContext context, TAdapterInput input, ILogger logger)
         {
             SqlSendAdapterConfig config = this.GetConfiguration<SqlSendAdapterConfig>(input.Context["Orchestration"].ToString());
 

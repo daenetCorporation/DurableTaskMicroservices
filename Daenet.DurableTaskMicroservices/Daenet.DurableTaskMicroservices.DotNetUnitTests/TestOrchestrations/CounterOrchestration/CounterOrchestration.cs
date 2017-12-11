@@ -11,33 +11,38 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-using Daenet.DurableTask.Microservices;
+
 using DurableTask;
+using DurableTask.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
+    public class Null { }
+
     public class CounterOrchestration : TaskOrchestration<int, TestOrchestrationInput>
     {
         public async override Task<int> RunTask(OrchestrationContext context, TestOrchestrationInput input)
         {
-            int cnt = input.Counter;
+            Debug.WriteLine($"{input.Counter}");
 
-            while (cnt > 0)
+            await context.ScheduleTask<Null>(typeof(Task1), ":)");
+
+            await context.ScheduleTask<Null>(typeof(Task2), ":<");
+
+            Task.Delay(100).Wait();
+
+            input.Counter--;
+            if (input.Counter > 0)
             {
-                cnt--;
-
-                await context.ScheduleTask<Null>(typeof(Task1), ":)");
-
-                await context.ScheduleTask<Null>(typeof(Task2), ":<");
-
-                Task.Delay(input.Delay).Wait();
+                context.ContinueAsNew(input);
             }
 
-            return cnt;
+            return input.Counter;
         }
     }
 }

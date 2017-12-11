@@ -1,10 +1,7 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Rules;
-using DurableTask;
-using System;
+using DurableTask.Core;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Common
