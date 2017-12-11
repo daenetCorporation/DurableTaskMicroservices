@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using DurableTask.Core;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
     public class Task1 : TaskBase<TaskInput, Null>
     {
-        protected override Null RunTask(TaskContext context, TaskInput input)
+  
+        protected override Null RunTask(TaskContext context, TaskInput input, ILogger logger)
         {
             Debug.WriteLine($"Executing Task {nameof(Task1)}. Data: {input.Data}");
             return new Null();

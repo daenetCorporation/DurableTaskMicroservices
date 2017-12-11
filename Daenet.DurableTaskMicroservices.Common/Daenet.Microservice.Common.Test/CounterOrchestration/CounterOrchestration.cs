@@ -1,5 +1,6 @@
 ﻿using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -13,9 +14,9 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         {
             Debug.WriteLine($"{input.Counter}");
 
-            await context.ScheduleTask<Null>(typeof(Task1), ":)");
+            await context.ScheduleTask<Null>(typeof(Task1), new TaskInput() { Data = 1 });
 
-            await context.ScheduleTask<Null>(typeof(Task2), ":<");
+            await context.ScheduleTask<Null>(typeof(Task2), new TaskInput() { Data = 2 });
             
             Task.Delay(100).Wait();
 

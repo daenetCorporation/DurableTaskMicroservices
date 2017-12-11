@@ -3,6 +3,7 @@ using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask;
 using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 {
     public class Task2 : TaskBase<TaskInput, Null>
     {
-        protected override Null RunTask(TaskContext context, TaskInput input)
+        protected override Null RunTask(TaskContext context, TaskInput input, ILogger logger)
         {
             Debug.WriteLine($"Executing Task {nameof(Task2)}. Data: {input.Data}");
             return new Null();
