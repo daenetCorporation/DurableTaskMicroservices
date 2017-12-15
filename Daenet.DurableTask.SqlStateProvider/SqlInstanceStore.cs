@@ -54,13 +54,17 @@ namespace Daenet.DurableTask.SqlStateProvider
             return null;
         }
 
+        /// <summary>
+        /// Get OrchestrationState
+        /// </summary>
+        /// <param name="instanceId"></param>
+        /// <param name="executionId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<OrchestrationStateInstanceEntity>> GetEntitiesAsync(string instanceId, string executionId)
         {
-            var query = new OrchestrationStateQuery().AddInstanceFilter(instanceId, executionId);
+            var results = await Client.ReadOrchestrationStateAsync(instanceId, executionId);
 
-            //var segmentsResult = await Client.QueryOrchestrationStatesAsync(query);
-
-            throw new NotImplementedException();
+            return results;
         }
 
         public Task<object> DeleteEntitiesAsync(IEnumerable<InstanceEntityBase> entities)

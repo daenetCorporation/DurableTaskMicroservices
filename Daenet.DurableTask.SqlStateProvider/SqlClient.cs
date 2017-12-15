@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Daenet.Common.Sql;
 
 namespace Daenet.DurableTask.SqlStateProvider
 {
@@ -23,9 +24,9 @@ namespace Daenet.DurableTask.SqlStateProvider
             get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_State"); }
         }
 
-        public string HistoryTableWithSchema
+        public string WorkItemTableWithSchema
         {
-            get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_History"); }
+            get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_WorkItem"); }
         }
 
         public string StateTableName
@@ -33,9 +34,9 @@ namespace Daenet.DurableTask.SqlStateProvider
             get { return String.Format("{0}", m_BaseTable + "_State"); }
         }
 
-        public string HistoryTableName
+        public string WorkItemTableName
         {
-            get { return String.Format("{0}", m_BaseTable + "_History"); }
+            get { return String.Format("{0}", m_BaseTable + "_WorkItem"); }
         }
 
         public SqlClient(string baseTableName, string sqlConnectionString, string schemaName = "dbo")
@@ -88,8 +89,9 @@ namespace Daenet.DurableTask.SqlStateProvider
                                          CREATE TABLE {0}
                                         (
 	                                        [Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-                                            [InstanceId] NVARCHAR(50) NOT NULL, 
-                                            [ExecutionId] NVARCHAR(50) NOT NULL, 
+                                            [InstanceId] NVARCHAR(50) NOT NULL,
+                                            [ExecutionId] NVARCHAR(50) NOT NULL,
+                                            [SequenceNumber] BIGINT NOT NULL,
                                             [CompletedTime] DATETIME NOT NULL, 
                                             [CompressedSize] BIGINT NOT NULL, 
                                             [CreatedTime] DATETIME NOT NULL, 
@@ -102,7 +104,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [ParentInstance] NVARCHAR(MAX) NOT NULL, 
                                             [Size] BIGINT NOT NULL, 
                                             [Status] NVARCHAR(50) NOT NULL, 
-                                            [Tags] NVARCHAR(50) NULL, 
+                                            [Tags] NVARCHAR(MAX) NULL, 
                                             [Version] NVARCHAR(50) NOT NULL
                                         )
                                           END", StateTableWithSchema);
@@ -113,7 +115,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     command.AppendFormat(@"IF (NOT EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
                  WHERE TABLE_SCHEMA = '{0}'
-                 AND  TABLE_NAME = '{1}'))", m_SchemaName, HistoryTableName);
+                 AND  TABLE_NAME = '{1}'))", m_SchemaName, WorkItemTableName);
 
                     command.AppendFormat(@"BEGIN 
                                         CREATE TABLE {0}
@@ -126,7 +128,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [TaskTimeStamp] DATETIME NOT NULL,
                                             [TimeStamp] DATETIMEOFFSET NOT NULL
                                         );
-                                    END", HistoryTableWithSchema);
+                                    END", WorkItemTableWithSchema);
 
 
                     // set commandtext
@@ -153,33 +155,33 @@ namespace Daenet.DurableTask.SqlStateProvider
             {
                 using (SqlConnection con = new SqlConnection(m_ConnectionString))
                 {
-                    string schema = "dbo";
+                    //string schema = "dbo";
 
                     await con.OpenAsync();
                     SqlCommand cmd = con.CreateCommand();
                     cmd.Transaction = con.BeginTransaction();
 
-                    // get default schema name
-                    cmd.CommandText = "SELECT SCHEMA_NAME()";
+                    //// get default schema name
+                    //cmd.CommandText = "SELECT SCHEMA_NAME()";
 
-                    var dbschema = await cmd.ExecuteScalarAsync();
+                    //var dbschema = await cmd.ExecuteScalarAsync();
 
-                    if (dbschema != null)
-                        schema = dbschema.ToString();
+                    //if (dbschema != null)
+                    //    schema = dbschema.ToString();
 
                     // build command for creating tables if not exists
                     StringBuilder command = new StringBuilder();
                     command.AppendFormat(@"IF (EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
                  WHERE TABLE_SCHEMA = '{0}'
-                 AND  TABLE_NAME = '{1}'))", schema, HistoryTableName);
-                    command.AppendFormat(@"BEGIN Drop Table {0} END", HistoryTableWithSchema);
+                 AND  TABLE_NAME = '{1}'))", m_SchemaName, WorkItemTableName);
+                    command.AppendFormat(@"BEGIN Drop Table {0} END", WorkItemTableWithSchema);
                     command.AppendLine();
 
                     command.AppendFormat(@"IF (EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
                  WHERE TABLE_SCHEMA = '{0}'
-                 AND  TABLE_NAME = '{1}'))", schema, StateTableName);
+                 AND  TABLE_NAME = '{1}'))", m_SchemaName, StateTableName);
                     command.AppendFormat(@"BEGIN Drop Table {0} END", StateTableWithSchema);
 
                     cmd.CommandText = command.ToString();
@@ -189,7 +191,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     cmd.Transaction.Commit();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;
@@ -210,17 +212,17 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                     SqlCommand cmd = con.CreateCommand();
 
-                    cmd.CommandText = String.Format("Insert Into {0} (InstanceId, ExecutionId, SequenceNumber, HistoryEvent, EventTimestamp, TimeStamp) VALUES (@InstanceId, @ExecutionId, @SequenceNumber, @HistoryEvent, @EventTimestamp, @TimeStamp)", HistoryTableWithSchema);
+                    cmd.CommandText = String.Format("Insert Into {0} (InstanceId, ExecutionId, SequenceNumber, HistoryEvent, EventTimestamp, TimeStamp) VALUES (@InstanceId, @ExecutionId, @SequenceNumber, @HistoryEvent, @EventTimestamp, @TimeStamp)", WorkItemTableWithSchema);
 
                     foreach (var entity in entities)
                     {
                         cmd.Parameters.Clear();
-                        cmd.Parameters.Add(createSqlParam("@InstanceId", entity.InstanceId));
-                        cmd.Parameters.Add(createSqlParam("@ExecutionId", entity.ExecutionId));
-                        cmd.Parameters.Add(createSqlParam("@SequenceNumber", entity.SequenceNumber));
-                        cmd.Parameters.Add(createSqlParam("@HistoryEvent", serializeToJson(entity.HistoryEvent)));
-                        cmd.Parameters.Add(createSqlParam("@EventTimestamp", entity.EventTimestamp));
-                        cmd.Parameters.Add(createSqlParam("@TimeStamp", DateTime.UtcNow));
+                        cmd.AddSqlParameter("@InstanceId", entity.InstanceId);
+                        cmd.AddSqlParameter("@ExecutionId", entity.ExecutionId);
+                        cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
+                        cmd.AddSqlParameter("@HistoryEvent", serializeToJson(entity.HistoryEvent));
+                        cmd.AddSqlParameter("@EventTimestamp", entity.EventTimestamp);
+                        cmd.AddSqlParameter("@TimeStamp", DateTime.UtcNow);
 
                         if (await cmd.ExecuteNonQueryAsync() != 1)
                             throw new Exception("Insert of Entity failed to SQL State Provider!");
@@ -250,7 +252,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 SqlCommand cmd = con.CreateCommand();
 
-                string insertCmdtxt = String.Format("Insert Into {0} (InstanceId, ExecutionId, CompletedTime, CompressedSize, CreatedTime, Input, LastUpdatedTime, Name, OrchestrationInstance, OrchestrationStatus, Output, ParentInstance, Size, Status, Tags, Version) VALUES (@InstanceId, @ExecutionId, @CompletedTime, @CompressedSize, @CreatedTime, @Input, @LastUpdatedTime, @Name, @OrchestrationInstance, @OrchestrationStatus, @Output, @ParentInstance, @Size, @Status, @Tags, @Version)", StateTableWithSchema);
+                string insertCmdtxt = String.Format("Insert Into {0} (InstanceId, ExecutionId, SequenceNumber, CompletedTime, CompressedSize, CreatedTime, Input, LastUpdatedTime, Name, OrchestrationInstance, OrchestrationStatus, Output, ParentInstance, Size, Status, Tags, Version) VALUES (@InstanceId, @ExecutionId, @SequenceNumber, @CompletedTime, @CompressedSize, @CreatedTime, @Input, @LastUpdatedTime, @Name, @OrchestrationInstance, @OrchestrationStatus, @Output, @ParentInstance, @Size, @Status, @Tags, @Version)", StateTableWithSchema);
 
                 string updateCmdTxt = String.Format("UPDATE {0} SET CompletedTime = @CompletedTime, CompressedSize = @CompressedSize, CreatedTime = @CreatedTime, Input = @Input, LastUpdatedTime = @LastUpdatedTime, Name = @Name, OrchestrationInstance = @OrchestrationInstance, OrchestrationStatus = @OrchestrationStatus, Output = @Output, ParentInstance = @ParentInstance, Size = @Size, Status = @Status, Tags = @Tags, Version = @Version WHERE InstanceId = @InstanceId AND ExecutionID = @ExecutionId", StateTableWithSchema);
 
@@ -275,8 +277,8 @@ namespace Daenet.DurableTask.SqlStateProvider
                     {
                         // check if state already exists
                         cmd.CommandText = getCmdtxt;
-                        cmd.Parameters.Add(createSqlParam("@InstanceId", instanceId));
-                        cmd.Parameters.Add(createSqlParam("@ExecutionId", executionId));
+                        cmd.AddSqlParameter("@InstanceId", instanceId);
+                        cmd.AddSqlParameter("@ExecutionId", executionId);
 
                         using (var reader = await cmd.ExecuteReaderAsync())
                         {
@@ -292,22 +294,23 @@ namespace Daenet.DurableTask.SqlStateProvider
 
 
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add(createSqlParam("@InstanceId", instanceId));
-                    cmd.Parameters.Add(createSqlParam("@ExecutionId", executionId));
-                    cmd.Parameters.Add(createSqlParam("@CompletedTime", state.CompletedTime));
-                    cmd.Parameters.Add(createSqlParam("@CompressedSize", state.CompressedSize));
-                    cmd.Parameters.Add(createSqlParam("@CreatedTime", state.CreatedTime));
-                    cmd.Parameters.Add(createSqlParam("@Input", state.Input));
-                    cmd.Parameters.Add(createSqlParam("@LastUpdatedTime", state.LastUpdatedTime));
-                    cmd.Parameters.Add(createSqlParam("@Name", state.Name));
-                    cmd.Parameters.Add(createSqlParam("@OrchestrationInstance", serializeToJson(state.OrchestrationInstance))); // serialize to json
-                    cmd.Parameters.Add(createSqlParam("@OrchestrationStatus", state.OrchestrationStatus.ToString())); // serialize to json
-                    cmd.Parameters.Add(createSqlParam("@Output", state.Output));
-                    cmd.Parameters.Add(createSqlParam("@ParentInstance", serializeToJson(state.ParentInstance))); // serialize to json
-                    cmd.Parameters.Add(createSqlParam("@Size", state.Size));
-                    cmd.Parameters.Add(createSqlParam("@Status", state.Status));
-                    cmd.Parameters.Add(createSqlParam("@Tags", serializeToJson(state.Tags)));
-                    cmd.Parameters.Add(createSqlParam("@Version", state.Version));
+                    cmd.AddSqlParameter("@InstanceId", instanceId);
+                    cmd.AddSqlParameter("@ExecutionId", executionId);
+                    cmd.AddSqlParameter("@SequenceNumber", stateInstance.SequenceNumber);
+                    cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
+                    cmd.AddSqlParameter("@CompressedSize", state.CompressedSize);
+                    cmd.AddSqlParameter("@CreatedTime", state.CreatedTime);
+                    cmd.AddSqlParameter("@Input", state.Input);
+                    cmd.AddSqlParameter("@LastUpdatedTime", state.LastUpdatedTime);
+                    cmd.AddSqlParameter("@Name", state.Name);
+                    cmd.AddSqlParameter("@OrchestrationInstance", serializeToJson(state.OrchestrationInstance)); // serialize to json
+                    cmd.AddSqlParameter("@OrchestrationStatus", state.OrchestrationStatus.ToString()); // serialize to json
+                    cmd.AddSqlParameter("@Output", state.Output);
+                    cmd.AddSqlParameter("@ParentInstance", serializeToJson(state.ParentInstance)); // serialize to json
+                    cmd.AddSqlParameter("@Size", state.Size);
+                    cmd.AddSqlParameter("@Status", state.Status);
+                    cmd.AddSqlParameter("@Tags", serializeToJson(state.Tags));
+                    cmd.AddSqlParameter("@Version", state.Version);
 
                     if (await cmd.ExecuteNonQueryAsync() != 1)
                         throw new Exception("Insert of Entity failed to SQL State Provider!");
@@ -357,7 +360,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                         cmd.CommandText = String.Format("Select [OrchestrationInstance] from {0} WHERE {1} <= @DT", StateTableWithSchema, columnName);
 
-                        cmd.Parameters.Add(createSqlParam("@DT", thresholdDateTimeUtc));
+                        cmd.AddSqlParameter("@DT", thresholdDateTimeUtc);
 
                         List<OrchestrationState> states = new List<OrchestrationState>();
 
@@ -384,13 +387,13 @@ namespace Daenet.DurableTask.SqlStateProvider
                         // clear after execute
                         cmd.Parameters.Clear();
 
-                        cmd.CommandText = String.Format("DELETE FROM {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId;", HistoryTableWithSchema);
+                        cmd.CommandText = String.Format("DELETE FROM {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId;", WorkItemTableWithSchema);
 
                         // delete all history events where SequenceId and ExeuctionId appears in state list and delete those states afterwards
                         foreach (var state in states)
                         {
-                            cmd.Parameters.Add(createSqlParam("@InstanceId", state.OrchestrationInstance.InstanceId));
-                            cmd.Parameters.Add(createSqlParam("@ExecutionId", state.OrchestrationInstance.ExecutionId));
+                            cmd.AddSqlParameter("@InstanceId", state.OrchestrationInstance.InstanceId);
+                            cmd.AddSqlParameter("@ExecutionId", state.OrchestrationInstance.ExecutionId);
 
                             await cmd.ExecuteNonQueryAsync();
 
@@ -411,11 +414,11 @@ namespace Daenet.DurableTask.SqlStateProvider
             }
         }
 
-        public async Task<IEnumerable<OrchestrationHistoryEvent>> ReadOrchestrationHistoryEventsAsync(string instanceId, string executionId)
+        public async Task<IEnumerable<OrchestrationStateInstanceEntity>> ReadOrchestrationStateAsync(string instanceId, string executionId)
         {
             try
             {
-                List<OrchestrationHistoryEvent> events = new List<OrchestrationHistoryEvent>();
+                List<OrchestrationStateInstanceEntity> stateInstances = new List<OrchestrationStateInstanceEntity>();
 
                 using (SqlConnection con = new SqlConnection(m_ConnectionString))
                 {
@@ -425,31 +428,44 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                     cmd.CommandText = String.Format("Select * from {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId;", StateTableWithSchema);
 
-                    cmd.Parameters.Add(createSqlParam("@InstanceId", instanceId));
-                    cmd.Parameters.Add(createSqlParam("@ExecutionId", executionId));
+                    cmd.AddSqlParameter("@InstanceId", instanceId);
+                    cmd.AddSqlParameter("@ExecutionId", executionId);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (reader.Read())
                         {
-                            string instanced = reader["InstanceId"].ToString();
-                            string executiond = reader["ExecutionId"].ToString();
-                            int sequenceNumber = Int32.Parse(reader["SequenceNumber"].ToString());
-                            DateTime tasktimeStamp = DateTime.Parse(reader["TaskTimeStamp"].ToString());
-                            DateTimeOffset timeStamp = DateTimeOffset.Parse(reader["TimeStamp"].ToString());
-                            string historyEventStr = reader["HistoryEvent"].ToString();
+                            var stateEntity = new OrchestrationStateInstanceEntity();
+                            stateEntity.SequenceNumber = reader.GetValue<long>("SequenceNumber");
 
-                            HistoryEvent hEvent = deserializeJson<HistoryEvent>(historyEventStr);
+                            var state = new OrchestrationState();
+                            state.CompletedTime = reader.GetValue<DateTime>("CompletedTime");
+                            state.CompressedSize = reader.GetValue<long>("CompressedSize");
+                            state.CreatedTime = reader.GetValue<DateTime>("CreatedTime");
+                            state.Input = reader.GetValue<string>("Input");
+                            state.LastUpdatedTime = reader.GetValue<DateTime>("LastUpdatedTime");
+                            state.Name = reader.GetValue<string>("Name");
 
-                            OrchestrationHistoryEvent ev = new OrchestrationHistoryEvent(instanced, executiond, sequenceNumber, tasktimeStamp, hEvent);
-                            ev.Timestamp = timeStamp;
+                            state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
+                            state.OrchestrationStatus = reader.GetValue<OrchestrationStatus>("OrchestrationStatus");
+                            state.Output = reader["Output"].ToString();
+                            state.ParentInstance = deserializeJson<ParentInstance>(reader.GetValue<string>("ParentInstance"));
+                            state.Size = reader.GetValue<long>("Size");
+                            state.Status = reader.GetValue<string>("Status");
+                            state.Tags = deserializeJson<Dictionary<string, string>>(reader.GetValue<string>("Tags"));
+                            state.Version = reader.GetValue<string>("Version");
 
-                            events.Add(ev);
+                            string instanced = reader.GetValue<string>("InstanceId");
+                            string executiond = reader.GetValue<string>("ExecutionId");
+
+                            stateEntity.State = state;
+
+                            stateInstances.Add(stateEntity);
                         }
                     }
                 }
 
-                return events;
+                return stateInstances;
             }
             catch (Exception)
             {
@@ -622,6 +638,9 @@ namespace Daenet.DurableTask.SqlStateProvider
         /// <returns></returns>
         private T deserializeJson<T>(string jsonString)
         {
+            if (String.IsNullOrEmpty(jsonString) || String.IsNullOrWhiteSpace(jsonString))
+                return default(T);
+
             object obj = JsonConvert.DeserializeObject(jsonString, typeof(T));
 
             return (T)obj;
@@ -634,6 +653,9 @@ namespace Daenet.DurableTask.SqlStateProvider
         /// <returns></returns>
         private string serializeToJson(object obj)
         {
+            if (obj == null)
+                return String.Empty;
+
             string serializedHistoryEvent = JsonConvert.SerializeObject(obj,
                 new JsonSerializerSettings
                 {
@@ -642,24 +664,6 @@ namespace Daenet.DurableTask.SqlStateProvider
                 });
 
             return serializedHistoryEvent;
-        }
-
-        /// <summary>
-        /// Create Sql Parameter object
-        /// </summary>
-        /// <param name="key">Name of Param in CommandText</param>
-        /// <param name="val">Value of Param</param>
-        /// <returns></returns>
-        private SqlParameter createSqlParam(string key, object val)
-        {
-            SqlParameter param;
-
-            if (val == null)
-                param = new SqlParameter(key, DBNull.Value);
-            else
-                param = new SqlParameter(key, val);
-
-            return param;
         }
 
         /// <summary>
@@ -680,7 +684,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                 if (!String.IsNullOrEmpty(typedFilter.ExecutionId))
                 {
                     filterExpression.AppendFormat(CultureInfo.InvariantCulture, SqlInstanceStoreConstants.ExecIdTemplate, number);
-                    cmd.Parameters.Add(createSqlParam("@ExecutionId" + number, typedFilter.ExecutionId));
+                    cmd.AddSqlParameter("@ExecutionId" + number, typedFilter.ExecutionId);
                 }
 
                 if (!String.IsNullOrEmpty(typedFilter.InstanceId))
@@ -690,13 +694,13 @@ namespace Daenet.DurableTask.SqlStateProvider
                     if (typedFilter.StartsWith)
                     {
                         filterExpression.AppendFormat("InstanceId LIKE @InstanceId{0}", number);
-                        cmd.Parameters.Add(createSqlParam("@InstanceId" + number, String.Format("{0}%", typedFilter.InstanceId)));
+                        cmd.AddSqlParameter("@InstanceId" + number, String.Format("{0}%", typedFilter.InstanceId));
                     }
                     else
                     {
                         filterExpression.AppendFormat(CultureInfo.InvariantCulture, SqlInstanceStoreConstants.InstanceIdTemplate, number, number);
 
-                        cmd.Parameters.Add(createSqlParam("@InstanceId" + number, typedFilter.InstanceId));
+                        cmd.AddSqlParameter("@InstanceId" + number, typedFilter.InstanceId);
                     }
                 }
             }
@@ -706,7 +710,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 filterExpression.AppendFormat("OrchestrationStatus = @OrchestrationStatus{0}", number);
 
-                cmd.Parameters.Add(createSqlParam("@OrchestrationStatus" + number, typedFilter.Status.ToString()));
+                cmd.AddSqlParameter("@OrchestrationStatus" + number, typedFilter.Status.ToString());
             }
             else if (filter is OrchestrationStateNameVersionFilter)
             {
@@ -716,7 +720,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                 {
                     filterExpression.AppendFormat("Name = @Name{0}", number);
 
-                    cmd.Parameters.Add(createSqlParam("@Name" + number, typedFilter.Name));
+                    cmd.AddSqlParameter("@Name" + number, typedFilter.Name);
                 }
 
                 if (typedFilter.Version != null)
@@ -725,7 +729,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                     filterExpression.AppendFormat("Version = @Version{0}", number);
 
-                    cmd.Parameters.Add(createSqlParam("@Version" + number, typedFilter.Version));
+                    cmd.AddSqlParameter("@Version" + number, typedFilter.Version);
                 }
             }
             else if (filter is OrchestrationStateTimeRangeFilter)
@@ -743,7 +747,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     case OrchestrationStateTimeRangeFilterType.OrchestrationCompletedTimeFilter:
                         {
                             filterExpression.AppendFormat("(CompletedTime >= @StartDatetime{0} AND CompletedTime < @EndDatetime{0} AND OrchestrationStatus = @OrchestrationStatus)", number);
-                            cmd.Parameters.Add(createSqlParam("@OrchestrationStatus", OrchestrationStatus.Completed.ToString()));
+                            cmd.AddSqlParameter("@OrchestrationStatus", OrchestrationStatus.Completed.ToString());
                             break;
                         }
                     case OrchestrationStateTimeRangeFilterType.OrchestrationLastUpdatedTimeFilter:
@@ -757,14 +761,14 @@ namespace Daenet.DurableTask.SqlStateProvider
                 }
 
                 if (typedFilter.StartTime == DateTime.MinValue)
-                    cmd.Parameters.Add(createSqlParam("@StartDatetime" + number, SqlDateTime.MinValue));
+                    cmd.AddSqlParameter("@StartDatetime" + number, SqlDateTime.MinValue);
                 else
-                    cmd.Parameters.Add(createSqlParam("@StartDatetime" + number, typedFilter.StartTime));
+                    cmd.AddSqlParameter("@StartDatetime" + number, typedFilter.StartTime);
 
                 if (typedFilter.StartTime == DateTime.MinValue)
-                    cmd.Parameters.Add(createSqlParam("@EndDatetime" + number, SqlDateTime.MaxValue));
+                    cmd.AddSqlParameter("@EndDatetime" + number, SqlDateTime.MaxValue);
                 else
-                    cmd.Parameters.Add(createSqlParam("@EndDatetime" + number, typedFilter.EndTime));
+                    cmd.AddSqlParameter("@EndDatetime" + number, typedFilter.EndTime);
 
             }
             return filterExpression.ToString();
