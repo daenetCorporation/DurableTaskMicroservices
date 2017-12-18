@@ -1,10 +1,11 @@
 ﻿CREATE TABLE [dbo].[StateTable]
 (
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
 	[InstanceId] NVARCHAR(50) NOT NULL,
 	[ExecutionId] NVARCHAR(50) NOT NULL,
 	[SequenceNumber] BIGINT NOT NULL,
-	[CompletedTime] DATETIME NOT NULL, 
+	[JumpStartTime] DATETIME NOT NULL,
+	[CompletedTime] DATETIME NOT NULL,
 	[CompressedSize] BIGINT NOT NULL, 
 	[CreatedTime] DATETIME NOT NULL, 
 	[Input] NVARCHAR(MAX) NOT NULL, 

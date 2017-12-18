@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Daenet.Common.Sql;
+using DurableTask.Core.History;
 
 namespace Daenet.DurableTask.SqlStateProvider
 {
@@ -131,7 +132,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                     END", WorkItemTableWithSchema);
 
 
-                    // set commandtext
+                    // set CommandText
                     cmd.CommandText = command.ToString();
 
                     await cmd.ExecuteNonQueryAsync();
@@ -142,6 +143,89 @@ namespace Daenet.DurableTask.SqlStateProvider
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        internal async Task<IEnumerable<OrchestrationWorkItemInstanceEntity>> ReadWorkItemsAsync(string instanceId, string executionId)
+        {
+            List<OrchestrationWorkItemInstanceEntity> workItems = new List<OrchestrationWorkItemInstanceEntity>();
+
+            using (SqlConnection con = new SqlConnection(m_ConnectionString))
+            {
+                await con.OpenAsync();
+
+                SqlCommand cmd = con.CreateCommand();
+
+                cmd.CommandText = String.Format("Select * from {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId;", WorkItemTableWithSchema);
+
+                cmd.AddSqlParameter("@InstanceId", instanceId);
+                cmd.AddSqlParameter("@ExecutionId", executionId);
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (reader.Read())
+                    {
+                        var workItem = new OrchestrationWorkItemInstanceEntity();
+                        workItem.SequenceNumber = reader.GetValue<long>("SequenceNumber");
+                        workItem.InstanceId = reader.GetValue<string>("InstanceId");
+                        workItem.ExecutionId = reader.GetValue<string>("ExecutionId");
+                        workItem.EventTimestamp = reader.GetValue<DateTime>("EventTimestamp");
+                        workItem.HistoryEvent = deserializeJson<HistoryEvent>(reader.GetValue<string>("HistoryEvent"));
+
+                        workItems.Add(workItem);
+                    }
+                }
+            }
+
+            return workItems;
+        }
+
+        internal Task<IEnumerable<OrchestrationStateInstanceEntity>> QueryJumpStartOrchestrationsAsync(OrchestrationStateQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task DeleteStatesAsync(IEnumerable<OrchestrationStateInstanceEntity> stateItems)
+        {
+            using (SqlConnection con = new SqlConnection(m_ConnectionString))
+            {
+                await con.OpenAsync();
+
+                SqlCommand cmd = con.CreateCommand();
+
+                cmd.CommandText = String.Format("DELETE FROM {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId AND SequenceNumber = @SequenceNumber;", StateTableWithSchema);
+
+                foreach (var state in stateItems)
+                {
+                    cmd.Parameters.Clear();
+                    cmd.AddSqlParameter("@InstanceId", state.State.OrchestrationInstance.InstanceId);
+                    cmd.AddSqlParameter("@ExecutionId", state.State.OrchestrationInstance.ExecutionId);
+                    cmd.AddSqlParameter("@SequenceNumber", state.SequenceNumber);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+        internal async Task DeleteWorkItemsAsync(IEnumerable<OrchestrationWorkItemInstanceEntity> workItems)
+        {
+            using (SqlConnection con = new SqlConnection(m_ConnectionString))
+            {
+                await con.OpenAsync();
+
+                SqlCommand cmd = con.CreateCommand();
+
+                cmd.CommandText = String.Format("DELETE FROM {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId AND SequenceNumber = @SequenceNumber;", WorkItemTableWithSchema);
+
+                foreach (var workItem in workItems)
+                {
+                    cmd.Parameters.Clear();
+                    cmd.AddSqlParameter("@InstanceId", workItem.InstanceId);
+                    cmd.AddSqlParameter("@ExecutionId", workItem.ExecutionId);
+                    cmd.AddSqlParameter("@SequenceNumber", workItem.SequenceNumber);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
             }
         }
 
@@ -325,8 +409,9 @@ namespace Daenet.DurableTask.SqlStateProvider
         /// <param name="thresholdDateTimeUtc">Deletes instances older than.</param>
         /// <param name="timeRangeFilterType">Time lookup criteria.</param>
         /// <returns></returns>
-        public async Task PurgeOrchestrationInstanceHistoryAsync(DateTime thresholdDateTimeUtc, OrchestrationStateTimeRangeFilterType timeRangeFilterType)
+        public async Task<int> PurgeOrchestrationInstanceHistoryAsync(DateTime thresholdDateTimeUtc, OrchestrationStateTimeRangeFilterType timeRangeFilterType)
         {
+            int purgeCount = 0;
             string columnName = null;
 
             //
@@ -382,7 +467,8 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                         // delete all states which matches
                         cmd.CommandText = String.Format("DELETE from {0} WHERE {1} <= @DT", StateTableWithSchema, columnName);
-                        await cmd.ExecuteNonQueryAsync();
+
+                        purgeCount = await cmd.ExecuteNonQueryAsync();
 
                         // clear after execute
                         cmd.Parameters.Clear();
@@ -403,6 +489,8 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                         trans.Commit();
                     }
+
+                    return purgeCount;
                 }
                 catch (Exception)
                 {
@@ -455,8 +543,8 @@ namespace Daenet.DurableTask.SqlStateProvider
                             state.Tags = deserializeJson<Dictionary<string, string>>(reader.GetValue<string>("Tags"));
                             state.Version = reader.GetValue<string>("Version");
 
-                            string instanced = reader.GetValue<string>("InstanceId");
-                            string executiond = reader.GetValue<string>("ExecutionId");
+                            //string instanced = reader.GetValue<string>("InstanceId");
+                            //string executiond = reader.GetValue<string>("ExecutionId");
 
                             stateEntity.State = state;
 
