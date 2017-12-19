@@ -160,19 +160,25 @@ namespace Daenet.DurableTask.SqlStateProvider
         }
 
 
-        public Task<object> WriteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
+        public async Task<object> WriteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
         {
-            throw new NotImplementedException();
+            await Client.WriteJumpStartEntitiesAsync(entities);
+
+            return null;
         }
 
-        public Task<object> DeleteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
+        public async Task<object> DeleteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
         {
-            throw new NotImplementedException();
+            await Client.DeleteJumpStartEntitiesAsync(entities);
+
+            return null;
         }
 
-        public Task<IEnumerable<OrchestrationJumpStartInstanceEntity>> GetJumpStartEntitiesAsync(int top)
+        public async Task<IEnumerable<OrchestrationJumpStartInstanceEntity>> GetJumpStartEntitiesAsync(int top)
         {
-            throw new NotImplementedException();
+            var entities = await Client.QueryJumpStartOrchestrationsAsync(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, top);
+
+            return entities;
         }
 
         #endregion

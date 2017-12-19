@@ -25,9 +25,19 @@ namespace Daenet.DurableTask.SqlStateProvider
             get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_State"); }
         }
 
+        public string JumpStartTableWithSchema
+        {
+            get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_JumpStart"); }
+        }
+
         public string WorkItemTableWithSchema
         {
             get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_WorkItem"); }
+        }
+
+        public string JumpStartTableName
+        {
+            get { return String.Format("{0}", m_BaseTable + "_JumpStart"); }
         }
 
         public string StateTableName
@@ -80,7 +90,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     //    schema = dbschema.ToString();
 
                     //
-                    // History Table
+                    // State Table
                     command.AppendFormat(@"IF (NOT EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
                  WHERE TABLE_SCHEMA = '{0}'
@@ -112,7 +122,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     command.AppendLine();
 
                     //
-                    // State table
+                    // Workitem table
                     command.AppendFormat(@"IF (NOT EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
                  WHERE TABLE_SCHEMA = '{0}'
@@ -124,12 +134,43 @@ namespace Daenet.DurableTask.SqlStateProvider
 	                                        [Id] INT NOT NULL PRIMARY KEY IDENTITY, 
                                             [InstanceId] NVARCHAR(50) NOT NULL, 
                                             [ExecutionId] NVARCHAR(50) NOT NULL, 
-                                            [SequenceNumber] INT NOT NULL, 
+                                            [SequenceNumber] BIGINT NOT NULL, 
                                             [HistoryEvent] NVARCHAR(MAX) NOT NULL, 
                                             [TaskTimeStamp] DATETIME NOT NULL,
                                             [TimeStamp] DATETIMEOFFSET NOT NULL
                                         );
                                     END", WorkItemTableWithSchema);
+
+                    //
+                    // JumpStart table
+                    command.AppendFormat(@"IF (NOT EXISTS (SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES
+                 WHERE TABLE_SCHEMA = '{0}'
+                 AND  TABLE_NAME = '{1}'))", m_SchemaName, JumpStartTableName);
+
+                    command.AppendFormat(@"BEGIN 
+                                        CREATE TABLE {0}
+                                        (
+	                                        [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+                                            [InstanceId] NVARCHAR(50) NOT NULL,
+                                            [ExecutionId] NVARCHAR(50) NOT NULL,
+                                            [JumpStartTime] DATETIME NOT NULL,
+                                            [CompletedTime] DATETIME NOT NULL,
+                                            [CompressedSize] BIGINT NOT NULL, 
+                                            [CreatedTime] DATETIME NOT NULL, 
+                                            [Input] NVARCHAR(MAX) NOT NULL, 
+                                            [LastUpdatedTime] DATETIME NOT NULL, 
+                                            [Name] NVARCHAR(100) NOT NULL, 
+                                            [OrchestrationInstance] NVARCHAR(MAX) NOT NULL, 
+                                            [OrchestrationStatus] NVARCHAR(MAX) NOT NULL, 
+                                            [Output] NVARCHAR(MAX) NULL, 
+                                            [ParentInstance] NVARCHAR(MAX) NOT NULL, 
+                                            [Size] BIGINT NOT NULL, 
+                                            [Status] NVARCHAR(50) NOT NULL, 
+                                            [Tags] NVARCHAR(MAX) NULL, 
+                                            [Version] NVARCHAR(50) NOT NULL
+                                        );
+                                    END", JumpStartTableWithSchema);
 
 
                     // set CommandText
@@ -143,6 +184,77 @@ namespace Daenet.DurableTask.SqlStateProvider
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        internal async Task<IEnumerable<OrchestrationJumpStartInstanceEntity>> QueryJumpStartOrchestrationsAsync(DateTime startTime, DateTime endTime, int top)
+        {
+            var entities = new List<OrchestrationJumpStartInstanceEntity>();
+
+            using (SqlConnection con = new SqlConnection(m_ConnectionString))
+            {
+                await con.OpenAsync();
+
+                SqlCommand cmd = con.CreateCommand();
+
+                cmd.CommandText = String.Format("SELECT TOP {0} * FROM {1} WHERE JumpStartTime < @StartTime AND JumpStartTime > @EndTime", top, JumpStartTableWithSchema);
+
+                    cmd.AddSqlParameter("@StartTime", startTime);
+                    cmd.AddSqlParameter("@EndTime", endTime);
+
+                    var reader = await cmd.ExecuteReaderAsync();
+
+                while(reader.Read())
+                {
+                    var jumpStartEntity = new OrchestrationJumpStartInstanceEntity();
+                    jumpStartEntity.SequenceNumber = reader.GetValue<long>("SequenceNumber");
+                    jumpStartEntity.JumpStartTime = reader.GetValue<DateTime>("JumpStartTime");
+
+                    var state = new OrchestrationState();
+                    state.CompletedTime = reader.GetValue<DateTime>("CompletedTime");
+                    state.CompressedSize = reader.GetValue<long>("CompressedSize");
+                    state.CreatedTime = reader.GetValue<DateTime>("CreatedTime");
+                    state.Input = reader.GetValue<string>("Input");
+                    state.LastUpdatedTime = reader.GetValue<DateTime>("LastUpdatedTime");
+                    state.Name = reader.GetValue<string>("Name");
+
+                    state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
+                    state.OrchestrationStatus = reader.GetValue<OrchestrationStatus>("OrchestrationStatus");
+                    state.Output = reader["Output"].ToString();
+                    state.ParentInstance = deserializeJson<ParentInstance>(reader.GetValue<string>("ParentInstance"));
+                    state.Size = reader.GetValue<long>("Size");
+                    state.Status = reader.GetValue<string>("Status");
+                    state.Tags = deserializeJson<Dictionary<string, string>>(reader.GetValue<string>("Tags"));
+                    state.Version = reader.GetValue<string>("Version");
+
+                    jumpStartEntity.State = state;
+
+                    entities.Add(jumpStartEntity);
+                }
+            }
+
+            return entities;
+        }
+
+        internal async Task DeleteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
+        {
+            using (SqlConnection con = new SqlConnection(m_ConnectionString))
+            {
+                await con.OpenAsync();
+
+                SqlCommand cmd = con.CreateCommand();
+
+                cmd.CommandText = String.Format("DELETE FROM {0} WHERE InstanceId = @InstanceId AND ExecutionId = @ExecutionId;", JumpStartTableWithSchema);
+
+                foreach (var entity in entities)
+                {
+                    cmd.Parameters.Clear();
+                    cmd.AddSqlParameter("@InstanceId", entity.State.OrchestrationInstance.InstanceId);
+                    cmd.AddSqlParameter("@ExecutionId", entity.State.OrchestrationInstance.ExecutionId);
+                    //cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
             }
         }
 
@@ -178,6 +290,59 @@ namespace Daenet.DurableTask.SqlStateProvider
             }
 
             return workItems;
+        }
+
+        internal async Task WriteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
+        {
+            if (entities == null || entities.Count() == 0)
+                return;
+
+            try
+            {
+                // TODO: use transaction here or not?
+                using (SqlConnection con = new SqlConnection(m_ConnectionString))
+                {
+                    await con.OpenAsync();
+
+                    SqlCommand cmd = con.CreateCommand();
+
+                    cmd.CommandText = String.Format("Insert Into {0} (InstanceId, ExecutionId, SequenceNumber, JumpStartTime, CompletedTime, CompressedSize, CreatedTime, Input, LastUpdatedTime, Name, OrchestrationInstance, OrchestrationStatus, Output, ParentInstance, Size, Status, Tags, Version) " +
+                        "VALUES (@InstanceId, @ExecutionId, @SequenceNumber, @JumpStartTime, @CompletedTime, @CompressedSize, @CreatedTime, @Input, @LastUpdatedTime, @Name, @OrchestrationInstance, @OrchestrationStatus, @Output, @ParentInstance, @Size, @Status, @Tags, @Version)", WorkItemTableWithSchema);
+
+                    foreach (var entity in entities)
+                    {
+                        var state = entity.State;
+
+                        cmd.Parameters.Clear();
+                        cmd.AddSqlParameter("@InstanceId", state.OrchestrationInstance.InstanceId);
+                        cmd.AddSqlParameter("@ExecutionId", state.OrchestrationInstance.ExecutionId);
+                        cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
+                        cmd.AddSqlParameter("@JumpStartTime", entity.JumpStartTime);
+                        cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
+                        cmd.AddSqlParameter("@CompressedSize", state.CompressedSize);
+                        cmd.AddSqlParameter("@CreatedTime", state.CreatedTime);
+                        cmd.AddSqlParameter("@Input", state.Input);
+                        cmd.AddSqlParameter("@LastUpdatedTime", state.LastUpdatedTime);
+                        cmd.AddSqlParameter("@Name", state.Name);
+                        cmd.AddSqlParameter("@OrchestrationInstance", serializeToJson(state.OrchestrationInstance)); // serialize to json
+                        cmd.AddSqlParameter("@OrchestrationStatus", state.OrchestrationStatus.ToString()); // serialize to json
+                        cmd.AddSqlParameter("@Output", state.Output);
+                        cmd.AddSqlParameter("@ParentInstance", serializeToJson(state.ParentInstance)); // serialize to json
+                        cmd.AddSqlParameter("@Size", state.Size);
+                        cmd.AddSqlParameter("@Status", state.Status);
+                        cmd.AddSqlParameter("@Tags", serializeToJson(state.Tags));
+                        cmd.AddSqlParameter("@Version", state.Version);
+
+                        if (await cmd.ExecuteNonQueryAsync() != 1)
+                            throw new Exception("Insert of Entity failed to SQL State Provider!");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         internal Task<IEnumerable<OrchestrationStateInstanceEntity>> QueryJumpStartOrchestrationsAsync(OrchestrationStateQuery query)
@@ -267,6 +432,12 @@ namespace Daenet.DurableTask.SqlStateProvider
                  WHERE TABLE_SCHEMA = '{0}'
                  AND  TABLE_NAME = '{1}'))", m_SchemaName, StateTableName);
                     command.AppendFormat(@"BEGIN Drop Table {0} END", StateTableWithSchema);
+
+                    command.AppendFormat(@"IF (EXISTS (SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES
+                 WHERE TABLE_SCHEMA = '{0}'
+                 AND  TABLE_NAME = '{1}'))", m_SchemaName, JumpStartTableName);
+                    command.AppendFormat(@"BEGIN Drop Table {0} END", JumpStartTableWithSchema);
 
                     cmd.CommandText = command.ToString();
 
