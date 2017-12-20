@@ -86,7 +86,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
             var stateEntities = (await Client.QueryOrchestrationStatesAsync(query))?.Results;
 
-            IEnumerable<OrchestrationStateInstanceEntity> jumpStartEntities = await Client.QueryJumpStartOrchestrationsAsync(query);
+            IEnumerable<OrchestrationStateInstanceEntity> jumpStartEntities = (await Client.QueryJumpStartOrchestrationsAsync(query)).Results?.Select(s => tableStateToStateEvent(s));
 
             IEnumerable<OrchestrationState> states = stateEntities.Select(stateEntity => stateEntity);
             IEnumerable<OrchestrationState> jumpStartStates = jumpStartEntities.Select(j => j.State)
@@ -124,11 +124,12 @@ namespace Daenet.DurableTask.SqlStateProvider
             if (result == null)
             {
                 // Query from JumpStart table
-                result = (await Client.QueryJumpStartOrchestrationsAsync(
+                var querySegment = (await Client.QueryJumpStartOrchestrationsAsync(
                        new OrchestrationStateQuery()
                         .AddInstanceFilter(instanceId, executionId))
-                        .ConfigureAwait(false))
-                    .FirstOrDefault();
+                        .ConfigureAwait(false));
+
+                result = tableStateToStateEvent(querySegment.Results?.FirstOrDefault());
             }
 
             return (result != null) ? tableStateToStateEvent(result.State) : null;
@@ -188,6 +189,9 @@ namespace Daenet.DurableTask.SqlStateProvider
 
         private OrchestrationStateInstanceEntity tableStateToStateEvent(OrchestrationState state)
         {
+            if (state == null)
+                return null;
+
             return new OrchestrationStateInstanceEntity { State = state };
         }
 

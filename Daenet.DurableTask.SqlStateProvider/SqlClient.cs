@@ -141,6 +141,8 @@ namespace Daenet.DurableTask.SqlStateProvider
                                         );
                                     END", WorkItemTableWithSchema);
 
+                    command.AppendLine();
+
                     //
                     // JumpStart table
                     command.AppendFormat(@"IF (NOT EXISTS (SELECT * 
@@ -345,9 +347,124 @@ namespace Daenet.DurableTask.SqlStateProvider
             }
         }
 
-        internal Task<IEnumerable<OrchestrationStateInstanceEntity>> QueryJumpStartOrchestrationsAsync(OrchestrationStateQuery query)
+        internal async Task<OrchestrationStateQuerySegment> QueryJumpStartOrchestrationsAsync(OrchestrationStateQuery stateQuery)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //throw new NotImplementedException("no access to OrchestrationStateQuery filters object");
+                // no access to statequery filters objects
+                OrchestrationStateQuerySegment segment = new OrchestrationStateQuerySegment();
+                segment.Results = new List<OrchestrationState>();
+
+                string query = "";
+
+                int skipRowsCount = 1;
+
+                // if not set, set to 10.000 (10k)
+                //if (count == -1)
+                //    count = 10000;
+
+                int toRow = 1000;
+
+                //// if token is set, get number from token where to start
+                //if (continuationToken != null && String.IsNullOrEmpty(continuationToken.ToString()) == false)
+                //{
+                //    skipRowsCount = deserializeJson<int>(continuationToken.ToString());
+                //    toRow = skipRowsCount + count - 1;
+                //}
+
+                int paramCounter = 1;
+
+                using (SqlConnection con = new SqlConnection(m_ConnectionString))
+                {
+                    SqlCommand cmd = con.CreateCommand();
+
+                    await con.OpenAsync();
+
+
+                    // basis string
+                    //query.AppendFormat("SELECT TOP {0} * FROM {1}", count, StateTable);
+
+                    //query.AppendFormat(@"SELECT *
+                    //                    FROM
+                    //                    (
+                    //                    SELECT *, ROW_NUMBER() OVER (ORDER BY CreatedTime) rownum
+                    //                    FROM {0} WHERE 1 = 1 {1}
+                    //                    ) as seq
+                    //                     WHERE seq.rownum BETWEEN {2} AND {3} ", StateTable, skipRowsCount, toRow);
+
+
+                    //if (primaryFilter != null || secondaryFilters != null)
+                    //    query.Append(" AND ");
+
+                    StringBuilder whereQuery = buildOrchestrationQueryString(stateQuery, ref paramCounter, cmd);
+
+                    //query.Append(whereQuery);
+
+                    query = String.Format(@"SELECT *
+                                        FROM
+                                        (
+                                        SELECT *, ROW_NUMBER() OVER (ORDER BY CreatedTime) rownum
+                                        FROM {0} WHERE 1 = 1 {1} 
+                                        ) as seq
+                                         WHERE seq.rownum BETWEEN {2} AND {3} ", StateTableWithSchema, whereQuery, skipRowsCount, toRow);
+
+                    //if (primaryFilter != null || secondaryFilters != null)
+                    //    query.Append(" ORDER BY [CreatedTime] ASC ");
+
+                    cmd.CommandText = query.ToString();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            OrchestrationState state = new OrchestrationState();
+                            state.CompletedTime = DateTime.Parse(reader["CompletedTime"].ToString());
+                            state.CompressedSize = Int64.Parse(reader["CompressedSize"].ToString());
+                            state.CreatedTime = DateTime.Parse(reader["CreatedTime"].ToString());
+                            state.Input = reader["Input"].ToString();
+                            state.LastUpdatedTime = DateTime.Parse(reader["LastUpdatedTime"].ToString());
+                            state.Name = reader["Name"].ToString();
+                            state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader["OrchestrationInstance"].ToString());
+                            state.OrchestrationStatus = (OrchestrationStatus)Enum.Parse(typeof(OrchestrationStatus), reader["OrchestrationStatus"].ToString());
+                            state.Output = reader["Output"].ToString();
+                            state.ParentInstance = deserializeJson<ParentInstance>(reader["ParentInstance"].ToString());
+                            state.Size = Int64.Parse(reader["Size"].ToString());
+                            state.Status = reader["Status"].ToString();
+                            state.Tags = deserializeJson<Dictionary<string, string>>(reader["Tags"].ToString());
+                            state.Version = reader["Version"].ToString();
+
+                            (segment.Results as List<OrchestrationState>).Add(state);
+                        }
+                    }
+
+                    cmd.CommandText = String.Format("SELECT TOP 1 ROW_NUMBER() OVER (ORDER BY ID) rownum FROM {0}  WHERE 1 = 1 {1} ORDER BY rownum DESC", JumpStartTableWithSchema, whereQuery.ToString());
+
+                    var allRows = Convert.ToInt64(await cmd.ExecuteScalarAsync());
+
+                    if (allRows != default(Int64))
+                    {
+                        // get actual queried items + skipped
+                        long actualPosition = skipRowsCount + (segment.Results as List<OrchestrationState>).Count;
+
+                        // if not all rows queried, return new position
+                        if (actualPosition <= allRows)
+                            segment.ContinuationToken = serializeToJson(actualPosition);
+                        else
+                            segment.ContinuationToken = null;
+                    }
+                }
+
+                // skipRowsCount from parameter + added rows = new token
+                //segment.ContinuationToken = serializeToJson((skipRowsCount + (segment.Results as List<OrchestrationState>).Count).ToString());
+
+                return segment;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         internal async Task DeleteStatesAsync(IEnumerable<OrchestrationStateInstanceEntity> stateItems)
@@ -744,18 +861,6 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 string query = "";
 
-                var filters = stateQuery.GetFilters();
-
-
-                OrchestrationStateQueryFilter primaryFilter = null;
-                IEnumerable<OrchestrationStateQueryFilter> secondaryFilters = null;
-
-                if (filters != null)
-                {
-                    primaryFilter = filters.Item1;
-                    secondaryFilters = filters.Item2;
-                }
-
                 int skipRowsCount = 1;
 
                 // if not set, set to 10.000 (10k)
@@ -795,29 +900,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     //if (primaryFilter != null || secondaryFilters != null)
                     //    query.Append(" AND ");
 
-                    StringBuilder whereQuery = new StringBuilder();
-
-                    if (primaryFilter != null)
-                    {
-                        whereQuery.Append(" AND ");
-
-                        whereQuery.Append(getFilterString(primaryFilter, cmd, paramCounter));
-                        paramCounter++;
-                    }
-
-                    if (secondaryFilters != null)
-                    {
-                        foreach (var filter in secondaryFilters)
-                        {
-                            // add AND if something is in here
-                            if (whereQuery.Length != 0)
-                                whereQuery.Append(" AND ");
-
-                            whereQuery.Append(getFilterString(filter, cmd, paramCounter));
-
-                            paramCounter++;
-                        }
-                    }
+                    StringBuilder whereQuery = buildOrchestrationQueryString(stateQuery, ref paramCounter, cmd);
 
                     //query.Append(whereQuery);
 
@@ -885,6 +968,47 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 throw;
             }
+        }
+
+        private StringBuilder buildOrchestrationQueryString(OrchestrationStateQuery stateQuery, ref int paramCounter, SqlCommand cmd)
+        {
+            var filters = stateQuery.GetFilters();
+
+
+            OrchestrationStateQueryFilter primaryFilter = null;
+            IEnumerable<OrchestrationStateQueryFilter> secondaryFilters = null;
+
+            if (filters != null)
+            {
+                primaryFilter = filters.Item1;
+                secondaryFilters = filters.Item2;
+            }
+
+            StringBuilder whereQuery = new StringBuilder();
+
+            if (primaryFilter != null)
+            {
+                whereQuery.Append(" AND ");
+
+                whereQuery.Append(getFilterString(primaryFilter, cmd, paramCounter));
+                paramCounter++;
+            }
+
+            if (secondaryFilters != null)
+            {
+                foreach (var filter in secondaryFilters)
+                {
+                    // add AND if something is in here
+                    if (whereQuery.Length != 0)
+                        whereQuery.Append(" AND ");
+
+                    whereQuery.Append(getFilterString(filter, cmd, paramCounter));
+
+                    paramCounter++;
+                }
+            }
+
+            return whereQuery;
         }
 
         #region Private Methods
