@@ -157,7 +157,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [InstanceId] NVARCHAR(50) NOT NULL,
                                             [ExecutionId] NVARCHAR(50) NOT NULL,
                                             [SequenceNumber] BIGINT NOT NULL,
-                                            [JumpStartTime] DATETIME NOT NULL,
+                                            [JumpStartTime] DATETIME NULL,
                                             [CompletedTime] DATETIME NULL,
                                             [CompressedSize] BIGINT NOT NULL, 
                                             [CreatedTime] DATETIME NOT NULL, 
@@ -200,7 +200,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 SqlCommand cmd = con.CreateCommand();
 
-                cmd.CommandText = String.Format("SELECT TOP {0} * FROM {1} WHERE JumpStartTime < @StartTime AND JumpStartTime > @EndTime", top, JumpStartTableWithSchema);
+                cmd.CommandText = String.Format("SELECT TOP {0} * FROM {1} WHERE CreatedTime > @StartTime AND CreatedTime < @EndTime", top, JumpStartTableWithSchema);
 
                     cmd.AddSqlParameter("@StartTime", startTime);
                     cmd.AddSqlParameter("@EndTime", endTime);
@@ -322,9 +322,9 @@ namespace Daenet.DurableTask.SqlStateProvider
                         cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
 
                         if (entity.JumpStartTime == default(DateTime))
-                            entity.JumpStartTime = DateTime.UtcNow;
-
-                        cmd.AddSqlParameter("@JumpStartTime", entity.JumpStartTime);
+                            cmd.AddSqlParameter("@JumpStartTime", null);
+                        else
+                            cmd.AddSqlParameter("@JumpStartTime", entity.JumpStartTime);
 
 
                         if (state.CompletedTime == default(DateTime))
