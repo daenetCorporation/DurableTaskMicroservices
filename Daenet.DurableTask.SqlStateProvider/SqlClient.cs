@@ -184,7 +184,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     cmd.Transaction.Commit();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -471,7 +471,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 return segment;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;
@@ -981,7 +981,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 return segment;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;
