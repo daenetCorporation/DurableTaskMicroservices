@@ -12,6 +12,7 @@
 //  ----------------------------------------------------------------------------------
 
 using Daenet.DurableTask.Microservices;
+using Daenet.DurableTask.SqlStateProvider;
 using DurableTask;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
@@ -32,8 +33,9 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     [TestClass]
     public class UnitTests
     {
-        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
-        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
+        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"]?.ConnectionString;
+        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"]?.ConnectionString;
+        private static string SqlStorageConnectionString = ConfigurationManager.ConnectionStrings["Sql"]?.ConnectionString;
 
         private static ServiceHost createMicroserviceHost()
         {
@@ -41,7 +43,23 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
 
-            instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
+            //instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
+            ServiceHost host;
+
+            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
+
+            return host;
+        }
+
+        private static ServiceHost getMicroServiceWithSqlInstanceStoreHost()
+        {
+            IOrchestrationServiceInstanceStore instanceStore = new SqlInstanceStore("Dtf", SqlStorageConnectionString);
+            //instanceStore.DeleteStoreAsync().Wait();
+
+            ServiceBusOrchestrationService orchestrationServiceAndClient =
+               new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
+
+            //instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
             ServiceHost host;
 
             host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
@@ -50,9 +68,39 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         }
 
         [TestMethod]
-        public void OpenAndStartServiceHostTest()
+        public void OpenAndStartServiceHostTestWithSB()
         {
             var host = createMicroserviceHost();
+
+            Microservice service = new Microservice();
+            service.InputArgument = new TestOrchestrationInput()
+            {
+                Counter = 2,
+                Delay = 1000,
+            };
+
+            service.OrchestrationQName = typeof(CounterOrchestration).AssemblyQualifiedName;
+
+            service.ActivityQNames = new string[]{
+                typeof(Task1).AssemblyQualifiedName,  typeof(Task2).AssemblyQualifiedName,
+            };
+
+            host.LoadService(service);
+
+            host.OpenAsync().Wait();
+
+            // This is client side code.
+            var instance = host.StartServiceAsync(service.OrchestrationQName, service.InputArgument).Result;
+
+            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
+
+            host.WaitOnInstanceAsync(instance).Wait();
+        }
+
+        [TestMethod]
+        public void OpenAndStartServiceHostTestWithSql()
+        {
+            var host = getMicroServiceWithSqlInstanceStoreHost();
 
             Microservice service = new Microservice();
             service.InputArgument = new TestOrchestrationInput()
