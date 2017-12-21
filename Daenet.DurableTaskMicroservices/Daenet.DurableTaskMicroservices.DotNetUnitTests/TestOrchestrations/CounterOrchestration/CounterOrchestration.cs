@@ -28,11 +28,11 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     {
         public async override Task<int> RunTask(OrchestrationContext context, TestOrchestrationInput input)
         {
-            Debug.WriteLine($"Input Counter: {input.Counter}");
+            Debug.WriteLine($"Orchestration Input: {input.Counter}. IsReplaying: {context.IsReplaying}");
 
             await context.ScheduleTask<Null>(typeof(Task1), "Input1");
 
-            await context.ScheduleTask<Null>(typeof(Task2), "Input2");
+            await context.ScheduleTask<Null>(typeof(Task2), "Input1");
 
             Task.Delay(100).Wait();
 

@@ -24,8 +24,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     {
         protected override Null Execute(TaskContext context, string input)
         {
-            Debug.WriteLine($"Executing Task: {nameof(Task1)}");
-            Debug.WriteLine($"Input {nameof(Task1)}: {input}");
+            Debug.WriteLine($"Executing Task: {nameof(Task1)}. Input: {input}");
             return new Null();
         }
     }
