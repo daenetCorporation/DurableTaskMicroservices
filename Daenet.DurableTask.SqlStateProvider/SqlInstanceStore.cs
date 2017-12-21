@@ -17,9 +17,9 @@ namespace Daenet.DurableTask.SqlStateProvider
     {
         public SqlClient Client { get; set; }
 
-        public int MaxHistoryEntryLength => throw new NotImplementedException();
+        public int MaxHistoryEntryLength => Int32.MaxValue;
 
-        public SqlInstanceStore(string baseTableName, string sqlConnectionString, string schemaName = null)
+        public SqlInstanceStore(string baseTableName, string sqlConnectionString, string schemaName = "dbo")
         {
             Client = new SqlClient(baseTableName, sqlConnectionString, schemaName);
         }

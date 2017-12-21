@@ -103,7 +103,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [InstanceId] NVARCHAR(50) NOT NULL,
                                             [ExecutionId] NVARCHAR(50) NOT NULL,
                                             [SequenceNumber] BIGINT NOT NULL,
-                                            [CompletedTime] DATETIME NOT NULL, 
+                                            [CompletedTime] DATETIME NULL, 
                                             [CompressedSize] BIGINT NOT NULL, 
                                             [CreatedTime] DATETIME NOT NULL, 
                                             [Input] NVARCHAR(MAX) NOT NULL, 
@@ -114,7 +114,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [Output] NVARCHAR(MAX) NULL, 
                                             [ParentInstance] NVARCHAR(MAX) NOT NULL, 
                                             [Size] BIGINT NOT NULL, 
-                                            [Status] NVARCHAR(50) NOT NULL, 
+                                            [Status] NVARCHAR(50) NULL, 
                                             [Tags] NVARCHAR(MAX) NULL, 
                                             [Version] NVARCHAR(50) NOT NULL
                                         )
@@ -136,7 +136,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [ExecutionId] NVARCHAR(50) NOT NULL, 
                                             [SequenceNumber] BIGINT NOT NULL, 
                                             [HistoryEvent] NVARCHAR(MAX) NOT NULL, 
-                                            [TaskTimeStamp] DATETIME NOT NULL,
+                                            [EventTimestamp] DATETIME NOT NULL,
                                             [TimeStamp] DATETIMEOFFSET NOT NULL
                                         );
                                     END", WorkItemTableWithSchema);
@@ -156,8 +156,9 @@ namespace Daenet.DurableTask.SqlStateProvider
 	                                        [Id] INT NOT NULL PRIMARY KEY IDENTITY,
                                             [InstanceId] NVARCHAR(50) NOT NULL,
                                             [ExecutionId] NVARCHAR(50) NOT NULL,
+                                            [SequenceNumber] BIGINT NOT NULL,
                                             [JumpStartTime] DATETIME NOT NULL,
-                                            [CompletedTime] DATETIME NOT NULL,
+                                            [CompletedTime] DATETIME NULL,
                                             [CompressedSize] BIGINT NOT NULL, 
                                             [CreatedTime] DATETIME NOT NULL, 
                                             [Input] NVARCHAR(MAX) NOT NULL, 
@@ -168,7 +169,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [Output] NVARCHAR(MAX) NULL, 
                                             [ParentInstance] NVARCHAR(MAX) NOT NULL, 
                                             [Size] BIGINT NOT NULL, 
-                                            [Status] NVARCHAR(50) NOT NULL, 
+                                            [Status] NVARCHAR(50) NULL, 
                                             [Tags] NVARCHAR(MAX) NULL, 
                                             [Version] NVARCHAR(50) NOT NULL
                                         );
@@ -222,7 +223,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                     state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
                     state.OrchestrationStatus = reader.GetValue<OrchestrationStatus>("OrchestrationStatus");
-                    state.Output = reader["Output"].ToString();
+                    state.Output = reader.GetValue<string>("Output");
                     state.ParentInstance = deserializeJson<ParentInstance>(reader.GetValue<string>("ParentInstance"));
                     state.Size = reader.GetValue<long>("Size");
                     state.Status = reader.GetValue<string>("Status");
@@ -309,7 +310,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     SqlCommand cmd = con.CreateCommand();
 
                     cmd.CommandText = String.Format("Insert Into {0} (InstanceId, ExecutionId, SequenceNumber, JumpStartTime, CompletedTime, CompressedSize, CreatedTime, Input, LastUpdatedTime, Name, OrchestrationInstance, OrchestrationStatus, Output, ParentInstance, Size, Status, Tags, Version) " +
-                        "VALUES (@InstanceId, @ExecutionId, @SequenceNumber, @JumpStartTime, @CompletedTime, @CompressedSize, @CreatedTime, @Input, @LastUpdatedTime, @Name, @OrchestrationInstance, @OrchestrationStatus, @Output, @ParentInstance, @Size, @Status, @Tags, @Version)", WorkItemTableWithSchema);
+                        "VALUES (@InstanceId, @ExecutionId, @SequenceNumber, @JumpStartTime, @CompletedTime, @CompressedSize, @CreatedTime, @Input, @LastUpdatedTime, @Name, @OrchestrationInstance, @OrchestrationStatus, @Output, @ParentInstance, @Size, @Status, @Tags, @Version)", JumpStartTableWithSchema);
 
                     foreach (var entity in entities)
                     {
@@ -319,8 +320,18 @@ namespace Daenet.DurableTask.SqlStateProvider
                         cmd.AddSqlParameter("@InstanceId", state.OrchestrationInstance.InstanceId);
                         cmd.AddSqlParameter("@ExecutionId", state.OrchestrationInstance.ExecutionId);
                         cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
+
+                        if (entity.JumpStartTime == default(DateTime))
+                            entity.JumpStartTime = DateTime.UtcNow;
+
                         cmd.AddSqlParameter("@JumpStartTime", entity.JumpStartTime);
-                        cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
+
+
+                        if (state.CompletedTime == default(DateTime))
+                            cmd.AddSqlParameter("@CompletedTime", null);
+                        else
+                            cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
+
                         cmd.AddSqlParameter("@CompressedSize", state.CompressedSize);
                         cmd.AddSqlParameter("@CreatedTime", state.CreatedTime);
                         cmd.AddSqlParameter("@Input", state.Input);
@@ -419,20 +430,20 @@ namespace Daenet.DurableTask.SqlStateProvider
                         while (await reader.ReadAsync())
                         {
                             OrchestrationState state = new OrchestrationState();
-                            state.CompletedTime = DateTime.Parse(reader["CompletedTime"].ToString());
-                            state.CompressedSize = Int64.Parse(reader["CompressedSize"].ToString());
-                            state.CreatedTime = DateTime.Parse(reader["CreatedTime"].ToString());
-                            state.Input = reader["Input"].ToString();
-                            state.LastUpdatedTime = DateTime.Parse(reader["LastUpdatedTime"].ToString());
-                            state.Name = reader["Name"].ToString();
-                            state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader["OrchestrationInstance"].ToString());
-                            state.OrchestrationStatus = (OrchestrationStatus)Enum.Parse(typeof(OrchestrationStatus), reader["OrchestrationStatus"].ToString());
-                            state.Output = reader["Output"].ToString();
-                            state.ParentInstance = deserializeJson<ParentInstance>(reader["ParentInstance"].ToString());
-                            state.Size = Int64.Parse(reader["Size"].ToString());
-                            state.Status = reader["Status"].ToString();
-                            state.Tags = deserializeJson<Dictionary<string, string>>(reader["Tags"].ToString());
-                            state.Version = reader["Version"].ToString();
+                            state.CompletedTime = reader.GetValue<DateTime>("CompletedTime");
+                            state.CompressedSize = reader.GetValue<long>("CompressedSize");
+                            state.CreatedTime = reader.GetValue<DateTime>("CreatedTime");
+                            state.Input = reader.GetValue<string>("Input");
+                            state.LastUpdatedTime = reader.GetValue<DateTime>("LastUpdatedTime");
+                            state.Name = reader.GetValue<string>("Name");
+                            state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
+                            state.OrchestrationStatus = reader.GetValue<OrchestrationStatus>("OrchestrationStatus");
+                            state.Output = reader.GetValue<string>("Output");
+                            state.ParentInstance = deserializeJson<ParentInstance>(reader.GetValue<string>("ParentInstance"));
+                            state.Size = reader.GetValue<long>("Size");
+                            state.Status = reader.GetValue<string>("Status");
+                            state.Tags = deserializeJson<Dictionary<string, string>>(reader.GetValue<string>("Tags"));
+                            state.Version = reader.GetValue<string>("Version");
 
                             (segment.Results as List<OrchestrationState>).Add(state);
                         }
@@ -549,6 +560,8 @@ namespace Daenet.DurableTask.SqlStateProvider
                  WHERE TABLE_SCHEMA = '{0}'
                  AND  TABLE_NAME = '{1}'))", m_SchemaName, StateTableName);
                     command.AppendFormat(@"BEGIN Drop Table {0} END", StateTableWithSchema);
+
+                    command.AppendLine();
 
                     command.AppendFormat(@"IF (EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
@@ -669,7 +682,12 @@ namespace Daenet.DurableTask.SqlStateProvider
                     cmd.AddSqlParameter("@InstanceId", instanceId);
                     cmd.AddSqlParameter("@ExecutionId", executionId);
                     cmd.AddSqlParameter("@SequenceNumber", stateInstance.SequenceNumber);
-                    cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
+
+                    if (state.CompletedTime == default(DateTime))
+                        cmd.AddSqlParameter("@CompletedTime", null);
+                    else
+                        cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
+
                     cmd.AddSqlParameter("@CompressedSize", state.CompressedSize);
                     cmd.AddSqlParameter("@CreatedTime", state.CreatedTime);
                     cmd.AddSqlParameter("@Input", state.Input);
@@ -747,7 +765,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                 //state.CompressedSize = Int64.Parse(reader["CompressedSize"].ToString());
 
                                 // only fill OrchestrationInstance for SequenceId and ExecutionId
-                                state.OrchestrationInstance = JsonConvert.DeserializeObject<OrchestrationInstance>(reader["OrchestrationInstance"].ToString());
+                                state.OrchestrationInstance = JsonConvert.DeserializeObject<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
 
                                 states.Add(state);
                             }
@@ -824,7 +842,7 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                             state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
                             state.OrchestrationStatus = reader.GetValue<OrchestrationStatus>("OrchestrationStatus");
-                            state.Output = reader["Output"].ToString();
+                            state.Output = reader.GetValue<string>("Output");
                             state.ParentInstance = deserializeJson<ParentInstance>(reader.GetValue<string>("ParentInstance"));
                             state.Size = reader.GetValue<long>("Size");
                             state.Status = reader.GetValue<string>("Status");
@@ -922,20 +940,20 @@ namespace Daenet.DurableTask.SqlStateProvider
                         while (await reader.ReadAsync())
                         {
                             OrchestrationState state = new OrchestrationState();
-                            state.CompletedTime = DateTime.Parse(reader["CompletedTime"].ToString());
-                            state.CompressedSize = Int64.Parse(reader["CompressedSize"].ToString());
-                            state.CreatedTime = DateTime.Parse(reader["CreatedTime"].ToString());
-                            state.Input = reader["Input"].ToString();
-                            state.LastUpdatedTime = DateTime.Parse(reader["LastUpdatedTime"].ToString());
-                            state.Name = reader["Name"].ToString();
-                            state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader["OrchestrationInstance"].ToString());
-                            state.OrchestrationStatus = (OrchestrationStatus)Enum.Parse(typeof(OrchestrationStatus), reader["OrchestrationStatus"].ToString());
-                            state.Output = reader["Output"].ToString();
-                            state.ParentInstance = deserializeJson<ParentInstance>(reader["ParentInstance"].ToString());
-                            state.Size = Int64.Parse(reader["Size"].ToString());
-                            state.Status = reader["Status"].ToString();
-                            state.Tags = deserializeJson<Dictionary<string, string>>(reader["Tags"].ToString());
-                            state.Version = reader["Version"].ToString();
+                            state.CompletedTime = reader.GetValue<DateTime>("CompletedTime");
+                            state.CompressedSize = reader.GetValue<long>("CompressedSize");
+                            state.CreatedTime = reader.GetValue<DateTime>("CreatedTime");
+                            state.Input = reader.GetValue<string>("Input");
+                            state.LastUpdatedTime = reader.GetValue<DateTime>("LastUpdatedTime");
+                            state.Name = reader.GetValue<string>("Name");
+                            state.OrchestrationInstance = deserializeJson<OrchestrationInstance>(reader.GetValue<string>("OrchestrationInstance"));
+                            state.OrchestrationStatus = reader.GetValue<OrchestrationStatus>("OrchestrationStatus");
+                            state.Output = reader.GetValue<string>("Output");
+                            state.ParentInstance = deserializeJson<ParentInstance>(reader.GetValue<string>("ParentInstance"));
+                            state.Size = reader.GetValue<long>("Size");
+                            state.Status = reader.GetValue<string>("Status");
+                            state.Tags = deserializeJson<Dictionary<string, string>>(reader.GetValue<string>("Tags"));
+                            state.Version = reader.GetValue<string>("Version");
 
                             (segment.Results as List<OrchestrationState>).Add(state);
                         }
