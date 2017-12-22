@@ -9,6 +9,7 @@
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</RepositoryUrl>
     <PackageTags>durabletask</PackageTags>
+    <Version>1.0.1 -preview</Version>
   </PropertyGroup>
 
   <ItemGroup>
