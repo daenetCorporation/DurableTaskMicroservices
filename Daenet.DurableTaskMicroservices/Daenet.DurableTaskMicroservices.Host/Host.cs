@@ -12,6 +12,7 @@
 //  ----------------------------------------------------------------------------------
 
 using Daenet.DurableTask.Microservices;
+using Daenet.DurableTask.SqlStateProvider;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;
@@ -252,19 +253,34 @@ namespace Daenet.DurableTaskMicroservices.Host
 
     public static class HostHelpersExtensions
     {
-        public static ServiceHost CreateMicroserviceHost(string ServiceBusConnectionString, string StorageConnectionString, string hubName, 
-           bool purgeStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null)
+
+        public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storageConnectionString, string hubName, 
+           bool purgeStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null, bool useSqlInstanceStore = false)
         {
-            AzureTableInstanceStore instanceStore = new AzureTableInstanceStore(hubName, StorageConnectionString);
+            IOrchestrationServiceInstanceStore instanceStore;
+
+            if (!useSqlInstanceStore)
+            {
+                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);              
+            }
+            else
+            {
+                instanceStore = new SqlInstanceStore("Dtf", storageConnectionString);              
+            }
+
             ServiceBusOrchestrationService orchestrationServiceAndClient =
-               new ServiceBusOrchestrationService(ServiceBusConnectionString, hubName, instanceStore, null, null);
+                 new ServiceBusOrchestrationService(serviceBusConnectionString, hubName, instanceStore, null, null);
 
             try
             {
                 if (purgeStore)
                     instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
-                
-                runningInstances = instanceStore.GetRunningInstances();
+
+                // Not available on interface yet.
+                if (instanceStore is AzureTableInstanceStore)
+                    runningInstances = ((AzureTableInstanceStore)instanceStore).GetRunningInstances();
+                else
+                    runningInstances = null; //todo ((SqlInstanceStore)instanceStore).GetRunningInstances();
             }
             catch (Exception)
             {
