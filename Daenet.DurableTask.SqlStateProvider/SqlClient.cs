@@ -14,42 +14,70 @@ using DurableTask.Core.History;
 
 namespace Daenet.DurableTask.SqlStateProvider
 {
+    /// <summary>
+    /// Client for Connecting to SqlServer
+    /// </summary>
     public class SqlClient
     {
         private string m_ConnectionString;
         private readonly string m_BaseTable;
         private string m_SchemaName;
 
+        /// <summary>
+        /// Table Name for State with Schema
+        /// </summary>
         public string StateTableWithSchema
         {
             get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_State"); }
         }
 
+        /// <summary>
+        /// Table Name for JumpStart entity with Schema
+        /// </summary>
         public string JumpStartTableWithSchema
         {
             get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_JumpStart"); }
         }
 
+        /// <summary>
+        /// Table Name for WorkItems with Schema
+        /// </summary>
         public string WorkItemTableWithSchema
         {
             get { return String.Format("{0}.{1}", m_SchemaName, m_BaseTable + "_WorkItem"); }
         }
 
+        /// <summary>
+        /// Table Name for Jumpstart Entity
+        /// </summary>
         public string JumpStartTableName
         {
             get { return String.Format("{0}", m_BaseTable + "_JumpStart"); }
         }
 
+        /// <summary>
+        /// Table Name for State Entity
+        /// </summary>
         public string StateTableName
         {
             get { return String.Format("{0}", m_BaseTable + "_State"); }
         }
 
+        /// <summary>
+        /// Table Name for WorkItems
+        /// </summary>
         public string WorkItemTableName
         {
             get { return String.Format("{0}", m_BaseTable + "_WorkItem"); }
         }
 
+
+        /// <summary>
+        /// Constructor for SqlClient
+        /// </summary>
+        /// <param name="baseTableName">prefix for all tables</param>
+        /// <param name="sqlConnectionString">ConnectionString to Sql</param>
+        /// <param name="schemaName">Schema name for tables</param>
         public SqlClient(string baseTableName, string sqlConnectionString, string schemaName = "dbo")
         {
             if (string.IsNullOrEmpty(sqlConnectionString))
@@ -80,14 +108,6 @@ namespace Daenet.DurableTask.SqlStateProvider
                     cmd.Transaction = con.BeginTransaction();
 
                     StringBuilder command = new StringBuilder();
-
-                    //// get default schema name
-                    //cmd.CommandText = "SELECT SCHEMA_NAME()";
-
-                    //var dbschema = await cmd.ExecuteScalarAsync();
-
-                    //if (dbschema != null)
-                    //    schema = dbschema.ToString();
 
                     //
                     // State Table
@@ -190,6 +210,13 @@ namespace Daenet.DurableTask.SqlStateProvider
             }
         }
 
+        /// <summary>
+        /// Query JumpStartOrchestrations
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="top"></param>
+        /// <returns>Matching JumpStartOrchestrations</returns>
         internal async Task<IEnumerable<OrchestrationJumpStartInstanceEntity>> QueryJumpStartOrchestrationsAsync(DateTime startTime, DateTime endTime, int top)
         {
             var entities = new List<OrchestrationJumpStartInstanceEntity>();
