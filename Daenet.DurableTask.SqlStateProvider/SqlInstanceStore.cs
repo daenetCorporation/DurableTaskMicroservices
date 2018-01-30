@@ -160,6 +160,29 @@ namespace Daenet.DurableTask.SqlStateProvider
             return purgeCount;
         }
 
+        /// <summary>
+        ///     Get a list of orchestration states from the instance storage table which match the specified
+        ///     orchestration state query.
+        /// </summary>
+        /// <param name="stateQuery">Orchestration state query to execute</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<OrchestrationState>> QueryOrchestrationStatesAsync(
+            OrchestrationStateQuery stateQuery)
+        {
+            var result = await Client.QueryOrchestrationStatesAsync(stateQuery).ConfigureAwait(false);
+
+            var states = result.Results.Select(s => tableStateToStateEvent(s));
+
+            // Query from JumpStart table
+            var jumpStartEntities = await this.Client.QueryJumpStartOrchestrationsAsync(stateQuery).ConfigureAwait(false);
+
+            var jumpStartResult = result.Results.Select(s => tableStateToStateEvent(s));
+
+            var newStates = states.Concat(jumpStartResult.Where(js => !states.Any(s => s.State.OrchestrationInstance.InstanceId == js.State.OrchestrationInstance.InstanceId)));
+
+            return newStates.Select(stateEntity => stateEntity.State);
+        }
+
 
         public async Task<object> WriteJumpStartEntitiesAsync(IEnumerable<OrchestrationJumpStartInstanceEntity> entities)
         {

@@ -254,18 +254,20 @@ namespace Daenet.DurableTaskMicroservices.Host
     public static class HostHelpersExtensions
     {
 
-        public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storageConnectionString, string hubName, 
+        public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storageConnectionString, string hubName,
            bool purgeStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null, bool useSqlInstanceStore = false)
         {
             IOrchestrationServiceInstanceStore instanceStore;
 
             if (!useSqlInstanceStore)
             {
-                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);              
+                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
             }
             else
             {
-                instanceStore = new SqlInstanceStore("Dtf", storageConnectionString);              
+                instanceStore = new SqlInstanceStore("Dtf", storageConnectionString);
+
+                instanceStore.InitializeStoreAsync(false);
             }
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =
@@ -280,7 +282,7 @@ namespace Daenet.DurableTaskMicroservices.Host
                 if (instanceStore is AzureTableInstanceStore)
                     runningInstances = ((AzureTableInstanceStore)instanceStore).GetRunningInstances();
                 else
-                    runningInstances = null; //todo ((SqlInstanceStore)instanceStore).GetRunningInstances();
+                    runningInstances = ((SqlInstanceStore)instanceStore).GetRunningInstances();
             }
             catch (Exception)
             {
@@ -293,6 +295,32 @@ namespace Daenet.DurableTaskMicroservices.Host
             host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false, loggerFactory);
 
             return host;
+        }
+
+        public static List<OrchestrationState> GetRunningInstances(this SqlInstanceStore instanceStore)
+        {
+            List<OrchestrationState> instances = new List<OrchestrationState>();
+
+            var byNameQuery = new OrchestrationStateQuery();
+            byNameQuery.AddStatusFilter(OrchestrationStatus.Running);
+
+            instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.Running));
+
+            instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.ContinuedAsNew));
+
+            instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.Pending));
+
+            return instances;
+        }
+
+        public static IEnumerable<OrchestrationState> GetInstancesByState(this SqlInstanceStore instanceStore, OrchestrationStatus status)
+        {
+            List<OrchestrationState> instances = new List<OrchestrationState>();
+
+            var byNameQuery = new OrchestrationStateQuery();
+            byNameQuery.AddStatusFilter(status);
+
+            return instanceStore.QueryOrchestrationStatesAsync(byNameQuery).Result;
         }
 
         public static List<OrchestrationState> GetRunningInstances(this AzureTableInstanceStore instanceStore)
