@@ -17,9 +17,11 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
 
             logger.LogInformation("Orchestration started.");
 
-            await context.ScheduleTask<Null>(typeof(Task1), new Task1Input() { Text = "Text passed from Orchestration." });
 
-            await context.ScheduleTask<Null>(typeof(Task2), new Task2Input() { Number = 2 });
+            await ScheduleTask<Null>(typeof(Task1), new Task1Input() { Text = "Text passed from Orchestration." });
+
+            await ScheduleTask<Null>(typeof(Task2), new Task2Input() { Number = 2 });
+            //await context.ScheduleTask<Null>(typeof(Task2), new Task2Input() { Number = 2 });
             
             Task.Delay(100).Wait();
 

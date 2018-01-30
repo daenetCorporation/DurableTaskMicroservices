@@ -6,11 +6,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test.CounterOrchestration
+namespace Daenet.Microservice.Common.Test
 {
-    public class Task1Input : TaskInput
+    [DataContractAttribute]
+    public class TweetOrchestrationInput : OrchestrationInput
     {
         [DataMember]
-        public string Text { get; set; }
+        public string LatestTweetId { get; set; }
     }
 }

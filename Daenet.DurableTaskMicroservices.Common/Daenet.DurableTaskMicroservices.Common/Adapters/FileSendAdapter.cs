@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.System.Integration
+namespace Daenet.Integration
 {
     /// <summary>
     /// Creates a single file in queue folder and invoke the mapper which maps the instance to a single text line.
