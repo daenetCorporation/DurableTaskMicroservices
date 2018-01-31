@@ -24,9 +24,12 @@ namespace Daenet.Microservice.Common.Test
 
             if (input.OldTweetId != input.LatestTweetId)
             {
-                logger.LogInformation("New tweet got.");
+                logger.LogInformation("New mention got in tweets.");
+
                 SwitchOnLight();
+
                 Task.Delay(5000).Wait();
+
                 SwitchOffLight();
             }
 
@@ -35,6 +38,9 @@ namespace Daenet.Microservice.Common.Test
             return new Null();
         }
 
+        /// <summary>
+        /// Switch On the light
+        /// </summary>
         public void SwitchOnLight()
         {
             var iotApi = getIotApi();
@@ -52,6 +58,9 @@ namespace Daenet.Microservice.Common.Test
             }).Result;
         }
 
+        /// <summary>
+        /// Switch Off the light
+        /// </summary>
         public void SwitchOffLight()
         {
             var iotApi = getIotApi();
@@ -68,6 +77,10 @@ namespace Daenet.Microservice.Common.Test
             }).Result;
         }
 
+        /// <summary>
+        /// Get IotApi
+        /// </summary>
+        /// <returns></returns>
         private IotApi getIotApi()
         {
             var api = new IotApi();

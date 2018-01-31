@@ -20,8 +20,6 @@ namespace Daenet.Microservice.Common.Test
             
             input.LatestTweetId = outPut.LatestTweetId;
 
-            Task.Delay(500).Wait();
-
             logger.LogInformation("Orchestration will ContinueAsNew.");
             context.ContinueAsNew(input);
 
@@ -32,8 +30,10 @@ namespace Daenet.Microservice.Common.Test
         {
             return new GetTweetsTaskInput()
             {
-                Key = "quXmqOcBD89bQMDH2GgejLS0r",
-                Secret = "mO6ISttJWUF8tiI6YIZ3W0Nr9NWa4KlH61th8KEPMTsPceUveD",
+                ConsumerKey = "quXmqOcBD89bQMDH2GgejLS0r",
+                ConsumerSecret = "mO6ISttJWUF8tiI6YIZ3W0Nr9NWa4KlH61th8KEPMTsPceUveD",
+                AccessToken = "271351273-mGxKKELunOhYN8CvrEOS8IdQYCbR2nCByHBI4nij",
+                AccessTokenSecret = "mVtaNYbeuN9UWyQIMdmEKsIb18QWVDoyD8u7Buon6OiwW",
                 Name = "summoncse",
                 Count = 1
             };

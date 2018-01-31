@@ -14,13 +14,25 @@ namespace Daenet.Microservice.Common.Test
         /// Twitter Consumer Key
         /// </summary>
         [DataMember]
-        public string Key { get; set; }
+        public string ConsumerKey { get; set; }
 
         /// <summary>
         /// Twitter Consumer secret 
         /// </summary>
         [DataMember]
-        public string Secret { get; set; }
+        public string ConsumerSecret { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public string AccessToken { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public string AccessTokenSecret { get; set; }
 
         /// <summary>
         /// Twitter User Name 

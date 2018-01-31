@@ -1,5 +1,6 @@
 ﻿using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using DurableTask.Core;
+using LinqToTwitter;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -18,16 +19,78 @@ namespace Daenet.Microservice.Common.Test
         {
             logger.LogInformation($"{nameof(GetTweetsTask)} entered.");
 
-            var credential = getCredential(input.Key, input.Secret);
-            var aToken = getToken(credential: credential, logger: logger);
-            var result = getTweet(input.Name, input.Count, aToken, logger);
+            //var credential = getCredential(input.Key, input.Secret);
+            //var aToken = getToken(credential: credential, logger: logger);
+            //var result = getTweet(input.Name, input.Count, aToken, logger);
+
+            var result = getMentions(input, logger).Result;
 
             logger.LogInformation($"{nameof(GetTweetsTask)} exit.");
 
             return result;
 
         }
-        
+
+        /// <summary>
+        /// Get mentions in tweet
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static async Task<GetTweetTaskOutput> getMentions(GetTweetsTaskInput input, ILogger logger)
+        {
+            logger.LogInformation($"Getting mention. Method {nameof(getMentions)}");
+
+            GetTweetTaskOutput output = new GetTweetTaskOutput()
+            {
+                IsTweetAvailable = false
+            };
+
+            try
+            {
+                var auth = new SingleUserAuthorizer()
+                {
+                    CredentialStore = new SingleUserInMemoryCredentialStore()
+                    {
+                        ConsumerKey = input.ConsumerKey,
+                        ConsumerSecret = input.ConsumerSecret,
+                        AccessToken = input.AccessToken,
+                        AccessTokenSecret = input.AccessTokenSecret
+                    },
+                };
+
+                auth.AuthorizeAsync().Wait();
+                var twitterCtx = new TwitterContext(auth);
+
+                var tweets =
+                     await
+                     (from tweet in twitterCtx.Status
+                      where tweet.Type == StatusType.Mentions &&
+                      tweet.Count == input.Count
+                      select tweet)
+                     .ToListAsync();
+
+                foreach (var tweet in tweets)
+                {
+                    output.LatestTweetId = tweet.StatusID.ToString();
+
+                    logger.LogInformation($"Mention Id: {tweet.StatusID}");
+
+                    output.IsTweetAvailable = true;
+                }
+
+                Task.Delay(15000).Wait();
+
+                logger.LogInformation($"Exit method {nameof(getMentions)}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning($"{ex.Message}");
+            }
+
+            return output;
+        }
+
 
         /// <summary>
         /// Get Tweets 
