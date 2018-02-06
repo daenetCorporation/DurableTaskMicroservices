@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test
+namespace GetTweetsMention
 {
     public class TweetOrchestration : OrchestrationBase<TweetOrchestrationInput, Null>
     {
@@ -19,11 +19,8 @@ namespace Daenet.Microservice.Common.Test
             await context.ScheduleTask<Null>(typeof(SwitchOnLightTask), switchOnLightTaskInput(input.LatestTweetId, outPut.LatestTweetId));
             
             input.LatestTweetId = outPut.LatestTweetId;
-
-
-            //Task.Delay(500).Wait();
-
-            await context.CreateTimer(context.CurrentUtcDateTime.AddSeconds(15), "");
+            
+            await context.CreateTimer(context.CurrentUtcDateTime.AddMinutes(1), "");
             
 
             logger.LogInformation("Orchestration will ContinueAsNew.");
@@ -40,7 +37,7 @@ namespace Daenet.Microservice.Common.Test
                 ConsumerSecret = "Gkd0Gl9Z8GvZGYY4xx7UhA2sfJcRVbOb2w2SJyUFl0T6Pxdh5p",
                 AccessToken = "634344694-lnrzrUuNVGKCk4lOqeABPGAvtUvDZQDr1BwAJfcP",
                 AccessTokenSecret = "wmt1fKTQQQ2ztUIAl1bGTNhvzp8bxE7qNVDwm9ib7Inw8",
-                Name = "summoncse",
+                Name = "daenet",
                 Count = 1
             };
         }

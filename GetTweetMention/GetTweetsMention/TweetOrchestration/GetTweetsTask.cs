@@ -11,7 +11,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test
+namespace GetTweetsMention
 {
     public class GetTweetsTask : TaskBase<GetTweetsTaskInput, GetTweetTaskOutput>
     {
@@ -199,5 +199,6 @@ namespace Daenet.Microservice.Common.Test
 
             return client;
         }
+        
     }
 }

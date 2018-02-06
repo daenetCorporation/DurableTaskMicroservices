@@ -266,7 +266,7 @@ namespace Daenet.DurableTaskMicroservices.Host
             else
             {
                 instanceStore = new SqlInstanceStore("Dtf", storageConnectionString);
-
+                
                 instanceStore.InitializeStoreAsync(false);
             }
 
@@ -306,7 +306,7 @@ namespace Daenet.DurableTaskMicroservices.Host
 
             instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.Running));
 
-            instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.ContinuedAsNew));
+           // instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.ContinuedAsNew));
 
             instances.AddRange(GetInstancesByState(instanceStore, OrchestrationStatus.Pending));
 
