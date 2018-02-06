@@ -898,19 +898,26 @@ namespace Daenet.DurableTask.Microservices
         {
             List<Type> types = new List<Type>();
 
-            foreach (var assemblyFile in Directory.GetFiles(directory, "*.dll", SearchOption.AllDirectories))
+            foreach (var assemblyFile in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).Where(f=>f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")))
             {
-                Assembly asm = Assembly.LoadFile(assemblyFile);
-                var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
-                if (attr != null)
+
+                try
                 {
-                    foreach (var type in asm.GetTypes())
+                    Assembly asm = Assembly.LoadFile(assemblyFile);
+                    var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
+                    if (attr != null)
                     {
-                        if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
+                        foreach (var type in asm.GetTypes())
                         {
-                            types.Add(type);
+                            if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
+                            {
+                                types.Add(type);
+                            }
                         }
                     }
+                }
+                catch (Exception)
+                {
                 }
             }
 
