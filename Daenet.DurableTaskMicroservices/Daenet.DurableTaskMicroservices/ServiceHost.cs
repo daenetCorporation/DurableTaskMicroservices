@@ -39,12 +39,9 @@ namespace Daenet.DurableTask.Microservices
         private TaskHubWorker m_TaskHubWorker;
         private IOrchestrationServiceInstanceStore m_InstanceStoreService;
         private ILogger m_Logger;
-        private static string m_SchemaName;
         private static ILoggerFactory m_LoggerFactory;
 
         #endregion
-
-
 
         private Dictionary<string, object> m_Services;
 
@@ -58,7 +55,6 @@ namespace Daenet.DurableTask.Microservices
             bool resetHub = false,
             ILoggerFactory loggerFactory = null)
         {
-
             this.m_HubClient = new TaskHubClient(orchestrationClient);
             this.m_TaskHubWorker = new TaskHubWorker(orchestrationService);
             this.m_InstanceStoreService = instanceStore;
@@ -506,8 +502,8 @@ namespace Daenet.DurableTask.Microservices
         /// Starts the MicroService Host.
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
-        /// <param name="searchPattern">Search pattern for config files.</param>
-        /// <param name="runningInstances">List of currentlly unning instances. In the future ServiceHost will be able to grab the list 
+        /// <param name="searchPattern">Search pattern for configuration files.</param>
+        /// <param name="runningInstances">List of currently running instances. In the future ServiceHost will be able to grab the list 
         /// of running instances. Waiting on DTF team.</param>
         public async Task<List<MicroserviceInstance>> StartServiceHostAsync(string directory = null, string searchPattern = "*.config.xml", ICollection<OrchestrationState> runningInstances = null, Dictionary<string, object> context = null)
         {
