@@ -193,12 +193,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 result = await RunOrchestration(context, orchestrationInput, logger);
 
                 logger?.LogDebug("Orchestration {P1} exited successfully", this.GetType().FullName);
-
             }
             catch (Exception ex)
             {
-                logger?.LogError($"{ex}");
-                throw ex;
+                logger?.LogError(ex.ToString());
+                throw;
             }
             finally
             {
