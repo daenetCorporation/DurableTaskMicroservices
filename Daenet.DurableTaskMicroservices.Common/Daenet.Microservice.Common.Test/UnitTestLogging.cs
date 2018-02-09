@@ -23,7 +23,7 @@ namespace Daenet.Microservice.Common.Test
         private static ILoggerFactory getDebugLoggerFactory()
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
-            loggerFactory.AddDebug(LogLevel.Information);
+            loggerFactory.AddDebug(LogLevel.Trace);
 
             return loggerFactory;
         }

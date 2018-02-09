@@ -3,7 +3,7 @@
     "IncludeScopes": true,
     "Debug": {
       "LogLevel": {
-        "Default": "Warning"
+        "Default": "Debug"
       }
     },
     "Console": {
@@ -18,7 +18,7 @@
     },
     "SqlProviderSettings": {
       "ConnectionString": "TODO",
-      "TableName": "TLogger",
+      "TableName": "TUnitTestLogger",
       "CreateTblIfNotExist": true,
       "IncludeExceptionStackTrace": false,
       "IgnoreLoggingErrors": false
