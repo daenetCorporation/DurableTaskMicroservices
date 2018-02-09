@@ -265,7 +265,7 @@ namespace Daenet.DurableTaskMicroservices.Host
             }
             else
             {
-                instanceStore = new SqlInstanceStore("Dtf", storageConnectionString);
+                instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
                 
                 instanceStore.InitializeStoreAsync(false);
             }
