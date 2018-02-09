@@ -1,0 +1,27 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": true,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "SqlProvider": {
+      "LogLevel": {
+        "Default": "Error"
+      }
+    },
+    "SqlProviderSettings": {
+      "ConnectionString": "TODO",
+      "TableName": "TLogger",
+      "CreateTblIfNotExist": true,
+      "IncludeExceptionStackTrace": false,
+      "IgnoreLoggingErrors": false
+    }
+  }
+}

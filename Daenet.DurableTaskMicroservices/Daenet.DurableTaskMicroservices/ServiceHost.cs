@@ -517,7 +517,7 @@ namespace Daenet.DurableTask.Microservices
 
                 if (String.IsNullOrEmpty(directory))
                     directory = Environment.CurrentDirectory;
-
+                
                 string[] configFiles = loadConfigFiles(directory, searchPattern);
 
                 List<MicroserviceInstance> instances = new List<MicroserviceInstance>();
