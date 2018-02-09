@@ -17,7 +17,7 @@ namespace Daenet.Microservice.Common.Test
     {
         private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
         private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
-        private static string SqlConnectionString = ConfigurationManager.ConnectionStrings["Sql"].ConnectionString;
+        private static string SqlConnectionString = ConfigurationManager.ConnectionStrings["SqlStorage"].ConnectionString;
 
         private static ILoggerFactory getLoggerFactory()
         {
