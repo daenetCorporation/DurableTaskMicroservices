@@ -266,8 +266,6 @@ namespace Daenet.DurableTaskMicroservices.Host
             else
             {
                 instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
-                
-                instanceStore.InitializeStoreAsync(false);
             }
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =
@@ -276,7 +274,10 @@ namespace Daenet.DurableTaskMicroservices.Host
             try
             {
                 if (purgeStore)
+                {
+                    instanceStore.InitializeStoreAsync(false).Wait();
                     instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
+                }
 
                 // Not available on interface yet.
                 if (instanceStore is AzureTableInstanceStore)

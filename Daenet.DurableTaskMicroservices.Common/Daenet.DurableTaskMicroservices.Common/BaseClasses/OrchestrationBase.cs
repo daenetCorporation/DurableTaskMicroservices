@@ -141,50 +141,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             try
             {
-                /*
-                if (this.LogManager == null)
-                {  
-                    this.LogManager = new LogManager(this?.Configuration?.LogTraceSourceName);
-                }
-
-                if (orchestrationInput == null)
-                {
-                    orchestrationInput = Activator.CreateInstance<TInput>();
-                }
-
-                // Add an new ActivityId if not existing yet. 
-                if (!this.LogManager.CurrentScope.ContainsKey("ActivityId"))
-                {
-                    if (orchestrationInput.Context.ContainsKey("ParentLoggingContext") && ((LoggingContext)orchestrationInput.Context["ParentLoggingContext"]).LoggingScopes.ContainsKey("ActivityId"))
-                    {
-                        this.LogManager.AddScope("ActivityId", 
-                            ((LoggingContext)orchestrationInput.Context["ParentLoggingContext"]).LoggingScopes["ActivityId"]);
-                    }
-                    else
-                    {
-                        this.LogManager.AddScope("ActivityId", Guid.NewGuid().ToString());
-                    }
-                }
-              
-                // Add WorkflowInstanceId as a new ActivityId if not existing yet. 
-                if (!this.LogManager.CurrentScope.ContainsKey("OrchestrationInstanceId"))
-                    this.LogManager.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
-
-                if (!this.LogManager.CurrentScope.ContainsKey("LogTraceSourceName"))
-                    this.LogManager.AddScope("LogTraceSourceName", this.Configuration.LogTraceSourceName);
-
-                //foreach (var scope in this.LogManager.LoggingScopes)
-                //    this.LogManager.AddScope(scope.Key, scope.Value);
-
-                if (!this.LogManager.CurrentScope.ContainsKey("OrchestrationInstanceId"))
-                    this.LogManager.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
-
-                if (!orchestrationInput.Context.ContainsKey("ParentLoggingContext"))
-                    orchestrationInput.Context.Add("ParentLoggingContext", new LoggingContext() { LoggingScopes = this.LogManager.CurrentScope });
-                */
-
-
-                logger?.LogDebug("Orchestration {P1} entered", this.GetType().FullName);
+                logger?.LogTrace("Orchestration {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
 
                 m_OrchestrationConext = context;
 
@@ -199,12 +156,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 logger?.LogError(ex.ToString());
                 throw;
             }
-            finally
-            {
-
-                //TODO.. log ??
-            }
-
+           
             return result;
         }
 

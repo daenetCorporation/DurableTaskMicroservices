@@ -1,0 +1,27 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": true,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Debug"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "SqlProvider": {
+      "LogLevel": {
+        "Default": "Error"
+      }
+    },
+    "SqlProviderSettings": {
+      "ConnectionString": "TODO",
+      "TableName": "TUnitTestLogger",
+      "CreateTblIfNotExist": true,
+      "IncludeExceptionStackTrace": false,
+      "IgnoreLoggingErrors": false
+    }
+  }
+}

@@ -1,15 +1,13 @@
 ﻿using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.BaseClasses;
 using DurableTask.Core;
-using Iot;
 using Microsoft.Extensions.Logging;
 using System;
-using PhilipsHueConnector;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PhilipsHueConnector.Entities;
+
 
 namespace Daenet.Microservice.Common.Test
 {
