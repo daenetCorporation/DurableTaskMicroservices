@@ -182,7 +182,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         {
             TOutput result = null;
 
-            string activityId = ServiceHost.GetActivityIdFromContext(taskInputArgs);
+            string activityId = ServiceHost.GetActivityIdFromContext(taskInputArgs.Context);
 
             var logger = ServiceHost.GetLogger(this.GetType(), activityId);
 
@@ -192,11 +192,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             try
             {
-                logger?.LogDebug("Task with orchestration {InstanceId} started successfully", context.OrchestrationInstance.InstanceId);
+                logger?.LogDebug("Task with OrchestrationInstanceId {InstanceId} started successfully", context.OrchestrationInstance.InstanceId);
                 
                 result = RunTask(context, taskInputArgs, logger);
 
-                logger?.LogDebug("Task with orchestration instance {InstanceId} exited successfully", context.OrchestrationInstance.InstanceId);
+                logger?.LogDebug("Task with OrchestrationInstanceId {InstanceId} exited successfully", context.OrchestrationInstance.InstanceId);
             }
             catch (ValidationRuleException validationException)
             {

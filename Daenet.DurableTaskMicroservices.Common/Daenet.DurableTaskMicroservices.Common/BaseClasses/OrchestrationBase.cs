@@ -135,11 +135,13 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         {
             TOutput result = null;
 
-            string activityId = ServiceHost.GetActivityIdFromContext(orchestrationInput);
+            string activityId = ServiceHost.GetActivityIdFromContext(orchestrationInput.Context);
 
             var logger = ServiceHost.GetLogger(this.GetType(), activityId);
 
             logger.BeginScope(context.OrchestrationInstance.InstanceId);
+
+            logger.BeginScope(context.OrchestrationInstance.ExecutionId);
 
             try
             {
@@ -151,7 +153,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 result = await RunOrchestration(context, orchestrationInput, logger);
 
-                logger?.LogTrace("Orchestration {P1} exited successfully", this.GetType().FullName);
+                logger?.LogTrace("Orchestration {InstanceId} exited successfully", this.GetType().FullName);
             }
             catch (Exception ex)
             {
@@ -165,7 +167,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
  
 
         /// <summary>
-        ///  Create a suborchestration of the specified type. Also retry on failure as 
+        ///  Create a SubOrchestration of the specified type. Also retry on failure as 
         ///  per supplied policy.
         ///  It transfers the input orchestration context to the new orchestration.
         ///  </summary>

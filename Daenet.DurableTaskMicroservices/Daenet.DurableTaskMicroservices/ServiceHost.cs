@@ -47,7 +47,7 @@ namespace Daenet.DurableTask.Microservices
 
 
         #region Initialization Code
-        
+
 
         public ServiceHost(IOrchestrationService orchestrationService,
             IOrchestrationServiceClient orchestrationClient,
@@ -417,24 +417,18 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationInput"></param>
         /// <param name="activityId"></param>
         /// <returns></returns>
-        public static string GetActivityIdFromContext(object orchestrationInput)
+        public static string GetActivityIdFromContext(Dictionary<string, object> context)
         {
             string activityId = Guid.NewGuid().ToString();
-            if (orchestrationInput is DurableTaskMicroservices.Common.Entities.OrchestrationInput)
+
+            const string ctxName = "ActivityId";
+
+            if (context.ContainsKey(ctxName))
             {
-                const string ctxName = "ActivityId";
-
-                DurableTaskMicroservices.Common.Entities.OrchestrationInput msIn = (DurableTaskMicroservices.Common.Entities.OrchestrationInput)orchestrationInput;
-                if (msIn.Context == null)
-                    msIn.Context = new Dictionary<string, object>();
-
-                if (msIn.Context.ContainsKey(ctxName))
-                {
-                    activityId = msIn.Context[ctxName] as string;
-                }
-                else
-                    msIn.Context.Add(ctxName, activityId);
+                activityId = context[ctxName] as string;
             }
+            else
+                context.Add(ctxName, activityId);
 
             return activityId;
         }
@@ -531,7 +525,7 @@ namespace Daenet.DurableTask.Microservices
 
                 if (String.IsNullOrEmpty(directory))
                     directory = Environment.CurrentDirectory;
-                
+
                 string[] configFiles = loadConfigFiles(directory, searchPattern);
 
                 List<MicroserviceInstance> instances = new List<MicroserviceInstance>();
@@ -754,8 +748,8 @@ namespace Daenet.DurableTask.Microservices
             return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
         }
 
-      
-        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string,object> context)
+
+        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context)
         {
             object iArgs = inputArgs;
 
@@ -912,7 +906,7 @@ namespace Daenet.DurableTask.Microservices
         {
             List<Type> types = new List<Type>();
 
-            foreach (var assemblyFile in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).Where(f=>f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")))
+            foreach (var assemblyFile in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).Where(f => f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")))
             {
 
                 try

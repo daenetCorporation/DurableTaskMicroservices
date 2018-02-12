@@ -16,19 +16,20 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             Debug.WriteLine($"Counter: {input.Counter}");
 
             if (!context.IsReplaying)
-                logger.LogInformation("Orchestration started.");
+                logger.LogInformation("Orchestration started with Input: {input}.", input.Counter);
 
             await ScheduleTask<Null>(typeof(Task1), new Task1Input() { Text = "Text passed from Orchestration." });
 
             await ScheduleTask<Null>(typeof(Task2), new Task2Input() { Number = 2 });
-            //await context.ScheduleTask<Null>(typeof(Task2), new Task2Input() { Number = 2 });
             
             Task.Delay(100).Wait();
 
             input.Counter--;
             if (input.Counter > 0)
             {
-                logger.LogInformation("Orchestration will ContinueAsNew.");
+                if (!context.IsReplaying)
+                    logger.LogInformation("Orchestration will ContinueAsNew.");
+
                 context.ContinueAsNew(input);
             }
 
