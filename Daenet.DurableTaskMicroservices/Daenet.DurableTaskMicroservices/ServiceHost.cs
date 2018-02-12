@@ -68,7 +68,25 @@ namespace Daenet.DurableTask.Microservices
             if (resetHub)
                 orchestrationService.DeleteAsync().Wait();
 
-            orchestrationService.CreateIfNotExistsAsync().Wait();
+            int n = 10;
+            while (--n > 0)
+            {
+                try
+                {
+                    orchestrationService.CreateIfNotExistsAsync().Wait();
+                    break;
+                }
+                catch (AggregateException aggEx)
+                {
+                    if (n <= 0)
+                        throw;
+
+                    if (aggEx.InnerException.Message.Contains("409"))
+                    {
+                        Thread.Sleep(10000);
+                    }
+                }
+            }
         }
 
 
@@ -374,17 +392,17 @@ namespace Daenet.DurableTask.Microservices
         /// Gets the logger instance.
         /// </summary>
         /// <param name="type">Type which defines logger category.</param>
-        /// <param name="activityId">Activity identifier.</param>
+        /// <param name="scopeId">Activity identifier.</param>
         /// <returns></returns>
-        public static ILogger GetLogger(Type type, string activityId = null)
+        public static ILogger GetLogger(Type type, string scopeId = null)
         {
             lock (m_LoggerFactory)
             {
                 if (m_LoggerFactory != null)
                 {
                     var logger = m_LoggerFactory.CreateLogger(type.FullName);
-                    if (activityId != null)
-                        logger.BeginScope(activityId);
+                    if (scopeId != null)
+                        logger.BeginScope(scopeId);
 
                     return logger;
                 }

@@ -186,6 +186,10 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             var logger = ServiceHost.GetLogger(this.GetType(), activityId);
 
+            logger.BeginScope(context.OrchestrationInstance.InstanceId);
+
+            logger.BeginScope(context.OrchestrationInstance.ExecutionId);
+
             try
             {
                 logger?.LogDebug("Task with orchestration {InstanceId} started successfully", context.OrchestrationInstance.InstanceId);

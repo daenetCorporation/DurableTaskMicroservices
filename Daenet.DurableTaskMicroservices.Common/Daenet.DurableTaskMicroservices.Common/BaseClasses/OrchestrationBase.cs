@@ -139,6 +139,8 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             var logger = ServiceHost.GetLogger(this.GetType(), activityId);
 
+            logger.BeginScope(context.OrchestrationInstance.InstanceId);
+
             try
             {
                 logger?.LogTrace("Orchestration {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
@@ -149,7 +151,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 result = await RunOrchestration(context, orchestrationInput, logger);
 
-                logger?.LogDebug("Orchestration {P1} exited successfully", this.GetType().FullName);
+                logger?.LogTrace("Orchestration {P1} exited successfully", this.GetType().FullName);
             }
             catch (Exception ex)
             {

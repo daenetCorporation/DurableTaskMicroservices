@@ -13,10 +13,10 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     {       
         protected override async Task<Null> RunOrchestration(OrchestrationContext context, CounterOrchestrationInput input, ILogger logger)
         {
-            Debug.WriteLine($"{input.Counter}");
+            Debug.WriteLine($"Counter: {input.Counter}");
 
-            logger.LogInformation("Orchestration started.");
-
+            if (!context.IsReplaying)
+                logger.LogInformation("Orchestration started.");
 
             await ScheduleTask<Null>(typeof(Task1), new Task1Input() { Text = "Text passed from Orchestration." });
 

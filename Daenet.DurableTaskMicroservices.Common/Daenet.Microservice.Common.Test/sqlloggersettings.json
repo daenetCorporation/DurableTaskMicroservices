@@ -17,7 +17,7 @@
       }
     },
     "SqlProviderSettings": {
-      "ConnectionString": "TODO",
+      "ConnectionString": "Server=tcp:daenetdevserver2.database.windows.net,1433;Initial Catalog=studentdb;Persist Security Info=False;User ID=ddobric;Password=daenet$2017;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
       "TableName": "TUnitTestLogger",
       "CreateTblIfNotExist": true,
       "IncludeExceptionStackTrace": false,
