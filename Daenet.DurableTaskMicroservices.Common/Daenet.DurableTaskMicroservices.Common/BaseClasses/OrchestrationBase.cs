@@ -145,7 +145,10 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             try
             {
-                logger?.LogTrace("Orchestration {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
+                if(context.IsReplaying == false)
+                    logger?.LogDebug("OrchestrationBase {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
+                else
+                    logger?.LogTrace("OrchestrationBase {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
 
                 m_OrchestrationConext = context;
 
@@ -153,7 +156,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 result = await RunOrchestration(context, orchestrationInput, logger);
 
-                logger?.LogTrace("Orchestration {InstanceId} exited successfully", this.GetType().FullName);
+                if (context.IsReplaying == false)
+                    logger?.LogDebug("OrchestrationBase {InstanceId} exited successfully", this.GetType().FullName);
+                else
+                    logger?.LogTrace("OrchestrationBase {InstanceId} exited successfully", this.GetType().FullName);
+
             }
             catch (Exception ex)
             {

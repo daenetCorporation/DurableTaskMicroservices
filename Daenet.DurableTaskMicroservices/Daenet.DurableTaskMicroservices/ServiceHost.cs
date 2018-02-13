@@ -11,6 +11,7 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask.Core;
 using DurableTask.Core.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,7 @@ namespace Daenet.DurableTask.Microservices
     public class ServiceHost
     {
         #region Private Members
+        public const string cActivityIdCtxName = "ActivityId";
 
         /// <summary>
         /// Holds the list of dictionaries of service and activity configurations.
@@ -421,14 +423,12 @@ namespace Daenet.DurableTask.Microservices
         {
             string activityId = Guid.NewGuid().ToString();
 
-            const string ctxName = "ActivityId";
-
-            if (context.ContainsKey(ctxName))
+            if (context.ContainsKey(cActivityIdCtxName))
             {
-                activityId = context[ctxName] as string;
+                activityId = context[cActivityIdCtxName] as string;
             }
             else
-                context.Add(ctxName, activityId);
+                context.Add(cActivityIdCtxName, activityId);
 
             return activityId;
         }
@@ -748,14 +748,31 @@ namespace Daenet.DurableTask.Microservices
             return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
         }
 
-
+        /// <summary>
+        /// Here we create a context and ensure that ActivityId is provided.
+        /// </summary>
+        /// <param name="orchestration"></param>
+        /// <param name="inputArgs"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context)
         {
             object iArgs = inputArgs;
 
-            if (context != null && inputArgs is DurableTaskMicroservices.Common.Entities.OrchestrationInput)
+            if (inputArgs is OrchestrationInput)
             {
-                ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context = context;
+                ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context = new Dictionary<string, object>();
+
+                if (context != null)
+                {
+                    foreach (var item in context)
+                    {
+                        ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context.Add(item.Key, item.Value);
+                    }
+                }
+
+                if (((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context.ContainsKey(cActivityIdCtxName) == false)
+                    ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context.Add(cActivityIdCtxName, Guid.NewGuid().ToString());
             }
 
             var ms = new MicroserviceInstance()
