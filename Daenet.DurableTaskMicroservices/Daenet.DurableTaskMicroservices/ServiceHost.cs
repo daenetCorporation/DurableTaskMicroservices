@@ -757,27 +757,19 @@ namespace Daenet.DurableTask.Microservices
         /// <returns></returns>
         private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context)
         {
-            object iArgs = inputArgs;
+            OrchestrationInput orchestrationInput = inputArgs as OrchestrationInput;
 
-            if (inputArgs is OrchestrationInput)
+            if (orchestrationInput != null)
             {
-                ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context = new Dictionary<string, object>();
+                orchestrationInput.Context = new Dictionary<string, object>(context);
 
-                if (context != null)
-                {
-                    foreach (var item in context)
-                    {
-                        ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context.Add(item.Key, item.Value);
-                    }
-                }
-
-                if (((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context.ContainsKey(cActivityIdCtxName) == false)
-                    ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context.Add(cActivityIdCtxName, Guid.NewGuid().ToString());
+                if (orchestrationInput.Context.ContainsKey(cActivityIdCtxName) == false)
+                    orchestrationInput.Context.Add(cActivityIdCtxName, Guid.NewGuid().ToString());
             }
 
             var ms = new MicroserviceInstance()
             {
-                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, iArgs),
+                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
             };
             return ms;
         }
