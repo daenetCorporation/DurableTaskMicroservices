@@ -33,10 +33,10 @@ namespace GetTweetsMention
         {
             return new GetTweetsTaskInput()
             {
-                ConsumerKey = "3fGIMVjex4rqO1dzSV7Gwie11",
-                ConsumerSecret = "Gkd0Gl9Z8GvZGYY4xx7UhA2sfJcRVbOb2w2SJyUFl0T6Pxdh5p",
-                AccessToken = "634344694-lnrzrUuNVGKCk4lOqeABPGAvtUvDZQDr1BwAJfcP",
-                AccessTokenSecret = "wmt1fKTQQQ2ztUIAl1bGTNhvzp8bxE7qNVDwm9ib7Inw8",
+                ConsumerKey = "",
+                ConsumerSecret = "",
+                AccessToken = "",
+                AccessTokenSecret = "",
                 Name = "daenet",
                 Count = 1
             };
