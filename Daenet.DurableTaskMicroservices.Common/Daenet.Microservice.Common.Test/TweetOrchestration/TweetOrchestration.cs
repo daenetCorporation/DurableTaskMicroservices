@@ -36,10 +36,10 @@ namespace Daenet.Microservice.Common.Test
         {
             return new GetTweetsTaskInput()
             {
-                ConsumerKey = "3fGIMVjex4rqO1dzSV7Gwie11",
-                ConsumerSecret = "Gkd0Gl9Z8GvZGYY4xx7UhA2sfJcRVbOb2w2SJyUFl0T6Pxdh5p",
-                AccessToken = "634344694-lnrzrUuNVGKCk4lOqeABPGAvtUvDZQDr1BwAJfcP",
-                AccessTokenSecret = "wmt1fKTQQQ2ztUIAl1bGTNhvzp8bxE7qNVDwm9ib7Inw8",
+                ConsumerKey = "3fGIMVjex4rqkmgdzSViee11",
+                ConsumerSecret = "Gkd0Gl9Z8GvZGYY4xxA2sfJcRVbOb2jdkw2SJyUFl0T6Pxdh5p",
+                AccessToken = "634344694-lnrzrUuNVGKCkOqeABPGAvtUvDZQDr1BwAJfcP",
+                AccessTokenSecret = "wmt1fKTQQQ2UIAl1bGTNhvkmste8bxE7qNVDwm9ibjhe7Inw8",
                 Name = "summoncse",
                 Count = 1
             };
@@ -50,7 +50,7 @@ namespace Daenet.Microservice.Common.Test
             return new SwitchOnLightTaskInput()
             {
                 GatewayUrl = "http://192.168.0.99",
-                UserName = "gusp-xLeBhYznPCkz0ZQBnuZ25f3cOwRpW3tiQ8k",
+                UserName = "gusp-xLeBhYznPCkz8okdiueBnuZ25f3cOwRpW3tiQ8k",
                 DeviceId = "4",
                 OldTweetId = oldId,
                 LatestTweetId = newId
