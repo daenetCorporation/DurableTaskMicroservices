@@ -761,7 +761,8 @@ namespace Daenet.DurableTask.Microservices
 
             if (orchestrationInput != null)
             {
-                orchestrationInput.Context = new Dictionary<string, object>(context);
+                if(orchestrationInput.Context == null)
+                    orchestrationInput.Context = new Dictionary<string, object>(context);
 
                 if (orchestrationInput.Context.ContainsKey(cActivityIdCtxName) == false)
                     orchestrationInput.Context.Add(cActivityIdCtxName, Guid.NewGuid().ToString());
