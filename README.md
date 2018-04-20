@@ -54,12 +54,12 @@ A simple windows service used to host the DurableTaskFramework.
 
 The installation process is quite simple. First you should compile the WindowsServiceHost solution and copy the output into the deployment folder (you should create one).
 
-To install the windows service, just run the `installservice.ps1`.
+To install the windows service, just run the `Scripts/installservice.ps1`.
 The PowerShell script will guide you trough the install process.
 
 #### How to Uninstall the service
 
-To uninstall the windows service, just run the `uninstallservice.ps1`.
+To uninstall the windows service, just run the `Scripts/uninstallservice.ps1`.
 
 # Daenet.DurableTaskMicroservices.Common
 
