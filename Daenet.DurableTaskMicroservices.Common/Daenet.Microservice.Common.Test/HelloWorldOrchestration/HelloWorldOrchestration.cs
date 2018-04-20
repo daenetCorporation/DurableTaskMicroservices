@@ -17,7 +17,7 @@ namespace Daenet.Microservice.Common.Test.HelloWorldOrchestration
         {
             logger.LogInformation($"Orchestration Input: {input.HelloText}. IsReplaying: {context.IsReplaying}");
 
-            await context.ScheduleTask<Null>(typeof(DurableTaskMicroservices.UnitTests.Task1), new Task1Input { Text = input.HelloText });
+            await this.ScheduleTask<Null>(typeof(DurableTaskMicroservices.UnitTests.Task1), new Task1Input { Text = input.HelloText });
 
             return new Null();
         }

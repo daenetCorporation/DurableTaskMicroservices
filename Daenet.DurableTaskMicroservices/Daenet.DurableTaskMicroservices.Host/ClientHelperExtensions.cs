@@ -12,17 +12,17 @@ namespace Daenet.DurableTaskMicroservices.Host
 {
     public static class ClientHelperExtensions
     {
-        public static ServiceClient CreateMicroserviceClient(string serviceBusConnectionString, string storageConnectionString, string hubName, ILogger logger = null, bool useSqlInstanceStore = false)
+        public static ServiceClient CreateMicroserviceClient(string serviceBusConnectionString, string storageConnectionString, string hubName, ILogger logger = null)
         {
             IOrchestrationServiceInstanceStore instanceStore;
 
-            if (!useSqlInstanceStore)
+            if (storageConnectionString.ToLower().Contains("server="))
             {
-                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
+                instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
             }
             else
             {
-                instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
+                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
             }
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =

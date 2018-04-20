@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="DurableTask.ServiceBus" Version="2.0.0.4-preview5" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>

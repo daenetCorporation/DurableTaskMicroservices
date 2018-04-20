@@ -8,6 +8,10 @@ using System.Configuration;
 using System.Diagnostics;
 using System.ServiceProcess;
 using Daenet.DurableTaskMicroservices.Host;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using Daenet.Common.Logging.Sql;
+using Microsoft.Extensions.Configuration;
 
 namespace WindowsServiceHost
 {
@@ -19,7 +23,6 @@ namespace WindowsServiceHost
         private EventLog m_ELog;
         private static string m_ServiceBusConnectionString;
         private static string m_StorageConnectionString;
-        private static string m_SqlStateProviderConnectionString;
         private static string m_TaskHubName;
         #endregion
 
@@ -53,22 +56,33 @@ namespace WindowsServiceHost
 
                 readConfiguration();
 
-                AzureTableInstanceStore instanceStore = new AzureTableInstanceStore(m_TaskHubName, m_StorageConnectionString);
-                ServiceBusOrchestrationService orchestrationServiceAndClient =
-                   new ServiceBusOrchestrationService(m_ServiceBusConnectionString, m_TaskHubName, instanceStore, null, null);
+                var loggerFact = getSqlLoggerFactory();
 
-                orchestrationServiceAndClient.CreateIfNotExistsAsync().Wait();
+                List<OrchestrationState> runningInstances;
 
-                TaskHubClient taskHubClient = new TaskHubClient(orchestrationServiceAndClient);
-                TaskHubWorker taskHub = new TaskHubWorker(orchestrationServiceAndClient);
+                ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName, false, out runningInstances, loggerFact);
 
-                ServiceHost host;
+                var microservices = host.StartServiceHostAsync(AppDomain.CurrentDomain.BaseDirectory, runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
-                host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
+                //host.WaitOnInstances(host, microservices);
 
-                var runningInstances = instanceStore.GetRunningInstances();
 
-                host.StartServiceHostAsync(Environment.CurrentDirectory, runningInstances: runningInstances).Wait();
+                //AzureTableInstanceStore instanceStore = new AzureTableInstanceStore(m_TaskHubName, m_StorageConnectionString);
+                //ServiceBusOrchestrationService orchestrationServiceAndClient =
+                //   new ServiceBusOrchestrationService(m_ServiceBusConnectionString, m_TaskHubName, instanceStore, null, null);
+
+                //orchestrationServiceAndClient.CreateIfNotExistsAsync().Wait();
+
+                //TaskHubClient taskHubClient = new TaskHubClient(orchestrationServiceAndClient);
+                //TaskHubWorker taskHub = new TaskHubWorker(orchestrationServiceAndClient);
+
+                //ServiceHost host;
+
+                //host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
+
+                //var runningInstances = instanceStore.GetRunningInstances();
+
+                //host.StartServiceHostAsync(Environment.CurrentDirectory, runningInstances: runningInstances).Wait();
             }
             catch (Exception ex)
             {
@@ -79,6 +93,17 @@ namespace WindowsServiceHost
 
         #endregion
 
+        private static ILoggerFactory getSqlLoggerFactory()
+        {
+            var builder = new ConfigurationBuilder().AddJsonFile("sqlloggersettings.json");
+            var Configuration = builder.Build();
+
+            string sectionName = "Logging";
+            var cfg = Configuration.GetSection(sectionName);
+
+            ILoggerFactory loggerFactory = new LoggerFactory().AddSqlServerLogger(cfg);
+            return loggerFactory;
+        }
 
         private static void readConfiguration()
         {
@@ -90,7 +115,6 @@ namespace WindowsServiceHost
             }
 
             m_StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"]?.ConnectionString;
-            m_SqlStateProviderConnectionString = ConfigurationManager.ConnectionStrings["SqlStateProviderConnectionString"]?.ConnectionString;
        
             m_TaskHubName = ConfigurationManager.AppSettings.Get("TaskHubName");
         }

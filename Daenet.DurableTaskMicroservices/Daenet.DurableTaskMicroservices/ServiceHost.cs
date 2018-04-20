@@ -904,7 +904,7 @@ namespace Daenet.DurableTask.Microservices
         {
             List<string> configFiles = new List<string>();
 
-            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern))
+            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern, SearchOption.AllDirectories))
             {
                 configFiles.Add(cfgFile);
             }

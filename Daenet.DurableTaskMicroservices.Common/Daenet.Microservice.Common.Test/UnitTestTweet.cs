@@ -48,7 +48,7 @@ namespace Daenet.Microservice.Common.Test
 
             List<OrchestrationState> runningInstances;
 
-            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlConnectionString, nameof(TweetUsingSqlTest), true, out runningInstances, loggerFact,true);
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlConnectionString, nameof(TweetUsingSqlTest), true, out runningInstances, loggerFact);
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
