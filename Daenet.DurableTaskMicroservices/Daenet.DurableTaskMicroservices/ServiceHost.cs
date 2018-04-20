@@ -551,9 +551,11 @@ namespace Daenet.DurableTask.Microservices
 
                     foreach (var svc in microServices)
                     {
+                        if (svc.AutoStart == false)
+                            continue;
+
                         if (runningInstances == null ||
-                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null ||
-                            svc.IsSingletone == false)
+                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null)
                         {
                             var newInst = StartServiceAsync(svc.OrchestrationQName, svc.InputArgument, context).Result;
 

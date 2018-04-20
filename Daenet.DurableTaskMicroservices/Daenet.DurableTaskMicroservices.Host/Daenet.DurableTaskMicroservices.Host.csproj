@@ -10,11 +10,11 @@
     <PackageLicenseUrl>https://github.com/daenetCorporation/DurableTaskMicroservices/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>durabletask</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <RootNamespace>Daenet.DurableTaskMicroservices</RootNamespace>
+    <RootNamespace>Daenet.DurableTaskMicroservices.Host</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DurableTask.ServiceBus" Version="2.0.0.4-preview2" />
+    <PackageReference Include="DurableTask.ServiceBus" Version="2.0.0.4-preview5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
   </ItemGroup>
 

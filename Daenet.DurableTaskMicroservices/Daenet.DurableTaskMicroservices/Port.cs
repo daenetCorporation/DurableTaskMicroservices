@@ -21,18 +21,13 @@ namespace Daenet.DurableTask.Microservices
 {
     public abstract class Port<TPORTIN, TPORTOUT> : Microservice
     {
-        public override bool IsSingletone
+        /// <summary>
+        /// Sets AutoStart to true.
+        /// </summary>
+        public Port()
         {
-            get
-            {
-                return true;
-            }
-            set
-            {
-                base.IsSingletone = true;
-            }
+            this.AutoStart = true;
         }
-
         
         /// <summary>
         /// This service instance will be created when the port is triggered by message.

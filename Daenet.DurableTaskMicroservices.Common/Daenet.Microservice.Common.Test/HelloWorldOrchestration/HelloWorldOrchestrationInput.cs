@@ -6,12 +6,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test
+namespace Daenet.Microservice.Common.Test.HelloWorldOrchestration
 {
-    [DataContractAttribute]
-    public class TweetOrchestrationInput : OrchestrationInput
+    [DataContract]
+    public class HelloWorldOrchestrationInput : OrchestrationInput
     {
         [DataMember]
-        public string LatestTweetId { get; set; }
+        public string HelloText { get; set; }
     }
 }

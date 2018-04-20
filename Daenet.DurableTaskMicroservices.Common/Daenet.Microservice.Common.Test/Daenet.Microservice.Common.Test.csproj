@@ -7,16 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="TweetOrchestration\SwitchOnLightTask.cs" />
-    <Compile Remove="TweetOrchestration\TweetOrchestration.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\ConnectionStrings.config" Link="ConnectionStrings.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TweetOrchestration\SwitchOnLightTask.cs" />
-    <None Include="TweetOrchestration\TweetOrchestration.cs" />
   </ItemGroup>
 
 
@@ -27,7 +20,6 @@
   
   <ItemGroup>
     <PackageReference Include="Daenet.Common.Logging.Sql" Version="1.0.5" />
-    <PackageReference Include="linqtotwitter" Version="5.0.0-beta1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
@@ -44,8 +36,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ConnectionStrings.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="CounterOrchestration.config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="HelloWorldOrchestration.config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="sqlloggersettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

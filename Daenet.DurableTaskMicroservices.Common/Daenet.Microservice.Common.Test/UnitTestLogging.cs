@@ -65,9 +65,30 @@ namespace Daenet.Microservice.Common.Test
 
             List<OrchestrationState> runningInstances;
 
-            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlStorageConnectionString, nameof(SelfHostWithLoggingTest), true, out runningInstances, loggerFact, true);
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlStorageConnectionString, nameof(SelfHostWithLoggingTest), false, out runningInstances, loggerFact, true);
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
+
+            host.WaitOnInstances(host, microservices);
+        }
+
+        [TestMethod]
+        public void SelfHostServiceClientTest()
+        {
+            var loggerFact = getSqlLoggerFactory();
+
+            List<OrchestrationState> runningInstances;
+
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlStorageConnectionString, nameof(SelfHostServiceClientTest), true, out runningInstances, loggerFact, true);
+
+            var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
+
+            ServiceClient client = ClientHelperExtensions.CreateMicroserviceClient(ServiceBusConnectionString, SqlStorageConnectionString, nameof(SelfHostServiceClientTest),useSqlInstanceStore: true);
+
+            string svcName = "Daenet.Microservice.Common.Test.HelloWorldOrchestration.HelloWorldOrchestration";
+
+            var svc = client.StartServiceAsync(svcName, new HelloWorldOrchestration.HelloWorldOrchestrationInput { HelloText = "SelfHostServiceClientTestInputArg" }).Result;
+            microservices.Add(svc);
 
             host.WaitOnInstances(host, microservices);
         }

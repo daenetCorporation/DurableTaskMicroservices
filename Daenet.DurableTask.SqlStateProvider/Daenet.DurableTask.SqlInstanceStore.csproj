@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Daenet.Common.Sql" Version="1.0.1" />
-    <PackageReference Include="DurableTask.Core" Version="2.0.0.4-preview2" />
+    <PackageReference Include="DurableTask.Core" Version="2.0.0.4-preview5" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
   </ItemGroup>
 
