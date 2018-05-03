@@ -31,19 +31,19 @@ namespace Daenet.DurableTaskMicroservices.Host
     public static class HostHelpersExtensions
     {
         public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storageConnectionString, string hubName,
-           bool recreateHubAndStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null, bool useSqlInstanceStore = false)
+           bool recreateHubAndStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null)
         {
 
             IOrchestrationServiceInstanceStore instanceStore;
 
-            if (!useSqlInstanceStore)
-            {
-                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
-            }
-            else
+            //
+            // Try to determine if ConnectionString is SQL or TableStorage
+            if (storageConnectionString.ToLower().Contains("server="))
             {
                 instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
             }
+            else
+                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                  new ServiceBusOrchestrationService(serviceBusConnectionString, hubName, instanceStore, null, null);

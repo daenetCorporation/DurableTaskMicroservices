@@ -1,5 +1,6 @@
 ﻿using DurableTask;
 using DurableTask.Core;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,19 +28,6 @@ namespace Daenet.DurableTask.Microservices
            this.m_HubClient = new TaskHubClient(orchestrationClient);
         }
 
-        //public TaskHubClient createTaskHubClient(bool createInstanceStore = true)
-        //{
-        //    var settings = ServiceHost.GetDefaultHubClientSettings();          
-
-        //    if (createInstanceStore)
-        //    {
-        //        return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString, m_StorageConnectionString, settings);
-        //    }
-        //    else
-        //        return new TaskHubClient(m_TaskHubName, m_ServiceBusConnectionString);
-        //}
-
-
         /// <summary>
         /// Starts the new instance of the microservice by passing input arguments.
         /// This method will start the new instance of orchestration
@@ -47,9 +35,16 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public Task<MicroserviceInstance> StartService(string orchestrationQualifiedName, object inputArgs)
+        public async Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, string version = "")
         {
-            return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs);
+            if (version == null)
+                throw new ArgumentException("Value cannot be null!", nameof(version));
+
+            var ms = new MicroserviceInstance()
+            {
+                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestrationQualifiedName, version, inputArgs),
+            };
+            return ms;
         }
 
 
@@ -60,12 +55,7 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestration">The type of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs)
-        {
-            return createServiceInstance(orchestration, inputArgs);
-        }
-
-        private async Task<MicroserviceInstance>createServiceInstance(Type orchestration, object inputArgs)
+        public async Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs)
         {
             var ms = new MicroserviceInstance()
             {

@@ -192,11 +192,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             try
             {
-                logger?.LogDebug("Task with OrchestrationInstanceId {InstanceId} started successfully", context.OrchestrationInstance.InstanceId);
+                logger?.LogDebug("TaskBase: '{Task}' started successfully", this.GetType().FullName);
                 
                 result = RunTask(context, taskInputArgs, logger);
 
-                logger?.LogDebug("Task with OrchestrationInstanceId {InstanceId} exited successfully", context.OrchestrationInstance.InstanceId);
+                logger?.LogDebug("TaskBase: '{Task}' exited successfully", this.GetType().FullName);
             }
             catch (ValidationRuleException validationException)
             {

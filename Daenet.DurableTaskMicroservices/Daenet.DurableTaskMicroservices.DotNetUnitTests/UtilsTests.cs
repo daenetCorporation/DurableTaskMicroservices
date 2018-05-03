@@ -79,14 +79,16 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             }
         }
 
-        internal static Microservice DeserializeService(string configFile)
+        [TestMethod]
+        [DataRow(@"C:\Users\hvetter\Source\Repos\DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\bin\Debug\TestConfiguration\CounterOrchestration.config.xml")]
+        public void DeserializeService(string configFile)
         {
             using (XmlReader writer = XmlReader.Create(configFile))
             {
                 DataContractSerializerSettings sett = new DataContractSerializerSettings();
                 DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), loadKnownTypes());
                 object svc = ser.ReadObject(writer);
-                return svc as Microservice;
+                Assert.IsNotNull(svc as Microservice);
             }
         }
 

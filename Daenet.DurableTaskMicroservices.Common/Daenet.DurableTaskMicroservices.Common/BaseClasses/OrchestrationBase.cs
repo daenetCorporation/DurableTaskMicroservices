@@ -68,62 +68,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             return this.Configuration as TConfig;
         }
 
-
-       
-        /// <summary>
-        /// Instance of the daenet's LogManager component.
-        /// </summary>
-        protected ILogManager LogManager
-        {
-            get
-            {
-                if (m_Log == null)
-                {
-
-
-                }
-
-                return m_Log;
-            }
-            set
-            {
-                m_Log = value;
-            }
-        }
         #endregion
-
-        #region Private Members
-
-        private ILogManager m_Log;
-
-        #endregion
-
-        /*
-        /// <summary>
-        /// Sets the logging context as parent context for all configured tasks.
-        /// This method enumerates all properties of type TaskBase
-        /// </summary>
-        /// <param name="orchestrationInput">The instance of Orchestration, which holds Task configuration properties.</param>
-        /// <param name="logCtx">The context of orchestration, which should be set as </param>
-        protected void SetLoggingContextOnTasks(OrchestrationInput orchestrationInput, LoggingContext logCtx)
-        {
-            if (logCtx != null)
-            {
-                var tp = orchestrationInput.GetType();
-                var props = tp.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-
-                foreach (var prop in props)
-                {
-                    if (prop.PropertyType.IsSubclassOf(typeof(TaskInput)))
-                    {
-                        dynamic val = (prop.GetValue(orchestrationInput));
-                        if (val != null)
-                            val.ParentLoggingContext = logCtx;
-                    }
-                }
-            }
-        }
-        */
         
         /// <summary>
         /// Invoked when orchestration has to be started.
@@ -146,9 +91,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             try
             {
                 if(context.IsReplaying == false)
-                    logger?.LogDebug("OrchestrationBase {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
-                else
-                    logger?.LogTrace("OrchestrationBase {InstanceId} entered.", context.OrchestrationInstance.InstanceId);
+                    logger?.LogDebug("OrchestrationBase: '{Orchestration}' entered.", this.GetType().FullName);
 
                 m_OrchestrationConext = context;
 
@@ -157,10 +100,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
                 result = await RunOrchestration(context, orchestrationInput, logger);
 
                 if (context.IsReplaying == false)
-                    logger?.LogDebug("OrchestrationBase {InstanceId} exited successfully", this.GetType().FullName);
-                else
-                    logger?.LogTrace("OrchestrationBase {InstanceId} exited successfully", this.GetType().FullName);
-
+                    logger?.LogDebug("OrchestrationBase: '{Orchestration}' exited successfully", this.GetType().FullName);
             }
             catch (Exception ex)
             {

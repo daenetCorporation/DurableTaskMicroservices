@@ -552,9 +552,11 @@ namespace Daenet.DurableTask.Microservices
 
                     foreach (var svc in microServices)
                     {
+                        if (svc.AutoStart == false)
+                            continue;
+
                         if (runningInstances == null ||
-                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null ||
-                            svc.IsSingletone == false)
+                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null)
                         {
                             var newInst = StartServiceAsync(svc.OrchestrationQName, svc.InputArgument, context).Result;
 
@@ -903,7 +905,7 @@ namespace Daenet.DurableTask.Microservices
         {
             List<string> configFiles = new List<string>();
 
-            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern))
+            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern, SearchOption.AllDirectories))
             {
                 configFiles.Add(cfgFile);
             }
