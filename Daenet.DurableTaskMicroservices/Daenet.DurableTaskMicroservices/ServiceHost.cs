@@ -67,6 +67,7 @@ namespace Daenet.DurableTask.Microservices
                 m_Logger = m_LoggerFactory.CreateLogger<ServiceHost>();
             }
 
+         
             if (resetHub)
                 orchestrationService.DeleteAsync().Wait();
 

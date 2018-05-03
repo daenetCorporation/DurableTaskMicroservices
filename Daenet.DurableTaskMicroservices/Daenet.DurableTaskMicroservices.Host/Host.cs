@@ -25,7 +25,7 @@ namespace Daenet.DurableTaskMicroservices.Host
   
     /// <summary>
     /// This class is currentlly the only one in this project.
-    /// It is require, because if references to DurableTask.Servicebus, which in NOT .NET Core component.
+    /// It is required, because of a references to DurableTask.ServiceBus, which in NOT .NET Core component.
     /// Once microsoft makes it .NET core, we will move this code to Daenet.DurableTaskMicroservices project.
     /// </summary>
     public static class HostHelpersExtensions
