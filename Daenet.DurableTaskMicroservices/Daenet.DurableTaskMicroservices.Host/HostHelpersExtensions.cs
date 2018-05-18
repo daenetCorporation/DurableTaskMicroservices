@@ -22,44 +22,30 @@ using System.Collections.Generic;
 
 namespace Daenet.DurableTaskMicroservices.Host
 {
-  
+
     /// <summary>
-    /// This class is currentlly the only one in this project.
+    /// Containes methods with dependency to old DurableTask.ServiceBus functionality.
     /// It is required, because of a references to DurableTask.ServiceBus, which in NOT .NET Core component.
     /// Once microsoft makes it .NET core, we will move this code to Daenet.DurableTaskMicroservices project.
     /// </summary>
     public static class HostHelpersExtensions
     {
-        public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storageConnectionString, string hubName,
+        public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storeConnectionString, string hubName,
            bool recreateHubAndStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null)
         {
 
-            IOrchestrationServiceInstanceStore instanceStore;
-
-            //
-            // Try to determine if ConnectionString is SQL or TableStorage
-            if (storageConnectionString.ToLower().Contains("server="))
-            {
-                instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
-            }
-            else
-                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
+            IOrchestrationServiceInstanceStore instanceStore =
+              InstanceStoreFactory.CreateInstanceStore(hubName, storeConnectionString);
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                  new ServiceBusOrchestrationService(serviceBusConnectionString, hubName, instanceStore, null, null);
-
+            
             ServiceHost host;
 
             host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, recreateHubAndStore, loggerFactory);
 
             try
             {
-                //if (purgeStore)
-                //{
-                //    instanceStore.InitializeStoreAsync(false).Wait();
-                //    instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
-                //}
-
                 // Not available on interface yet.
                 if (instanceStore is AzureTableInstanceStore)
                     runningInstances = ((AzureTableInstanceStore)instanceStore).GetRunningInstances();

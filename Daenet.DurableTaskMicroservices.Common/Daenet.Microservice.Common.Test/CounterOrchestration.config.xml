@@ -7,6 +7,7 @@
   </ActivityQNames>
   <AutoStart>true</AutoStart>
   <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.UnitTests" i:type="d2p1:CounterOrchestrationInput">
+    <Context xmlns:d3p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.Common.Entities" />
     <d2p1:Counter>3</d2p1:Counter>
     <d2p1:Delay>1000</d2p1:Delay>
   </InputArgument>
@@ -14,4 +15,3 @@
   <OutputArgument i:nil="true" />
   <ServiceConfiguration i:nil="true" />
 </Microservice>
-

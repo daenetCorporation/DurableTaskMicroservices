@@ -15,14 +15,19 @@ using Daenet.DurableTask.Microservices;
 using Daenet.DurableTask.SqlStateProvider;
 using DurableTask;
 using DurableTask.Core;
+using DurableTask.Core.Tracing;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace Daenet.DurableTaskMicroservices.UnitTests
@@ -135,6 +140,11 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         [DataRow("CounterOrchestration.config.xml")]
         public void RunServiceFromXml(string fileName)
         {
+            ObservableEventListener eventListener = new ObservableEventListener();
+            eventListener.Subscribe(new MockSink());
+            eventListener.LogToConsole();
+            eventListener.EnableEvents(DefaultEventSource.Log, EventLevel.LogAlways);
+
             var host = getMicroserviceHostWithTableStorage();
 
             Microservice microSvc = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
@@ -150,5 +160,52 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         }
         
         
+    }
+
+    internal sealed class MockSink : IObserver<EventEntry>, IDisposable
+    {
+        private int onCompletedCalls;
+        private int onErrorCalls;
+        private ConcurrentBag<EventEntry> onNextCalls = new ConcurrentBag<EventEntry>();
+
+        public int OnCompletedCalls { get { return this.onCompletedCalls; } }
+        public int OnErrorCalls { get { return this.onErrorCalls; } }
+        public IEnumerable<EventEntry> OnNextCalls { get { return this.onNextCalls; } }
+        public bool DisposeCalled { get; private set; }
+
+        void IObserver<EventEntry>.OnCompleted()
+        {
+            Interlocked.Increment(ref this.onCompletedCalls);
+        }
+
+        void IObserver<EventEntry>.OnError(Exception error)
+        {
+            Interlocked.Increment(ref this.onErrorCalls);
+        }
+
+        void IObserver<EventEntry>.OnNext(EventEntry value)
+        {
+            this.onNextCalls.Add(value);
+
+            Debug.WriteLine(formatPayload(value));
+        }
+
+        public void Dispose()
+        {
+            this.DisposeCalled = true;
+        }
+
+        private static string formatPayload(EventEntry entry)
+        {
+            var eventSchema = entry.Schema;
+            var sb = new StringBuilder();
+            for (int i = 0; i < entry.Payload.Count; i++)
+            {
+                // Any errors will be handled in the sink.
+                sb.AppendFormat(" [{0} : {1}]", eventSchema.Payload[i], entry.Payload[i]);
+            }
+            return sb.ToString();
+        }
+
     }
 }

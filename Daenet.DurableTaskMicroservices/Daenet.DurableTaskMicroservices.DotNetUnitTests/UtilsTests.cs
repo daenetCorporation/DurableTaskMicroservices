@@ -80,7 +80,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         }
 
         [TestMethod]
-        [DataRow(@"C:\Users\hvetter\Source\Repos\DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\bin\Debug\TestConfiguration\CounterOrchestration.config.xml")]
+        [DataRow("TestConfiguration\\CounterOrchestration.config.xml")]
         public void DeserializeService(string configFile)
         {
             using (XmlReader writer = XmlReader.Create(configFile))

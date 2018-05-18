@@ -128,7 +128,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [CreatedTime] DATETIME NOT NULL, 
                                             [Input] NVARCHAR(MAX) NOT NULL, 
                                             [LastUpdatedTime] DATETIME NOT NULL, 
-                                            [Name] NVARCHAR(100) NOT NULL, 
+                                            [Name] NVARCHAR(256) NOT NULL, 
                                             [OrchestrationInstance] NVARCHAR(MAX) NOT NULL, 
                                             [OrchestrationStatus] NVARCHAR(MAX) NOT NULL, 
                                             [Output] NVARCHAR(MAX) NULL, 
@@ -183,7 +183,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                                             [CreatedTime] DATETIME NOT NULL, 
                                             [Input] NVARCHAR(MAX) NOT NULL, 
                                             [LastUpdatedTime] DATETIME NOT NULL, 
-                                            [Name] NVARCHAR(100) NOT NULL, 
+                                            [Name] NVARCHAR(256) NOT NULL,
                                             [OrchestrationInstance] NVARCHAR(MAX) NOT NULL, 
                                             [OrchestrationStatus] NVARCHAR(MAX) NOT NULL, 
                                             [Output] NVARCHAR(MAX) NULL, 
@@ -229,12 +229,12 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 cmd.CommandText = String.Format("SELECT TOP {0} * FROM {1} WHERE CreatedTime > @StartTime AND CreatedTime < @EndTime", top, JumpStartTableWithSchema);
 
-                    cmd.AddSqlParameter("@StartTime", startTime);
-                    cmd.AddSqlParameter("@EndTime", endTime);
+                cmd.AddSqlParameter("@StartTime", startTime);
+                cmd.AddSqlParameter("@EndTime", endTime);
 
-                    var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync();
 
-                while(reader.Read())
+                while (reader.Read())
                 {
                     var jumpStartEntity = new OrchestrationJumpStartInstanceEntity();
                     jumpStartEntity.SequenceNumber = reader.GetValue<long>("SequenceNumber");
@@ -1008,10 +1008,12 @@ namespace Daenet.DurableTask.SqlStateProvider
 
                 return segment;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                if (ex.Message.Contains("Invalid object name"))
+                    throw new Exception("This error might indicate that the store is no initialized. Please ensure that 'InitializeStoreAsync' is called or the create all required tables manually.", ex);
+                else
+                    throw;
             }
         }
 

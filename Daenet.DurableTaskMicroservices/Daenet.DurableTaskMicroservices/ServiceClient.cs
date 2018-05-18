@@ -12,11 +12,9 @@ namespace Daenet.DurableTask.Microservices
     /// <summary>
     /// Implements the client functionality for DTF microservices.
     /// </summary>
-    public class ServiceClient
+    public class ServiceClient : MicroserviceBase
     {
-        private TaskHubClient m_HubClient;
        
-
         /// <summary>
         /// Creates the instance of ServiceClient, which can be used to act with microservice.
         /// </summary>
@@ -28,41 +26,24 @@ namespace Daenet.DurableTask.Microservices
            this.m_HubClient = new TaskHubClient(orchestrationClient);
         }
 
-        /// <summary>
-        /// Starts the new instance of the microservice by passing input arguments.
-        /// This method will start the new instance of orchestration
-        /// </summary>
-        /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
-        /// <param name="inputArgs">Input arguments.</param>
-        /// <returns></returns>
-        public async Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, string version = "")
-        {
-            if (version == null)
-                throw new ArgumentException("Value cannot be null!", nameof(version));
-
-            var ms = new MicroserviceInstance()
-            {
-                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestrationQualifiedName, version, inputArgs),
-            };
-            return ms;
-        }
+      
 
 
-        /// <summary>
-        /// Starts the new instance of the microservice by passing input arguments.
-        /// This method will start the new instance of orchestration
-        /// </summary>
-        /// <param name="orchestration">The type of orchestration to be started.</param>
-        /// <param name="inputArgs">Input arguments.</param>
-        /// <returns></returns>
-        public async Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs)
-        {
-            var ms = new MicroserviceInstance()
-            {
-                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
-            };
-            return ms;
-        }
+        ///// <summary>
+        ///// Starts the new instance of the microservice by passing input arguments.
+        ///// This method will start the new instance of orchestration
+        ///// </summary>
+        ///// <param name="orchestration">The type of orchestration to be started.</param>
+        ///// <param name="inputArgs">Input arguments.</param>
+        ///// <returns></returns>
+        //public async Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs)
+        //{
+        //    var ms = new MicroserviceInstance()
+        //    {
+        //        OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
+        //    };
+        //    return ms;
+        //}
 
         public async Task Terminate(MicroserviceInstance svcInst, string reason = "Terminated by host.")
         {
@@ -79,5 +60,7 @@ namespace Daenet.DurableTask.Microservices
         {
             await m_HubClient.RaiseEventAsync(instance.OrchestrationInstance, eventName, data);
         }
+
+     
     }
 }
