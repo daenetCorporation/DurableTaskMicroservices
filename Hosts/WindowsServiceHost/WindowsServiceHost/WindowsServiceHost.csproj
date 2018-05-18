@@ -33,7 +33,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPMENT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPMENT2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -83,6 +83,12 @@
     <None Include="ConnectionStrings.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Scripts\InstallService.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\UninstallService.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectInstaller.resx">
@@ -102,6 +108,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj">
+      <Project>{a20b2b3f-4391-40e2-9e07-13f0a83719b2}</Project>
+      <Name>Daenet.DurableTask.SqlInstanceStore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj">
       <Project>{8a811d48-7dc5-4e4b-acf6-f607dbeaf196}</Project>
       <Name>Daenet.DurableTaskMicroservices.Host</Name>
@@ -112,8 +122,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Daenet.Common.Logging.Sql">
+      <Version>1.0.5</Version>
+    </PackageReference>
     <PackageReference Include="DurableTask.ServiceBus">
-      <Version>2.0.0.4-preview2</Version>
+      <Version>2.0.0.4-preview5</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json">
+      <Version>2.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging">
+      <Version>2.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

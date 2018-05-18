@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Common.Entities
 {
+
     [DataContract]
     public class OrchestrationInput
     {
@@ -27,7 +28,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Entities
 
         /// <summary>
         /// This property indicates that the internal logging context was already 
-        /// initializad (propagated).
+        /// initialized (propagated).
         /// </summary>
         public bool IsInitialized { get; set; }
 

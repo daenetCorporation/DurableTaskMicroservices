@@ -66,11 +66,10 @@ namespace Daenet.DurableTask.Microservices
         internal Type[] Activities { get; set; }
 
         /// <summary>
-        /// If TRUE then it will be automatically started if the instance
-        /// of same orchestration is not already running. 
+        /// If TRUE then it will be automatically started on ServiceHost creation.
         /// </summary>
         [DataMember]
-        virtual public bool IsSingletone { get; set; }
+        public bool AutoStart { get; set; }
 
         /// <summary>
         /// Dictionary of configurations of every single Task (Adapter), which is used in Microservice (orchestration).

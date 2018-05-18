@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Microservice xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTask.Microservices">
+  <ActivityConfiguration xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <ActivityQNames xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+    <d2p1:string>GetTweetsMention.GetTweetsTask, GetTweetsMention, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
+    <d2p1:string>GetTweetsMention.SwitchOnLightTask, GetTweetsMention, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
+  </ActivityQNames>
+  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/GetTweetsMention" i:type="d2p1:TweetOrchestrationInput">
+    <d2p1:LatestTweetId>"0"</d2p1:LatestTweetId>
+  </InputArgument>
+  <IsSingletone>true</IsSingletone>
+  <OrchestrationQName>GetTweetsMention.TweetOrchestration, GetTweetsMention, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</OrchestrationQName>
+  <OutputArgument i:nil="true" />
+  <ServiceConfiguration i:nil="true" />
+</Microservice>

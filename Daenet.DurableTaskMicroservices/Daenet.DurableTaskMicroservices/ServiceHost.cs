@@ -11,6 +11,7 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
+using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask.Core;
 using DurableTask.Core.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,7 @@ namespace Daenet.DurableTask.Microservices
     public class ServiceHost
     {
         #region Private Members
+        public const string cActivityIdCtxName = "ActivityId";
 
         /// <summary>
         /// Holds the list of dictionaries of service and activity configurations.
@@ -39,18 +41,15 @@ namespace Daenet.DurableTask.Microservices
         private TaskHubWorker m_TaskHubWorker;
         private IOrchestrationServiceInstanceStore m_InstanceStoreService;
         private ILogger m_Logger;
-        private static string m_SchemaName;
         private static ILoggerFactory m_LoggerFactory;
 
         #endregion
-
-
 
         private Dictionary<string, object> m_Services;
 
 
         #region Initialization Code
-        
+
 
         public ServiceHost(IOrchestrationService orchestrationService,
             IOrchestrationServiceClient orchestrationClient,
@@ -58,7 +57,6 @@ namespace Daenet.DurableTask.Microservices
             bool resetHub = false,
             ILoggerFactory loggerFactory = null)
         {
-
             this.m_HubClient = new TaskHubClient(orchestrationClient);
             this.m_TaskHubWorker = new TaskHubWorker(orchestrationService);
             this.m_InstanceStoreService = instanceStore;
@@ -69,10 +67,29 @@ namespace Daenet.DurableTask.Microservices
                 m_Logger = m_LoggerFactory.CreateLogger<ServiceHost>();
             }
 
+         
             if (resetHub)
                 orchestrationService.DeleteAsync().Wait();
 
-            orchestrationService.CreateIfNotExistsAsync().Wait();
+            int n = 10;
+            while (--n > 0)
+            {
+                try
+                {
+                    orchestrationService.CreateIfNotExistsAsync().Wait();
+                    break;
+                }
+                catch (AggregateException aggEx)
+                {
+                    if (n <= 0)
+                        throw;
+
+                    if (aggEx.InnerException.Message.Contains("409"))
+                    {
+                        Thread.Sleep(10000);
+                    }
+                }
+            }
         }
 
 
@@ -378,17 +395,17 @@ namespace Daenet.DurableTask.Microservices
         /// Gets the logger instance.
         /// </summary>
         /// <param name="type">Type which defines logger category.</param>
-        /// <param name="activityId">Activity identifier.</param>
+        /// <param name="scopeId">Activity identifier.</param>
         /// <returns></returns>
-        public static ILogger GetLogger(Type type, string activityId = null)
+        public static ILogger GetLogger(Type type, string scopeId = null)
         {
             lock (m_LoggerFactory)
             {
                 if (m_LoggerFactory != null)
                 {
                     var logger = m_LoggerFactory.CreateLogger(type.FullName);
-                    if (activityId != null)
-                        logger.BeginScope(activityId);
+                    if (scopeId != null)
+                        logger.BeginScope(scopeId);
 
                     return logger;
                 }
@@ -403,24 +420,16 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationInput"></param>
         /// <param name="activityId"></param>
         /// <returns></returns>
-        public static string GetActivityIdFromContext(object orchestrationInput)
+        public static string GetActivityIdFromContext(Dictionary<string, object> context)
         {
             string activityId = Guid.NewGuid().ToString();
-            if (orchestrationInput is DurableTaskMicroservices.Common.Entities.OrchestrationInput)
+
+            if (context.ContainsKey(cActivityIdCtxName))
             {
-                const string ctxName = "ActivityId";
-
-                DurableTaskMicroservices.Common.Entities.OrchestrationInput msIn = (DurableTaskMicroservices.Common.Entities.OrchestrationInput)orchestrationInput;
-                if (msIn.Context == null)
-                    msIn.Context = new Dictionary<string, object>();
-
-                if (msIn.Context.ContainsKey(ctxName))
-                {
-                    activityId = msIn.Context[ctxName] as string;
-                }
-                else
-                    msIn.Context.Add(ctxName, activityId);
+                activityId = context[cActivityIdCtxName] as string;
             }
+            else
+                context.Add(cActivityIdCtxName, activityId);
 
             return activityId;
         }
@@ -506,8 +515,8 @@ namespace Daenet.DurableTask.Microservices
         /// Starts the MicroService Host.
         /// </summary>
         /// <param name="directory">Directory where to search for *.config.xml, *.config.json and assemblies</param>
-        /// <param name="searchPattern">Search pattern for config files.</param>
-        /// <param name="runningInstances">List of currentlly unning instances. In the future ServiceHost will be able to grab the list 
+        /// <param name="searchPattern">Search pattern for configuration files.</param>
+        /// <param name="runningInstances">List of currently running instances. In the future ServiceHost will be able to grab the list 
         /// of running instances. Waiting on DTF team.</param>
         public async Task<List<MicroserviceInstance>> StartServiceHostAsync(string directory = null, string searchPattern = "*.config.xml", ICollection<OrchestrationState> runningInstances = null, Dictionary<string, object> context = null)
         {
@@ -543,9 +552,11 @@ namespace Daenet.DurableTask.Microservices
 
                     foreach (var svc in microServices)
                     {
+                        if (svc.AutoStart == false)
+                            continue;
+
                         if (runningInstances == null ||
-                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null ||
-                            svc.IsSingletone == false)
+                            runningInstances.FirstOrDefault(s => s.Name == svc.Orchestration.FullName) == null)
                         {
                             var newInst = StartServiceAsync(svc.OrchestrationQName, svc.InputArgument, context).Result;
 
@@ -740,19 +751,29 @@ namespace Daenet.DurableTask.Microservices
             return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
         }
 
-      
-        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string,object> context)
+        /// <summary>
+        /// Here we create a context and ensure that ActivityId is provided.
+        /// </summary>
+        /// <param name="orchestration"></param>
+        /// <param name="inputArgs"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context)
         {
-            object iArgs = inputArgs;
+            OrchestrationInput orchestrationInput = inputArgs as OrchestrationInput;
 
-            if (context != null && inputArgs is DurableTaskMicroservices.Common.Entities.OrchestrationInput)
+            if (orchestrationInput != null)
             {
-                ((DurableTaskMicroservices.Common.Entities.OrchestrationInput)inputArgs).Context = context;
+                if(orchestrationInput.Context == null)
+                    orchestrationInput.Context = new Dictionary<string, object>(context);
+
+                if (orchestrationInput.Context.ContainsKey(cActivityIdCtxName) == false)
+                    orchestrationInput.Context.Add(cActivityIdCtxName, Guid.NewGuid().ToString());
             }
 
             var ms = new MicroserviceInstance()
             {
-                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, iArgs),
+                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
             };
             return ms;
         }
@@ -884,7 +905,7 @@ namespace Daenet.DurableTask.Microservices
         {
             List<string> configFiles = new List<string>();
 
-            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern))
+            foreach (var cfgFile in Directory.GetFiles(directory, searchPattern, SearchOption.AllDirectories))
             {
                 configFiles.Add(cfgFile);
             }
@@ -898,19 +919,26 @@ namespace Daenet.DurableTask.Microservices
         {
             List<Type> types = new List<Type>();
 
-            foreach (var assemblyFile in Directory.GetFiles(directory, "*.dll", SearchOption.AllDirectories))
+            foreach (var assemblyFile in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).Where(f => f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")))
             {
-                Assembly asm = Assembly.LoadFile(assemblyFile);
-                var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
-                if (attr != null)
+
+                try
                 {
-                    foreach (var type in asm.GetTypes())
+                    Assembly asm = Assembly.LoadFile(assemblyFile);
+                    var attr = asm.GetCustomAttribute(typeof(IntegrationAssemblyAttribute));
+                    if (attr != null)
                     {
-                        if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
+                        foreach (var type in asm.GetTypes())
                         {
-                            types.Add(type);
+                            if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
+                            {
+                                types.Add(type);
+                            }
                         }
                     }
+                }
+                catch (Exception)
+                {
                 }
             }
 

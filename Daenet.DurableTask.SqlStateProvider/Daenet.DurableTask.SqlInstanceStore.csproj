@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <Company>daenet Gesellschaft für Informationstechnologie mbH</Company>
+    <Authors>daenet</Authors>
+    <PackageLicenseUrl>https://github.com/daenetCorporation/DurableTaskMicroservices/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</PackageProjectUrl>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
+    <RepositoryUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</RepositoryUrl>
+    <PackageTags>durabletask</PackageTags>
+    <Version>1.0.1 -preview</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Daenet.Common.Sql" Version="1.0.1" />
+    <PackageReference Include="DurableTask.Core" Version="2.0.0.4-preview5" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+  </ItemGroup>
+
+</Project>

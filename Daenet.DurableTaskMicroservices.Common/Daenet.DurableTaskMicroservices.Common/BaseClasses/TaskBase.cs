@@ -182,17 +182,21 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         {
             TOutput result = null;
 
-            string activityId = ServiceHost.GetActivityIdFromContext(taskInputArgs);
+            string activityId = ServiceHost.GetActivityIdFromContext(taskInputArgs.Context);
 
             var logger = ServiceHost.GetLogger(this.GetType(), activityId);
 
+            logger.BeginScope(context.OrchestrationInstance.InstanceId);
+
+            logger.BeginScope(context.OrchestrationInstance.ExecutionId);
+
             try
             {
-                logger?.LogDebug("Task {P1} entered", this.GetType().FullName);
-
+                logger?.LogDebug("TaskBase: '{Task}' started successfully", this.GetType().FullName);
+                
                 result = RunTask(context, taskInputArgs, logger);
 
-                logger?.LogDebug("Orchestration {P1} exited successfully", this.GetType().FullName);
+                logger?.LogDebug("TaskBase: '{Task}' exited successfully", this.GetType().FullName);
             }
             catch (ValidationRuleException validationException)
             {

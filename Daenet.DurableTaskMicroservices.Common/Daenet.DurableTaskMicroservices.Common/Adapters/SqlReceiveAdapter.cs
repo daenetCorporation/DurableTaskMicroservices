@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
 
-namespace Daenet.System.Integration
+namespace Daenet.Integration
 {
     public class SqlReceiveAdapter<TAdapterOutput, TAdapterInput> : ReceiveAdapterBase<TAdapterInput, TAdapterOutput> 
         where TAdapterOutput : class
@@ -19,7 +19,7 @@ namespace Daenet.System.Integration
 
             TAdapterOutput res = null;
 
-            base.LogManager.TraceInfMethodStarted("Daenet.System.Integration.SqlReceiveAdapter.RunTask()");
+            base.LogManager.TraceInfMethodStarted("Daenet.Integration.SqlReceiveAdapter.RunTask()");
             
             if (String.IsNullOrEmpty(config.ConnectionString))
                 throw new Exception("SqlReceiveAdapter must have valid ConnectionString. Please check your configuration.");
@@ -85,7 +85,7 @@ namespace Daenet.System.Integration
                     // Attempt to roll back the transaction. 
                     try
                     {
-                        base.LogManager.TraceErryAdapterExecution(ex, "Daenet.System.Integration.ReceiveSqlAdapter");
+                        base.LogManager.TraceErryAdapterExecution(ex, "Daenet.Integration.ReceiveSqlAdapter");
                         transaction.Rollback();
                         base.LogManager.TraceInfTransactionRolledBack();
                         throw;
@@ -95,14 +95,14 @@ namespace Daenet.System.Integration
                         // This catch block will handle any errors that may have occurred 
                         // on the server that would cause the rollback to fail, such as 
                         // a closed connection.
-                        base.LogManager.TraceErrFailedToCommitTransactionRollback(ex2, "Daenet.System.Integration.SqlReceiveAdapter");
+                        base.LogManager.TraceErrFailedToCommitTransactionRollback(ex2, "Daenet.Integration.SqlReceiveAdapter");
                         throw;
                         
                     }
                 }
             }
 
-            base.LogManager.TraceInfMethodCompleted("Daenet.System.Integration.SqlReceiveAdapter.RunTask()");
+            base.LogManager.TraceInfMethodCompleted("Daenet.Integration.SqlReceiveAdapter.RunTask()");
 
             return res;
         }

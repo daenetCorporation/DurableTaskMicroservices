@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F587E0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{E9C667F9-C83C-41DC-A4F7-CFAD14AA36FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTask.SqlInstanceStore", "Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj", "{A20B2B3F-4391-40E2-9E07-13F0A83719B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{1170C504-D6C7-4E8C-A0D6-32CC42D7FD93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1170C504-D6C7-4E8C-A0D6-32CC42D7FD93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1170C504-D6C7-4E8C-A0D6-32CC42D7FD93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A20B2B3F-4391-40E2-9E07-13F0A83719B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A20B2B3F-4391-40E2-9E07-13F0A83719B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A20B2B3F-4391-40E2-9E07-13F0A83719B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A20B2B3F-4391-40E2-9E07-13F0A83719B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

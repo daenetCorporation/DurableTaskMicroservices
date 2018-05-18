@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Microservice xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTask.Microservices">
+  <ActivityConfiguration xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <ActivityQNames xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+    <d2p1:string>Daenet.DurableTaskMicroservices.UnitTests.Task1, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
+  </ActivityQNames>
+  <AutoStart>false</AutoStart>
+  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/Daenet.Microservice.Common.Test.HelloWorldOrchestration" i:type="d2p1:HelloWorldOrchestrationInput">
+    <d2p1:HelloText>Hello World Text!</d2p1:HelloText>
+  </InputArgument>
+  <OrchestrationQName>Daenet.Microservice.Common.Test.HelloWorldOrchestration.HelloWorldOrchestration, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</OrchestrationQName>
+  <OutputArgument i:nil="true" />
+  <ServiceConfiguration i:nil="true" />
+</Microservice>
+

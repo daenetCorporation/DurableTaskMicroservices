@@ -68,62 +68,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             return this.Configuration as TConfig;
         }
 
-
-       
-        /// <summary>
-        /// Instance of the daenet's LogManager component.
-        /// </summary>
-        protected ILogManager LogManager
-        {
-            get
-            {
-                if (m_Log == null)
-                {
-
-
-                }
-
-                return m_Log;
-            }
-            set
-            {
-                m_Log = value;
-            }
-        }
         #endregion
-
-        #region Private Members
-
-        private ILogManager m_Log;
-
-        #endregion
-
-        /*
-        /// <summary>
-        /// Sets the logging context as parent context for all configured tasks.
-        /// This method enumerates all properties of type TaskBase
-        /// </summary>
-        /// <param name="orchestrationInput">The instance of Orchestration, which holds Task configuration properties.</param>
-        /// <param name="logCtx">The context of orchestration, which should be set as </param>
-        protected void SetLoggingContextOnTasks(OrchestrationInput orchestrationInput, LoggingContext logCtx)
-        {
-            if (logCtx != null)
-            {
-                var tp = orchestrationInput.GetType();
-                var props = tp.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-
-                foreach (var prop in props)
-                {
-                    if (prop.PropertyType.IsSubclassOf(typeof(TaskInput)))
-                    {
-                        dynamic val = (prop.GetValue(orchestrationInput));
-                        if (val != null)
-                            val.ParentLoggingContext = logCtx;
-                    }
-                }
-            }
-        }
-        */
         
         /// <summary>
         /// Invoked when orchestration has to be started.
@@ -135,56 +80,18 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
         {
             TOutput result = null;
 
-            string activityId = ServiceHost.GetActivityIdFromContext(orchestrationInput);
+            string activityId = ServiceHost.GetActivityIdFromContext(orchestrationInput.Context);
 
             var logger = ServiceHost.GetLogger(this.GetType(), activityId);
 
+            logger.BeginScope(context.OrchestrationInstance.InstanceId);
+
+            logger.BeginScope(context.OrchestrationInstance.ExecutionId);
+
             try
             {
-                /*
-                if (this.LogManager == null)
-                {  
-                    this.LogManager = new LogManager(this?.Configuration?.LogTraceSourceName);
-                }
-
-                if (orchestrationInput == null)
-                {
-                    orchestrationInput = Activator.CreateInstance<TInput>();
-                }
-
-                // Add an new ActivityId if not existing yet. 
-                if (!this.LogManager.CurrentScope.ContainsKey("ActivityId"))
-                {
-                    if (orchestrationInput.Context.ContainsKey("ParentLoggingContext") && ((LoggingContext)orchestrationInput.Context["ParentLoggingContext"]).LoggingScopes.ContainsKey("ActivityId"))
-                    {
-                        this.LogManager.AddScope("ActivityId", 
-                            ((LoggingContext)orchestrationInput.Context["ParentLoggingContext"]).LoggingScopes["ActivityId"]);
-                    }
-                    else
-                    {
-                        this.LogManager.AddScope("ActivityId", Guid.NewGuid().ToString());
-                    }
-                }
-              
-                // Add WorkflowInstanceId as a new ActivityId if not existing yet. 
-                if (!this.LogManager.CurrentScope.ContainsKey("OrchestrationInstanceId"))
-                    this.LogManager.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
-
-                if (!this.LogManager.CurrentScope.ContainsKey("LogTraceSourceName"))
-                    this.LogManager.AddScope("LogTraceSourceName", this.Configuration.LogTraceSourceName);
-
-                //foreach (var scope in this.LogManager.LoggingScopes)
-                //    this.LogManager.AddScope(scope.Key, scope.Value);
-
-                if (!this.LogManager.CurrentScope.ContainsKey("OrchestrationInstanceId"))
-                    this.LogManager.AddScope("OrchestrationInstanceId", context.OrchestrationInstance.InstanceId);
-
-                if (!orchestrationInput.Context.ContainsKey("ParentLoggingContext"))
-                    orchestrationInput.Context.Add("ParentLoggingContext", new LoggingContext() { LoggingScopes = this.LogManager.CurrentScope });
-                */
-
-
-                logger?.LogDebug("Orchestration {P1} entered", this.GetType().FullName);
+                if(context.IsReplaying == false)
+                    logger?.LogDebug("OrchestrationBase: '{Orchestration}' entered.", this.GetType().FullName);
 
                 m_OrchestrationConext = context;
 
@@ -192,27 +99,22 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
                 result = await RunOrchestration(context, orchestrationInput, logger);
 
-                logger?.LogDebug("Orchestration {P1} exited successfully", this.GetType().FullName);
-
+                if (context.IsReplaying == false)
+                    logger?.LogDebug("OrchestrationBase: '{Orchestration}' exited successfully", this.GetType().FullName);
             }
             catch (Exception ex)
             {
-                logger?.LogError($"{ex}");
-                throw ex;
+                logger?.LogError(ex.ToString());
+                throw;
             }
-            finally
-            {
-
-                //TODO.. log ??
-            }
-
+           
             return result;
         }
 
  
 
         /// <summary>
-        ///  Create a suborchestration of the specified type. Also retry on failure as 
+        ///  Create a SubOrchestration of the specified type. Also retry on failure as 
         ///  per supplied policy.
         ///  It transfers the input orchestration context to the new orchestration.
         ///  </summary>

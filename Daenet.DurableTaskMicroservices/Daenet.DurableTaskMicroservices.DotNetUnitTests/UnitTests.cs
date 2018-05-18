@@ -12,6 +12,7 @@
 //  ----------------------------------------------------------------------------------
 
 using Daenet.DurableTask.Microservices;
+using Daenet.DurableTask.SqlStateProvider;
 using DurableTask;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
@@ -32,16 +33,16 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
     [TestClass]
     public class UnitTests
     {
-        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
-        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
+        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"]?.ConnectionString;
+        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"]?.ConnectionString;
+        private static string SqlStorageConnectionString = ConfigurationManager.ConnectionStrings["SqlStorage"]?.ConnectionString;
 
-        private static ServiceHost createMicroserviceHost()
+        private static ServiceHost createMicroserviceHost(IOrchestrationServiceInstanceStore instanceStore)
         {
-            IOrchestrationServiceInstanceStore instanceStore = new AzureTableInstanceStore("UnitTestTmp", StorageConnectionString);
-            ServiceBusOrchestrationService orchestrationServiceAndClient =
+             ServiceBusOrchestrationService orchestrationServiceAndClient =
                new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
 
-            instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
+            //instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
             ServiceHost host;
 
             host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
@@ -49,10 +50,60 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             return host;
         }
 
-        [TestMethod]
-        public void OpenAndStartServiceHostTest()
+        private static ServiceHost getMicroserviceHostWithTableStorage()
         {
-            var host = createMicroserviceHost();
+            IOrchestrationServiceInstanceStore instanceStore = new AzureTableInstanceStore("UnitTestTmp", StorageConnectionString);
+            return createMicroserviceHost(instanceStore);
+        }
+
+
+        private static ServiceHost getMicroServiceWithSqlInstanceStoreHost()
+        {
+            IOrchestrationServiceInstanceStore instanceStore = new SqlInstanceStore("Dtf", SqlStorageConnectionString);
+            //instanceStore.DeleteStoreAsync().Wait();
+
+            return createMicroserviceHost(instanceStore);
+        }
+
+
+        [TestMethod]
+        public void OpenAndStartServiceHostTestWithSB()
+        {
+            var host = getMicroserviceHostWithTableStorage();
+
+            Microservice service = new Microservice();
+            service.InputArgument = new TestOrchestrationInput()
+            {
+                Counter = 2,
+                Delay = 1000,
+            };
+
+            service.OrchestrationQName = typeof(CounterOrchestration).AssemblyQualifiedName;
+
+            service.ActivityQNames = new string[]{
+                typeof(Task1).AssemblyQualifiedName,  typeof(Task2).AssemblyQualifiedName,
+            };
+
+            host.LoadService(service);
+
+            host.OpenAsync().Wait();
+
+            // This is client side code.
+            var instance = host.StartServiceAsync(service.OrchestrationQName, service.InputArgument).Result;
+
+            Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
+
+            host.WaitOnInstanceAsync(instance).Wait();
+        }
+
+
+        /// <summary>
+        /// Runs the orchestration with SQL Instance store.
+        /// </summary>
+        [TestMethod]
+        public void OpenAndStartServiceHostTestWithSql()
+        {
+            var host = getMicroServiceWithSqlInstanceStoreHost();
 
             Microservice service = new Microservice();
             service.InputArgument = new TestOrchestrationInput()
@@ -84,7 +135,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         [DataRow("CounterOrchestration.config.xml")]
         public void RunServiceFromXml(string fileName)
         {
-            var host = createMicroserviceHost();
+            var host = getMicroserviceHostWithTableStorage();
 
             Microservice microSvc = host.LoadServiceFromXml(UtilsTests.GetPathForFile(fileName), 
                 new List<Type>(){ typeof(TestOrchestrationInput) });

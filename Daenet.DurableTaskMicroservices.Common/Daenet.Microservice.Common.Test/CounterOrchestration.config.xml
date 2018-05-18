@@ -5,12 +5,13 @@
     <d2p1:string>Daenet.DurableTaskMicroservices.UnitTests.Task1, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
     <d2p1:string>Daenet.DurableTaskMicroservices.UnitTests.Task2, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
   </ActivityQNames>
+  <AutoStart>true</AutoStart>
   <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.UnitTests" i:type="d2p1:CounterOrchestrationInput">
     <d2p1:Counter>3</d2p1:Counter>
     <d2p1:Delay>1000</d2p1:Delay>
   </InputArgument>
-  <IsSingletone>true</IsSingletone>
   <OrchestrationQName>Daenet.DurableTaskMicroservices.UnitTests.CounterOrchestration, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</OrchestrationQName>
   <OutputArgument i:nil="true" />
   <ServiceConfiguration i:nil="true" />
 </Microservice>
+

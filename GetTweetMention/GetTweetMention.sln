@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetTweetsMention", "GetTweetsMention\GetTweetsMention.csproj", "{20B0C706-3B57-4543-94A8-FDA247BE4F7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices.Common", "..\Daenet.DurableTaskMicroservices.Common\Daenet.DurableTaskMicroservices.Common\Daenet.DurableTaskMicroservices.Common.csproj", "{BE9DF92A-42B9-4F1E-8493-3D7FE5E343DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices", "..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj", "{57990223-94C0-4DC9-A3E7-426EB8F27BFB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices.Host", "..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj", "{27BEBB6B-D2D7-4EAD-BAAD-94E474A7D77E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTask.SqlInstanceStore", "..\Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj", "{8F0F09C0-4A5C-44D4-AB63-0E5A602CA2F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20B0C706-3B57-4543-94A8-FDA247BE4F7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B0C706-3B57-4543-94A8-FDA247BE4F7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B0C706-3B57-4543-94A8-FDA247BE4F7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B0C706-3B57-4543-94A8-FDA247BE4F7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE9DF92A-42B9-4F1E-8493-3D7FE5E343DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE9DF92A-42B9-4F1E-8493-3D7FE5E343DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE9DF92A-42B9-4F1E-8493-3D7FE5E343DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE9DF92A-42B9-4F1E-8493-3D7FE5E343DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57990223-94C0-4DC9-A3E7-426EB8F27BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57990223-94C0-4DC9-A3E7-426EB8F27BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57990223-94C0-4DC9-A3E7-426EB8F27BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57990223-94C0-4DC9-A3E7-426EB8F27BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27BEBB6B-D2D7-4EAD-BAAD-94E474A7D77E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27BEBB6B-D2D7-4EAD-BAAD-94E474A7D77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27BEBB6B-D2D7-4EAD-BAAD-94E474A7D77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27BEBB6B-D2D7-4EAD-BAAD-94E474A7D77E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F0F09C0-4A5C-44D4-AB63-0E5A602CA2F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F0F09C0-4A5C-44D4-AB63-0E5A602CA2F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F0F09C0-4A5C-44D4-AB63-0E5A602CA2F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F0F09C0-4A5C-44D4-AB63-0E5A602CA2F8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A16315F-29A6-4BEA-B484-C37066A86192}
+	EndGlobalSection
+EndGlobal
