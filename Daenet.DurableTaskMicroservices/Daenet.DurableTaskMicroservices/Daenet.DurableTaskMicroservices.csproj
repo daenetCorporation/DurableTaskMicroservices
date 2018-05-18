@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Daenet.DurableTask.Microservices</RootNamespace>
+    <RootNamespace>Daenet.DurableTaskMicroservices.Core</RootNamespace>
     <VersionPrefix>0.0.2</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <PackageId>Daenet.DurableTask.Microservices</PackageId>
@@ -17,6 +17,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>0.0.8</Version>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
+    <AssemblyName>Daenet.DurableTaskMicroservices.Core</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

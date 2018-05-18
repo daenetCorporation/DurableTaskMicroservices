@@ -18,7 +18,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTask.Microservices
+namespace Daenet.DurableTaskMicroservices.Core
 {
     /// <summary>
     /// 

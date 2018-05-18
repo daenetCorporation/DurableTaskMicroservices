@@ -23,7 +23,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Daenet.DurableTaskMicroservices.UnitTests;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Tests
 {
     [TestClass]
     public class UtilsTests

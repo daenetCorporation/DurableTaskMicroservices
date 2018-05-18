@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.DotNetUnitTests
+namespace Daenet.DurableTaskMicroservices.Tests
 {
     [TestClass]
     public class DtfNativeTests

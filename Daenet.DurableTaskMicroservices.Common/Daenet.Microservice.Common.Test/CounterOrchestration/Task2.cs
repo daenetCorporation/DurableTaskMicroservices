@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration
 {
     public class Task2 : TaskBase<Task2Input, Null>
     {

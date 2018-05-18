@@ -9,7 +9,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Daenet.Microservice.Common.Test.CounterOrchestration;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration
 {
     public class Task1 : TaskBase<Task1Input, Null>
     {

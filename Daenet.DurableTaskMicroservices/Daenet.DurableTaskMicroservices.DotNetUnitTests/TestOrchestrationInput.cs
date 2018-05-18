@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Tests
 {
     [DataContractAttribute]
     public class TestOrchestrationInput

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 
-namespace Daenet.Integration
+namespace Daenet.DurableTaskMicroservices.Common.Adapters
 {
 
     public class FileReceiveAdapter<TAdapterOutput> : ReceiveAdapterBase<TaskInput, TAdapterOutput> where TAdapterOutput : class

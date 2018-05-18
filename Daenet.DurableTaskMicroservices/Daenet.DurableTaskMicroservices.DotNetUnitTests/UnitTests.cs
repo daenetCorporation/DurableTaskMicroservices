@@ -25,7 +25,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Tests
 {
     // AppContext.SetSwitch("Switch.System.IdentityModel.DisableMul‌​tipleDNSEntriesInSAN‌​Certificate", true);
     // See: https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/mitigation-x509certificateclaimset-findclaims-method

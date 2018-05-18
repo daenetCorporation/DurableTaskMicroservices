@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration
 {
     public class Task2 : TaskActivity<string, Null>
     {

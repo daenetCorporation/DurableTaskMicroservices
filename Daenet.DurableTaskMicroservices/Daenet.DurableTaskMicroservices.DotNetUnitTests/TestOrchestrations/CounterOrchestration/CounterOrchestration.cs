@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration
 {
     public class Null { }
 

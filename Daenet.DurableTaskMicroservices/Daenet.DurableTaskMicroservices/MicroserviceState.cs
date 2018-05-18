@@ -19,7 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTask.Microservices
+namespace Daenet.DurableTaskMicroservices.Core
 {
     public class MicroserviceState
     {

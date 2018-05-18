@@ -25,7 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Daenet.DurableTask.Microservices
+namespace Daenet.DurableTaskMicroservices.Core
 {
     public class ServiceHost
     {

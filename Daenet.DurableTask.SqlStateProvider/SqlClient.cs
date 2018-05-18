@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Daenet.Common.Sql;
 using DurableTask.Core.History;
 
-namespace Daenet.DurableTask.SqlStateProvider
+namespace Daenet.DurableTask.SqlInstanceStoreProvider
 {
     /// <summary>
     /// Client for Connecting to SqlServer

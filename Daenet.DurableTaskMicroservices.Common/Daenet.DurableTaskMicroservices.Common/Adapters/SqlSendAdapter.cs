@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
 
-namespace Daenet.Integration
+namespace Daenet.DurableTaskMicroservices.Common.Adapters
 {
     public class SqlSendAdapter<TAdapterOutput, TAdapterInput> : SendAdapterBase<TAdapterInput, TAdapterOutput> 
         where TAdapterOutput : class

@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration
 {
     [DataContractAttribute]
     public class CounterOrchestrationInput : OrchestrationInput

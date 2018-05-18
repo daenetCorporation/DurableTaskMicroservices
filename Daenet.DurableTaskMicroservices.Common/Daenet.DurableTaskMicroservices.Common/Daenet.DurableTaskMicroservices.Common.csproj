@@ -14,6 +14,8 @@
     <Company>daenet Gesellschaft für Informationstechnologie mbH</Company>
     <Product>Daenet.DurableTaskMicroservices.Common</Product>
     <PackageId>Daenet.DurableTaskMicroservices.Common</PackageId>
+    <AssemblyName>Daenet.DurableTaskMicroservices.Common</AssemblyName>
+    <RootNamespace>Daenet.DurableTaskMicroservices.Common</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

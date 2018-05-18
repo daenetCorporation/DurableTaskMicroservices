@@ -14,7 +14,7 @@
 
 using DurableTask.Core;
 
-namespace Daenet.DurableTask.Microservices
+namespace Daenet.DurableTaskMicroservices.Core
 {
     public class MicroserviceStateQuery
     {

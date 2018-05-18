@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.UnitTests
+namespace Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration
 {
     public class CounterOrchestration : OrchestrationBase<CounterOrchestrationInput, Null>
     {       

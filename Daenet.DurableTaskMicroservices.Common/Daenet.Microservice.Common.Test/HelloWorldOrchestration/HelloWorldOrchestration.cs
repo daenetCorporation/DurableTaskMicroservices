@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test.HelloWorldOrchestration
+namespace Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration
 {
     internal class HelloWorldOrchestration : OrchestrationBase<HelloWorldOrchestrationInput, Null>
     {

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Daenet.Common.Logging.Sql;
 
-namespace Daenet.Microservice.Common.Test
+namespace Daenet.DurableTaskMicroservices.Common.Test
 {
     [TestClass]
     public class UnitTestLogging

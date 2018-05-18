@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Daenet.DurableTaskMicroservices.Common.Logging
+namespace Daenet.DurableTaskMicroservices.Common
 {
     
     public static class DiagnosticEvents

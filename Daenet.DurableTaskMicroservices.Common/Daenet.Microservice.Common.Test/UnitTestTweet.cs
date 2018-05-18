@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test
+namespace Daenet.DurableTaskMicroservices.Common.Test
 {
     [TestClass]
     public class UnitTestTweet

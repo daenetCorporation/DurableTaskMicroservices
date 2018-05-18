@@ -11,7 +11,7 @@ using DurableTask.Core.Tracking;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace Daenet.DurableTask.SqlStateProvider
+namespace Daenet.DurableTask.SqlInstanceStoreProvider
 {
     public class SqlInstanceStore : IOrchestrationServiceInstanceStore
     {

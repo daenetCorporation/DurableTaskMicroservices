@@ -10,6 +10,8 @@
     <RepositoryUrl>https://github.com/daenetCorporation/DurableTaskMicroservices</RepositoryUrl>
     <PackageTags>durabletask</PackageTags>
     <Version>1.0.1 -preview</Version>
+    <AssemblyName>Daenet.DurableTask.SqlInstanceStoreProvider</AssemblyName>
+    <RootNamespace>Daenet.DurableTask.SqlInstanceStoreProvider</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

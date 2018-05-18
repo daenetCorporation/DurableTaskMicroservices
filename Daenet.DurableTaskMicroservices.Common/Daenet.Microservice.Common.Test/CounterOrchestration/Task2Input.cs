@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.Microservice.Common.Test.CounterOrchestration
+namespace Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration
 {
     public class Task2Input : TaskInput
     {

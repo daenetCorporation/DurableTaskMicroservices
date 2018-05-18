@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Daenet.Common.Logging;
 
-namespace Daenet.DurableTaskMicroservices.Common.Logging
+namespace Daenet.DurableTaskMicroservices.Common
 {
     public static class Extension
     {
