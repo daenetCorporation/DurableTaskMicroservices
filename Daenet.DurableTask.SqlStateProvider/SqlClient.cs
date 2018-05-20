@@ -348,13 +348,13 @@ namespace Daenet.DurableTask.SqlStateProvider
                         cmd.AddSqlParameter("@ExecutionId", state.OrchestrationInstance.ExecutionId);
                         cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
 
-                        if (entity.JumpStartTime == default(DateTime))
+                        if (entity.JumpStartTime == default(DateTime) || state.CompletedTime.Year == 1601)
                             cmd.AddSqlParameter("@JumpStartTime", null);
                         else
                             cmd.AddSqlParameter("@JumpStartTime", entity.JumpStartTime);
 
 
-                        if (state.CompletedTime == default(DateTime))
+                        if (state.CompletedTime == default(DateTime) || state.CompletedTime.Year == 1601)
                             cmd.AddSqlParameter("@CompletedTime", null);
                         else
                             cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
@@ -710,7 +710,7 @@ namespace Daenet.DurableTask.SqlStateProvider
                     cmd.AddSqlParameter("@ExecutionId", executionId);
                     cmd.AddSqlParameter("@SequenceNumber", stateInstance.SequenceNumber);
 
-                    if (state.CompletedTime == default(DateTime))
+                    if (state.CompletedTime == default(DateTime) || state.CompletedTime.Year == 1601)
                         cmd.AddSqlParameter("@CompletedTime", null);
                     else
                         cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);

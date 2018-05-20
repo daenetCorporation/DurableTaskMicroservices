@@ -11,9 +11,9 @@ namespace Daenet.DurableTask.Microservices
     public class MicroserviceBase
     {
         protected TaskHubClient m_HubClient;
-
+         
         public const string cActivityIdCtxName = "ActivityId";
-
+         
         /// <summary>
         /// Starts the new instance of the microservice by passing input arguments.
         /// This method will start the new instance of orchestration
@@ -45,7 +45,7 @@ namespace Daenet.DurableTask.Microservices
         /// <summary>
         /// Creates the instance of service from service name.
         /// </summary>
-        /// <param name="orchestrationQualifiedName"></param>
+        /// <param name="orchestrationQualifiedNameOrName"></param>
         /// <param name="inputArgs"></param>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -61,15 +61,19 @@ namespace Daenet.DurableTask.Microservices
         /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
         /// <param name="inputArgs">Input arguments.</param>
         /// <returns></returns>
-        public async Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context = null, string version = "")
+        public async Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedNameOrName, object inputArgs, Dictionary<string, object> context = null, string version = "")
         {
             try
-            {        
+            {
+                var tokens = orchestrationQualifiedNameOrName.Split(',');
+                if (tokens.Length > 1)
+                    orchestrationQualifiedNameOrName = tokens[0];
+
                 ensureActIdInContext(context, inputArgs);
 
                 var ms = new MicroserviceInstance()
                 {
-                    OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestrationQualifiedName, version, inputArgs),
+                    OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestrationQualifiedNameOrName, version, inputArgs),
                 };
                 return ms;
             }

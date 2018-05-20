@@ -157,9 +157,10 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
             Debug.WriteLine($"Microservice instance {instance.OrchestrationInstance.InstanceId} started");
 
             host.WaitOnInstanceAsync(instance).Wait();
+   
         }
-        
-        
+
+
     }
 
     internal sealed class MockSink : IObserver<EventEntry>, IDisposable
