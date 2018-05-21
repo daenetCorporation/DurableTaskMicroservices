@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -20,6 +20,7 @@
   
   <ItemGroup>
     <PackageReference Include="Daenet.Common.Logging.Sql" Version="1.0.5" />
+    <PackageReference Include="EnterpriseLibrary.SemanticLogging" Version="2.0.1406.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
