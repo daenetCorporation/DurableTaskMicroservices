@@ -17,7 +17,7 @@
       }
     },
     "SqlProviderSettings": {
-      "ConnectionString": "",
+      "ConnectionString": "todo",
       "TableName": "TUnitTestLogger",
       "CreateTblIfNotExist": true,
       "IncludeExceptionStackTrace": true,

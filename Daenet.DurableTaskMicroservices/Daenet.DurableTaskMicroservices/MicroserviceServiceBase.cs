@@ -8,25 +8,16 @@ using DurableTask.Core;
 
 namespace Daenet.DurableTask.Microservices
 {
+    /// <summary>
+    /// Base class for common Service and Client functionality. 
+    /// </summary>
     public class MicroserviceBase
     {
         protected TaskHubClient m_HubClient;
          
         public const string cActivityIdCtxName = "ActivityId";
-         
-        /// <summary>
-        /// Starts the new instance of the microservice by passing input arguments.
-        /// This method will start the new instance of orchestration
-        /// </summary>
-        /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
-        /// <param name="inputArgs">Input arguments.</param>
-        /// <returns></returns>
-        //public Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context = null)
-        //{
-        //    //return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
-        //}
 
-
+        #region Public Methods
         /// <summary>
         /// Starts the new instance of the microservice by passing input arguments.
         /// This method will start the new instance of orchestration
@@ -39,8 +30,18 @@ namespace Daenet.DurableTask.Microservices
             return createServiceInstanceAsync(orchestration, inputArgs, context);
         }
 
-
-
+        #region removed
+        /// <summary>
+        /// Starts the new instance of the microservice by passing input arguments.
+        /// This method will start the new instance of orchestration
+        /// </summary>
+        /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
+        /// <param name="inputArgs">Input arguments.</param>
+        /// <returns></returns>
+        //public Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context = null)
+        //{
+        //    //return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
+        //}
 
         /// <summary>
         /// Creates the instance of service from service name.
@@ -53,6 +54,7 @@ namespace Daenet.DurableTask.Microservices
         //{
         //    return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
         //}
+        #endregion
 
         /// <summary>
         /// Starts the new instance of the microservice by passing input arguments.
@@ -86,7 +88,26 @@ namespace Daenet.DurableTask.Microservices
                 throw;
             }
         }
+        
 
+        /// <summary>
+        /// Waits on single instance to complete execution with any of supported states.
+        /// Instance is running if it is in one of Pending, ContinuedAsNew or Running states.
+        /// </summary>
+        /// <param name="instance">The instance of the service to wait on.</param>
+        /// <param name="wait"></param>
+        /// <returns>Returns the state of orchestration after it has enetered on of terminal states: 
+        /// Canceled, Termnated, Failed or Completed.</returns>
+        public async Task<OrchestrationState> WaitOnInstanceAsync(MicroserviceInstance instance, int wait = int.MaxValue)
+        {
+            var state = await this.m_HubClient.WaitForOrchestrationAsync(instance.OrchestrationInstance, TimeSpan.FromMilliseconds(wait));
+            return state;
+        }
+
+
+        #endregion
+
+        #region Private Methods
 
         /// <summary>
         /// Here we create a context and ensure that ActivityId is provided.
@@ -121,38 +142,7 @@ namespace Daenet.DurableTask.Microservices
                 }
             }
         }
-
-
-
-        /// <summary>
-        /// Wait on single instance.
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <param name="wait"></param>
-        /// <returns></returns>
-        public async Task WaitOnInstanceAsync(MicroserviceInstance instance, int wait = int.MaxValue)
-        {
-            await this.m_HubClient.WaitForOrchestrationAsync(instance.OrchestrationInstance, TimeSpan.FromMilliseconds(wait));
-        }
-
-
-        /// <summary>
-        /// Wait on multiple instances.
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="microservices"></param>
-        public void WaitOnInstances(ServiceHost host, List<MicroserviceInstance> microservices)
-        {
-            List<Task> waitingTasks = new List<Task>();
-
-            foreach (var microservice in microservices)
-            {
-                waitingTasks.Add(host.WaitOnInstanceAsync(microservice));
-            }
-
-            Task.WaitAll(waitingTasks.ToArray());
-        }
-
+        #endregion
 
     }
 }

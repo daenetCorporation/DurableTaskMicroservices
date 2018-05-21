@@ -21,6 +21,7 @@ using System.Diagnostics;
 using DurableTask.Core.Tracing;
 using System.Diagnostics.Tracing;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
+using Daenet.DurableTaskMicroservices.Common;
 
 namespace Daenet.Microservice.Common.Test
 {
@@ -47,40 +48,6 @@ namespace Daenet.Microservice.Common.Test
             return loggerFactory;
         }
 
-        private static void xmlSerializeService(Daenet.DurableTask.Microservices.Microservice svc, string fileName)
-        {
-            using (XmlWriter writer = XmlWriter.Create(fileName, new System.Xml.XmlWriterSettings() { Indent = true }))
-            {
-                DataContractSerializerSettings sett = new DataContractSerializerSettings();
-                DataContractSerializer ser = new System.Runtime.Serialization.DataContractSerializer(typeof(Daenet.DurableTask.Microservices.Microservice),
-                    loadKnownTypes());
-                ser.WriteObject(writer, (Daenet.DurableTask.Microservices.Microservice)svc);
-            }
-        }
-
-        private static Type[] loadKnownTypes()
-        {
-            List<Type> types = new List<Type>();
-
-            string[] patterns = new string[] { "*.dll", "*.exe" };
-
-            foreach (var pattern in patterns)
-            {
-                Assembly asm = typeof(Daenet.DurableTaskMicroservices.UnitTests.CounterOrchestration).Assembly;
-
-                foreach (var type in asm.GetTypes())
-                {
-                    if (type.GetCustomAttributes(typeof(DataContractAttribute)).Count() > 0)
-                    {
-                        types.Add(type);
-                    }
-                }
-            }
-
-            return types.ToArray();
-        }
-
-
         static ObservableEventListener eventListener = new ObservableEventListener();
 
         /// <summary>
@@ -89,28 +56,6 @@ namespace Daenet.Microservice.Common.Test
         [TestMethod]
         public void SelfHostServiceClientTest()
         {
-            //var ms = new Daenet.DurableTask.Microservices.Microservice()
-            //{
-            //    AutoStart = true,
-            //    ActivityQNames = new string[]
-            //      {
-            //          typeof(Task1).AssemblyQualifiedName,
-            //          typeof(Task2).AssemblyQualifiedName
-            //      },
-            //     InputArgument = new Daenet.DurableTaskMicroservices.UnitTests.CounterOrchestrationInput()
-            //     {
-            //          Counter = 3, Delay = 1000
-            //     },
-            //      OrchestrationQName = typeof(Daenet.DurableTaskMicroservices.UnitTests.CounterOrchestration).AssemblyQualifiedName,
-            //};
-
-            //xmlSerializeService(ms, "aaa.xml");
-
-            //            DefaultEventSource.Log
-
-            //Trace.Listeners.Add(new System.Diagnostics.ConsoleTraceListener().TraceOutputOptions.
-            //EventSourceAnalyzer.InspectAll(DefaultEventSource.Log);
-
             eventListener.LogToConsole();
             eventListener.EnableEvents(DefaultEventSource.Log, EventLevel.Verbose);
             //eventListener.EnableEvents(null, EventLevel.Verbose)
@@ -124,8 +69,8 @@ namespace Daenet.Microservice.Common.Test
             ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostServiceClientTest), true, out runningInstances, loggerFact);
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
-            
-           // var r = new Daenet.Microservice() { };
+
+            // var r = new Daenet.Microservice() { };
 
             //xmlSerializeService(typeof(Daenet.DurableTaskMicroservices.UnitTests.CounterOrchestration), "aaa.xml");
 
@@ -138,6 +83,46 @@ namespace Daenet.Microservice.Common.Test
             host.WaitOnInstances(host, microservices);
         }
 
+
+        /// <summary>
+        /// Executes two orchestrations. First one is loaded from host and configuration and second one 
+        /// HelloWorldOrchetration is started from client with invalid arguments.
+        /// Invalid arguments will couse internal server errors, which have to be received by this test
+        /// inside of method SubscribeEvents.
+        /// </summary>
+        [TestMethod]
+        public void ServiceEventsTest()
+        {
+            int errCnt = 0;
+
+            var loggerFact = UnitTestLogging.GetDebugLoggerFactory(LogLevel.None);
+
+            List<OrchestrationState> runningInstances;
+
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, UnitTestLogging.SqlStorageConnectionString, nameof(ServiceEventsTest), true, out runningInstances, loggerFact);
+
+            // This method subscribes all errors, which happen internally on host.
+            host.SubscribeEvents(EventLevel.LogAlways,
+                (msg) =>
+                {
+                    Debug.WriteLine(msg);
+                    if(msg.Contains("Error converting value \"invalid input\" to type"))
+                        errCnt++;
+
+                }, "errors");
+
+            var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
+
+            string svcName = "Daenet.Microservice.Common.Test.HelloWorldOrchestration.HelloWorldOrchestration";
+
+            var svc = host.StartServiceAsync(svcName, "invalid input").Result;
+
+            microservices.Add(svc);
+
+            host.WaitOnInstances(host, microservices);
+
+            Assert.IsTrue(errCnt > 0);
+        }
 
         [TestMethod]
         public void SelfHostServiceClientTestWithHubName()

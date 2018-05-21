@@ -14,9 +14,12 @@
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using DurableTask.Core;
 using DurableTask.Core.Exceptions;
+using DurableTask.Core.Tracing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -27,6 +30,10 @@ using System.Xml;
 
 namespace Daenet.DurableTask.Microservices
 {
+    /// <summary>
+    /// Implements set of host functionalities for microservicese based on top of
+    /// Durable Task Framework.
+    /// </summary>
     public class ServiceHost : MicroserviceBase
     {
         #region Private Members
@@ -44,9 +51,6 @@ namespace Daenet.DurableTask.Microservices
         private static ILoggerFactory m_LoggerFactory;
 
         #endregion
-
-       // private Dictionary<string, object> m_Services;
-
 
         #region Initialization Code
 
@@ -92,6 +96,18 @@ namespace Daenet.DurableTask.Microservices
             }
         }
 
+        #region Removed
+        //private void startQuery(OrchestrationStateQuery query)
+        //{
+        //    ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
+        //    {
+        //        while (true)
+        //        {
+        //            Thread.Sleep(5000);
+
+        //        }
+        //    }));
+        //}
 
         //public TaskHubClient createTaskHubClient(bool createInstanceStore = true)
         //{
@@ -152,18 +168,8 @@ namespace Daenet.DurableTask.Microservices
         //    return settings;
         //}
         #endregion
-
-        //private void startQuery(OrchestrationStateQuery query)
-        //{
-        //    ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
-        //    {
-        //        while (true)
-        //        {
-        //            Thread.Sleep(5000);
-
-        //        }
-        //    }));
-        //}
+            
+        #endregion
 
         #region Public Members
         /// <summary>
@@ -483,8 +489,8 @@ namespace Daenet.DurableTask.Microservices
                 }
                 else
                 {
-                    m_Logger?.LogInformation("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
-                    throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
+                    m_Logger?.LogWarning("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
+                    //throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
                 }
 
                 return instances;
@@ -564,12 +570,6 @@ namespace Daenet.DurableTask.Microservices
                 m_TaskHubWorker.AddTaskActivities(serviceConfiguraton.Activities);
 
             RegisterServiceConfiguration(serviceConfiguraton);
-
-            //List<MicroserviceInstance> runningInstances;
-
-            //bool isRunning = loadRunningInstances(serviceConfiguraton.OrchestrationQName, out runningInstances);
-
-            //return runningInstances;
         }
 
 
@@ -633,6 +633,24 @@ namespace Daenet.DurableTask.Microservices
             await m_TaskHubWorker.StartAsync();
         }
 
+        /// <summary>
+        /// Instance of event receiver.
+        /// </summary>
+        ObservableEventListener m_EventListener;
+
+        /// <summary>
+        /// Subscribes receiver for DTF internal trace events.
+        /// </summary>
+        /// <param name="eventLevel">Level of events to be used.</param>
+        /// <param name="onEvent">Action to be registered as event subscriber.</param>
+        /// <param name="filter">If null, then all events will be received.
+        /// If you want to recieve errors, only pass string "errors" in this parameter.</param>
+        public void SubscribeEvents(EventLevel eventLevel, Action<string> onEvent, object filter)
+        {
+            m_EventListener = new ObservableEventListener();
+            m_EventListener.Subscribe(new TraceEventReceiver(onEvent, filter));
+            m_EventListener.EnableEvents(DefaultEventSource.Log, eventLevel);
+        }
 
         /// <summary>
         /// Closes (stops) the hub.
@@ -645,6 +663,25 @@ namespace Daenet.DurableTask.Microservices
                 await m_TaskHubWorker.orchestrationService.DeleteAsync(deletInstanceStore);
 
             await m_TaskHubWorker.StopAsync();
+        }
+
+
+        /// <summary>
+        /// Wait on multiple instances to enter one ofterminal states.
+        /// Instance is running if it is in one of Pending, ContinuedAsNew or Running states.
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="microservices">The instancea of the service to wait on.</param>
+        public void WaitOnInstances(ServiceHost host, List<MicroserviceInstance> microservices)
+        {
+            List<Task> waitingTasks = new List<Task>();
+
+            foreach (var microservice in microservices)
+            {
+                waitingTasks.Add(host.WaitOnInstanceAsync(microservice));
+            }
+
+            Task.WaitAll(waitingTasks.ToArray());
         }
         #endregion
 

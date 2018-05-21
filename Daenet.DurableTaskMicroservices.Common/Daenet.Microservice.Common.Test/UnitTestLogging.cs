@@ -11,21 +11,25 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Daenet.Common.Logging.Sql;
+using DurableTask.Core.Tracing;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
+using Daenet.DurableTaskMicroservices.Common;
+using System.Diagnostics.Tracing;
 
 namespace Daenet.Microservice.Common.Test
 {
     [TestClass]
     public class UnitTestLogging
     {
-        private static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
-        private static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
-        private static string SqlStorageConnectionString = ConfigurationManager.ConnectionStrings["SqlStorage"].ConnectionString;
+        internal static string ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["ServiceBus"].ConnectionString;
+        internal static string StorageConnectionString = ConfigurationManager.ConnectionStrings["Storage"].ConnectionString;
+        internal static string SqlStorageConnectionString = ConfigurationManager.ConnectionStrings["SqlStorage"].ConnectionString;
 
 
-        internal static ILoggerFactory GetDebugLoggerFactory()
+        internal static ILoggerFactory GetDebugLoggerFactory(LogLevel level = LogLevel.Trace)
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
-            loggerFactory.AddDebug(LogLevel.Trace);
+            loggerFactory.AddDebug(level);
 
             return loggerFactory;
         }
@@ -46,6 +50,12 @@ namespace Daenet.Microservice.Common.Test
         [TestMethod]
         public void SelfHostWithLoggingTest()
         {
+            //ServiceEventReceiver eventReceiver = new ServiceEventReceiver(EventLevel.LogAlways);
+
+            //ObservableEventListener eventListener = new ObservableEventListener();
+            //eventListener.Subscribe(new TraceEventReceiver());
+            //eventListener.EnableEvents(DefaultEventSource.Log, EventLevel.LogAlways);
+
             var loggerFact = GetDebugLoggerFactory();
 
             List<OrchestrationState> runningInstances;
@@ -65,7 +75,7 @@ namespace Daenet.Microservice.Common.Test
 
             List<OrchestrationState> runningInstances;
 
-            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlStorageConnectionString, nameof(SelfHostWithLoggingTest), false, out runningInstances, loggerFact);
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, SqlStorageConnectionString, nameof(SelfHostWithSqlLoggingTest), false, out runningInstances, loggerFact);
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
