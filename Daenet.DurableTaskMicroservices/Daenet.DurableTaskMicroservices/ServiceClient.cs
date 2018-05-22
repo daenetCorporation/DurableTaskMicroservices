@@ -1,4 +1,5 @@
-﻿using DurableTask;
+﻿using Daenet.DurableTask.Microservices;
+using DurableTask;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;

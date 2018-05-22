@@ -1,8 +1,9 @@
 ﻿using Daenet.Common.Logging;
 using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.Entities;
-using Daenet.DurableTaskMicroservices.Common.Logging;
+
 using Daenet.DurableTaskMicroservices.Common.Rules;
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Daenet.DurableTaskMicroservices.Common.Entities;
+
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask;
 using DurableTask.Core;
 

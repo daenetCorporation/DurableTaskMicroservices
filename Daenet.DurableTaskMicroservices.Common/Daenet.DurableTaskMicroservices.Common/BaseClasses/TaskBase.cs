@@ -2,7 +2,7 @@
 using Daenet.DurableTask.Microservices;
 using Daenet.DurableTaskMicroservices.Common.Entities;
 using Daenet.DurableTaskMicroservices.Common.Exceptions;
-using Daenet.DurableTaskMicroservices.Common.Logging;
+
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;

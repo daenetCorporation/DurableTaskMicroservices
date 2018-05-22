@@ -1,4 +1,5 @@
 ﻿using Daenet.Common.Logging;
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask.Core;
 using System.Runtime.Serialization;
 

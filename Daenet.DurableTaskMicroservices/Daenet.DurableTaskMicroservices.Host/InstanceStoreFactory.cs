@@ -1,4 +1,5 @@
-﻿using Daenet.DurableTask.SqlStateProvider;
+﻿
+using Daenet.DurableTask.SqlInstanceStoreProvider;
 using DurableTask.Core;
 using DurableTask.ServiceBus.Tracking;
 using System;

@@ -12,7 +12,8 @@
 //  ----------------------------------------------------------------------------------
 
 using Daenet.DurableTask.Microservices;
-using Daenet.DurableTask.SqlStateProvider;
+using Daenet.DurableTask.SqlInstanceStoreProvider;
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;

@@ -12,6 +12,7 @@
 //  ----------------------------------------------------------------------------------
 
 
+using Daenet.DurableTaskMicroservices.Tests;
 using DurableTask;
 using DurableTask.Core;
 using System;
@@ -31,7 +32,7 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         {
             Debug.WriteLine($"Orchestration Input: {input.Counter}. IsReplaying: {context.IsReplaying}");
 
-            await context.ScheduleTask<Null>(typeof(Task1), "Input1");
+            await context.ScheduleTask<Null>(typeof(Tests.TaskOrchestration.CounterOrchestration.Task1), "Input1");
 
             await context.ScheduleTask<Null>(typeof(Task2), "Input1");
 

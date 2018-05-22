@@ -1,4 +1,5 @@
 ﻿using Daenet.DurableTask.Microservices;
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask.Core;
 using System.Threading;
 

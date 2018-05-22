@@ -12,6 +12,7 @@
 //  ----------------------------------------------------------------------------------
 
 
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask;
 using DurableTask.Core;
 using System;
