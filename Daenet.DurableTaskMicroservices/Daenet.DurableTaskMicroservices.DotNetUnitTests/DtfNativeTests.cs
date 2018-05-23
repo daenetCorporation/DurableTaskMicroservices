@@ -29,6 +29,9 @@ using System.Threading.Tasks;
 
 namespace Daenet.DurableTaskMicroservices.Tests
 {
+    /// <summary>
+    /// Set of tests without dependency to microservice framework.
+    /// </summary>
     [TestClass]
     public class DtfNativeTests
     {
@@ -40,7 +43,7 @@ namespace Daenet.DurableTaskMicroservices.Tests
         static ObservableEventListener eventListener;
 
         /// <summary>
-        /// This test does not uses any Microservice functionality.
+        /// This test does not uses any daenet Microservice functionality.
         /// It runs DTF orchestration nativelly to ensure that is all setup correctlly.
         /// </summary>
         [TestMethod]

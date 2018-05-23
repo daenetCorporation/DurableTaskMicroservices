@@ -140,7 +140,7 @@ namespace Daenet.DurableTask.SqlInstanceStoreProvider
                                             [CreatedTime] DATETIME NOT NULL, 
                                             [Input] NVARCHAR(MAX) NOT NULL, 
                                             [LastUpdatedTime] DATETIME NOT NULL, 
-                                            [Name] NVARCHAR(100) NOT NULL, 
+                                            [Name] NVARCHAR(256) NOT NULL, 
                                             [OrchestrationInstance] NVARCHAR(MAX) NOT NULL, 
                                             [OrchestrationStatus] NVARCHAR(MAX) NOT NULL, 
                                             [Output] NVARCHAR(MAX) NULL, 
@@ -195,7 +195,7 @@ namespace Daenet.DurableTask.SqlInstanceStoreProvider
                                             [CreatedTime] DATETIME NOT NULL, 
                                             [Input] NVARCHAR(MAX) NOT NULL, 
                                             [LastUpdatedTime] DATETIME NOT NULL, 
-                                            [Name] NVARCHAR(100) NOT NULL, 
+                                            [Name] NVARCHAR(256) NOT NULL,
                                             [OrchestrationInstance] NVARCHAR(MAX) NOT NULL, 
                                             [OrchestrationStatus] NVARCHAR(MAX) NOT NULL, 
                                             [Output] NVARCHAR(MAX) NULL, 
@@ -241,12 +241,12 @@ namespace Daenet.DurableTask.SqlInstanceStoreProvider
 
                 cmd.CommandText = String.Format("SELECT TOP {0} * FROM {1} WHERE CreatedTime > @StartTime AND CreatedTime < @EndTime", top, JumpStartTableWithSchema);
 
-                    cmd.AddSqlParameter("@StartTime", startTime);
-                    cmd.AddSqlParameter("@EndTime", endTime);
+                cmd.AddSqlParameter("@StartTime", startTime);
+                cmd.AddSqlParameter("@EndTime", endTime);
 
-                    var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync();
 
-                while(reader.Read())
+                while (reader.Read())
                 {
                     var jumpStartEntity = new OrchestrationJumpStartInstanceEntity();
                     jumpStartEntity.SequenceNumber = reader.GetValue<long>("SequenceNumber");
@@ -360,13 +360,13 @@ namespace Daenet.DurableTask.SqlInstanceStoreProvider
                         cmd.AddSqlParameter("@ExecutionId", state.OrchestrationInstance.ExecutionId);
                         cmd.AddSqlParameter("@SequenceNumber", entity.SequenceNumber);
 
-                        if (entity.JumpStartTime == default(DateTime))
+                        if (entity.JumpStartTime == default(DateTime) || state.CompletedTime.Year == 1601)
                             cmd.AddSqlParameter("@JumpStartTime", null);
                         else
                             cmd.AddSqlParameter("@JumpStartTime", entity.JumpStartTime);
 
 
-                        if (state.CompletedTime == default(DateTime))
+                        if (state.CompletedTime == default(DateTime) || state.CompletedTime.Year == 1601)
                             cmd.AddSqlParameter("@CompletedTime", null);
                         else
                             cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
@@ -722,7 +722,7 @@ namespace Daenet.DurableTask.SqlInstanceStoreProvider
                     cmd.AddSqlParameter("@ExecutionId", executionId);
                     cmd.AddSqlParameter("@SequenceNumber", stateInstance.SequenceNumber);
 
-                    if (state.CompletedTime == default(DateTime))
+                    if (state.CompletedTime == default(DateTime) || state.CompletedTime.Year == 1601)
                         cmd.AddSqlParameter("@CompletedTime", null);
                     else
                         cmd.AddSqlParameter("@CompletedTime", state.CompletedTime);
@@ -1020,10 +1020,12 @@ namespace Daenet.DurableTask.SqlInstanceStoreProvider
 
                 return segment;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                if (ex.Message.Contains("Invalid object name"))
+                    throw new Exception("This error might indicate that the store is no initialized. Please ensure that 'InitializeStoreAsync' is called or the create all required tables manually.", ex);
+                else
+                    throw;
             }
         }
 

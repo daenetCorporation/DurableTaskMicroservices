@@ -17,7 +17,7 @@
       }
     },
     "SqlProviderSettings": {
-      "ConnectionString": "Server=tcp:hvetter.database.windows.net,1433;Initial Catalog=dtf;Persist Security Info=False;User ID=hvetter;Password=123abc?!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+      "ConnectionString": "todo",
       "TableName": "TUnitTestLogger",
       "CreateTblIfNotExist": true,
       "IncludeExceptionStackTrace": true,

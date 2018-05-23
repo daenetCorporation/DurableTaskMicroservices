@@ -11,6 +11,7 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask;
 using DurableTask.Core;
 using System;
