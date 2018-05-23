@@ -13,7 +13,6 @@
 
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Daenet.DurableTask.Microservices;
 using System.Xml;
 using System.Runtime.Serialization;
 using System.Reflection;
@@ -21,7 +20,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Daenet.DurableTaskMicroservices.UnitTests;
+using Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration;
+using Daenet.DurableTaskMicroservices.Core;
 
 namespace Daenet.DurableTaskMicroservices.Tests
 {

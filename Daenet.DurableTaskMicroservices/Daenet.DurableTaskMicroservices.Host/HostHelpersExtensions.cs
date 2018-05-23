@@ -11,8 +11,8 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-using Daenet.DurableTask.Microservices;
-using Daenet.DurableTask.SqlStateProvider;
+using Daenet.DurableTask.SqlInstanceStoreProvider;
+using Daenet.DurableTaskMicroservices.Core;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;
@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 namespace Daenet.DurableTaskMicroservices.Host
 {
-  
+
     /// <summary>
     /// This class is currentlly the only one in this project.
     /// It is required, because of a references to DurableTask.ServiceBus, which in NOT .NET Core component.

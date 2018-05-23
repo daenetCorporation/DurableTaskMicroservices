@@ -1,13 +1,9 @@
-﻿using Daenet.DurableTask.Microservices;
-using Daenet.DurableTaskMicroservices.Common.BaseClasses;
-using Daenet.Microservice.Common.Test.CounterOrchestration;
+﻿using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Daenet.DurableTaskMicroservices.Core;
 
 namespace Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration
 {

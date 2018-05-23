@@ -11,9 +11,10 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-using Daenet.DurableTask.Microservices;
-using Daenet.DurableTask.SqlStateProvider;
-using DurableTask;
+using Daenet.DurableTask.SqlInstanceStoreProvider;
+using Daenet.DurableTaskMicroservices.Core;
+using Daenet.DurableTaskMicroservices.Tests;
+using Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;
@@ -22,8 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
 namespace Daenet.DurableTaskMicroservices.Tests
 {
@@ -43,9 +42,7 @@ namespace Daenet.DurableTaskMicroservices.Tests
                new ServiceBusOrchestrationService(ServiceBusConnectionString, "UnitTestTmp", instanceStore, null, null);
 
             //instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
-            ServiceHost host;
-
-            host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
+            ServiceHost host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
 
             return host;
         }
@@ -72,7 +69,7 @@ namespace Daenet.DurableTaskMicroservices.Tests
             var host = getMicroserviceHostWithTableStorage();
 
             Microservice service = new Microservice();
-            service.InputArgument = new TestOrchestrationInput()
+            service.InputArgument = new Daenet.DurableTaskMicroservices.Tests.TestOrchestrationInput()
             {
                 Counter = 2,
                 Delay = 1000,
