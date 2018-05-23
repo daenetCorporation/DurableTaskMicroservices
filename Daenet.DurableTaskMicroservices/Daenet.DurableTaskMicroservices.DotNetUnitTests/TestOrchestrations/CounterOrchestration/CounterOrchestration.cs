@@ -13,6 +13,7 @@
 
 
 using Daenet.DurableTaskMicroservices.Tests;
+using Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration;
 using DurableTask;
 using DurableTask.Core;
 using System;

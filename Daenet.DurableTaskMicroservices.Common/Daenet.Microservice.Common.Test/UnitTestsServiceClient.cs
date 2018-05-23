@@ -22,6 +22,9 @@ using DurableTask.Core.Tracing;
 using System.Diagnostics.Tracing;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Daenet.DurableTaskMicroservices.Common;
+using Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration;
+using Daenet.DurableTaskMicroservices.Core;
+using Daenet.DurableTaskMicroservices.Tests;
 
 namespace Daenet.Microservice.Common.Test
 {
@@ -62,7 +65,7 @@ namespace Daenet.Microservice.Common.Test
             //eventListener.Subscribe((a)=> a    
 
 
-            var loggerFact = UnitTestLogging.GetDebugLoggerFactory();
+            var loggerFact = DurableTaskMicroservices.Common.Test.UnitTestLogging.GetDebugLoggerFactory();
 
             List<OrchestrationState> runningInstances;
 
@@ -76,7 +79,7 @@ namespace Daenet.Microservice.Common.Test
 
             ServiceClient client = ClientHelperExtensions.CreateMicroserviceClient(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostServiceClientTest));
 
-            var svc = client.StartServiceAsync(cSvcName, new HelloWorldOrchestration.HelloWorldOrchestrationInput { HelloText = "SelfHostServiceClientTestInputArg" }).Result;
+            var svc = client.StartServiceAsync(cSvcName, new HelloWorldOrchestrationInput { HelloText = "SelfHostServiceClientTestInputArg" }).Result;
 
             microservices.Add(svc);
 
@@ -95,21 +98,22 @@ namespace Daenet.Microservice.Common.Test
         {
             int errCnt = 0;
 
-            var loggerFact = UnitTestLogging.GetDebugLoggerFactory(LogLevel.None);
+            var loggerFact = DurableTaskMicroservices.Common.Test.UnitTestLogging.GetDebugLoggerFactory(LogLevel.None);
 
             List<OrchestrationState> runningInstances;
 
-            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, UnitTestLogging.SqlStorageConnectionString, nameof(ServiceEventsTest), true, out runningInstances, loggerFact);
+            ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, DurableTaskMicroservices.Common.Test.UnitTestLogging.SqlStorageConnectionString, nameof(ServiceEventsTest), true, out runningInstances, loggerFact);
 
             // This method subscribes all errors, which happen internally on host.
-            host.SubscribeEvents(EventLevel.LogAlways,
-                (msg) =>
-                {
-                    Debug.WriteLine(msg);
-                    if(msg.Contains("Error converting value \"invalid input\" to type"))
-                        errCnt++;
+            // ToDo Damir
+           // host.SubscribeEvents(EventLevel.LogAlways,
+              //  (msg) =>
+              //  {
+                //    Debug.WriteLine(msg);
+                 //   if(msg.Contains("Error converting value \"invalid input\" to type"))
+                   //     errCnt++;
 
-                }, "errors");
+              //  }, "errors");
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
@@ -127,11 +131,11 @@ namespace Daenet.Microservice.Common.Test
         [TestMethod]
         public void SelfHostServiceClientTestWithHubName()
         {
-            var loggerFact = UnitTestLogging.GetDebugLoggerFactory();
+            var loggerFact = DurableTaskMicroservices.Common.Test.UnitTestLogging.GetDebugLoggerFactory();
 
             ServiceClient client = ClientHelperExtensions.CreateMicroserviceClient(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostServiceClientTest));
 
-            var orchestrationInput = new HelloWorldOrchestration.HelloWorldOrchestrationInput
+            var orchestrationInput = new HelloWorldOrchestrationInput
             {
                 HelloText = "SelfHostServiceClientTestInputArg",
                 Context = new Dictionary<string, object> { { "ActivityId", "SelfHostServiceClientTestWithHubName" } }

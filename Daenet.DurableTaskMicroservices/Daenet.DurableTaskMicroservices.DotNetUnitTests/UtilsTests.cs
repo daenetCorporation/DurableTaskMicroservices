@@ -22,6 +22,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration;
 using Daenet.DurableTaskMicroservices.Core;
+using Daenet.DurableTaskMicroservices.UnitTests;
 
 namespace Daenet.DurableTaskMicroservices.Tests
 {

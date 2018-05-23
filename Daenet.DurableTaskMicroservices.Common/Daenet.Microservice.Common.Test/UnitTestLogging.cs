@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using Daenet.Common.Logging.Sql;
+using Daenet.DurableTaskMicroservices.Core;
 
 namespace Daenet.DurableTaskMicroservices.Common.Test
 {

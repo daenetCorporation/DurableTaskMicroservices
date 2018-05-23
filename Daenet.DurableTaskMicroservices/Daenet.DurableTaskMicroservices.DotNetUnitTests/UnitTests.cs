@@ -15,6 +15,7 @@ using Daenet.DurableTask.SqlInstanceStoreProvider;
 using Daenet.DurableTaskMicroservices.Core;
 using Daenet.DurableTaskMicroservices.Tests;
 using Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration;
+using Daenet.DurableTaskMicroservices.UnitTests;
 using DurableTask.Core;
 using DurableTask.ServiceBus;
 using DurableTask.ServiceBus.Tracking;

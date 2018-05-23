@@ -14,7 +14,7 @@
 
 
   <ItemGroup>
-    <AssemblyAttribute Include="Daenet.DurableTask.Microservices.IntegrationAssemblyAttribute">
+    <AssemblyAttribute Include="Daenet.DurableTaskMicroservices.Core.IntegrationAssemblyAttribute">
     </AssemblyAttribute>
   </ItemGroup>
   

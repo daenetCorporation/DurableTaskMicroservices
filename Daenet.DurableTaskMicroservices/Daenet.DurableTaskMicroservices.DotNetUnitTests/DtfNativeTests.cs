@@ -11,6 +11,7 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 using Daenet.DurableTaskMicroservices.Tests.TaskOrchestration.CounterOrchestration;
+using Daenet.DurableTaskMicroservices.UnitTests;
 using DurableTask.Core;
 using DurableTask.Core.Tracing;
 using DurableTask.ServiceBus;
