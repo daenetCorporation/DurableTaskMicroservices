@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj", "{799A8965-985F-4931-B045-5D09C429B593}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices.Core", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Core.csproj", "{799A8965-985F-4931-B045-5D09C429B593}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTaskMicroservices.DotNetUnitTests", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\Daenet.DurableTaskMicroservices.DotNetUnitTests.csproj", "{A03DAA2F-4D8D-434B-A3C4-217457FC5569}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTaskMicroservices.Tests", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\Daenet.DurableTaskMicroservices.Tests.csproj", "{A03DAA2F-4D8D-434B-A3C4-217457FC5569}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTaskMicroservices.Host", "Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj", "{FAE514FC-1C89-4AF6-8FD6-2675370ADB92}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F587E0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{E9C667F9-C83C-41DC-A4F7-CFAD14AA36FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daenet.DurableTask.SqlInstanceStore", "Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj", "{A20B2B3F-4391-40E2-9E07-13F0A83719B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTask.SqlInstanceStore", "Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj", "{A20B2B3F-4391-40E2-9E07-13F0A83719B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

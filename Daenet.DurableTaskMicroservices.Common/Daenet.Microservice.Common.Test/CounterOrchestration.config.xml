@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Microservice xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTask.Microservices">
+<Microservice xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.Core">
   <ActivityConfiguration xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <ActivityQNames xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
     <d2p1:string>Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration.Task1, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
     <d2p1:string>Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration.Task2, Daenet.Microservice.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</d2p1:string>
   </ActivityQNames>
   <AutoStart>true</AutoStart>
-  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.UnitTests" i:type="d2p1:CounterOrchestrationInput">
+  <InputArgument xmlns:d2p1="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration" i:type="d2p1:CounterOrchestrationInput">
     <Context xmlns:d3p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" xmlns="http://schemas.datacontract.org/2004/07/Daenet.DurableTaskMicroservices.Common.Entities" />
     <d2p1:Counter>3</d2p1:Counter>
     <d2p1:Delay>1000</d2p1:Delay>
