@@ -8,6 +8,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.IO;
 
@@ -89,16 +90,16 @@ namespace Daenet.Microservice.Common.Test
 
             ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(ServiceBusConnectionString, DurableTaskMicroservices.Common.Test.UnitTestLogging.SqlStorageConnectionString, nameof(ServiceEventsTest), true, out runningInstances, loggerFact);
 
+            //
             // This method subscribes all errors, which happen internally on host.
-            // ToDo Damir
-           // host.SubscribeEvents(EventLevel.LogAlways,
-              //  (msg) =>
-              //  {
-                //    Debug.WriteLine(msg);
-                 //   if(msg.Contains("Error converting value \"invalid input\" to type"))
-                   //     errCnt++;
+            host.SubscribeEvents(EventLevel.LogAlways,
+                (msg) =>
+                {
+                    Debug.WriteLine(msg);
+                    if (msg.Contains("Error converting value \"invalid input\" to type"))
+                        errCnt++;
 
-              //  }, "errors");
+                }, "errors");
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 

@@ -10,23 +10,16 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-//  Copyright daenet Gesellschaft für Informationstechnologie mbH
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//  http://www.apache.org/licenses/LICENSE-2.0
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//  ----------------------------------------------------------------------------------
+
+
 using DurableTask.Core;
 using DurableTask.Core.Exceptions;
+using DurableTask.Core.Tracing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -37,26 +30,27 @@ using System.Xml;
 
 namespace Daenet.DurableTaskMicroservices.Core
 {
-    public class ServiceHost
+    /// <summary>
+    /// Implements set of host functionalities for microservicese based on top of
+    /// Durable Task Framework.
+    /// </summary>
+    public class ServiceHost : MicroserviceBase
     {
         #region Private Members
-        public const string cActivityIdCtxName = "ActivityId";
+
 
         /// <summary>
         /// Holds the list of dictionaries of service and activity configurations.
         /// </summary>
         private static Dictionary<string, Dictionary<string, object>> m_SvcConfigs = new Dictionary<string, Dictionary<string, object>>();
 
-        private TaskHubClient m_HubClient;
+
         private TaskHubWorker m_TaskHubWorker;
         private IOrchestrationServiceInstanceStore m_InstanceStoreService;
         private ILogger m_Logger;
         private static ILoggerFactory m_LoggerFactory;
 
         #endregion
-
-        private Dictionary<string, object> m_Services;
-
 
         #region Initialization Code
 
@@ -67,7 +61,7 @@ namespace Daenet.DurableTaskMicroservices.Core
             bool resetHub = false,
             ILoggerFactory loggerFactory = null)
         {
-            this.m_HubClient = new TaskHubClient(orchestrationClient);
+            m_HubClient = new TaskHubClient(orchestrationClient);
             this.m_TaskHubWorker = new TaskHubWorker(orchestrationService);
             this.m_InstanceStoreService = instanceStore;
 
@@ -77,7 +71,7 @@ namespace Daenet.DurableTaskMicroservices.Core
                 m_Logger = m_LoggerFactory.CreateLogger<ServiceHost>();
             }
 
-         
+
             if (resetHub)
                 orchestrationService.DeleteAsync().Wait();
 
@@ -102,6 +96,18 @@ namespace Daenet.DurableTaskMicroservices.Core
             }
         }
 
+        #region Removed
+        //private void startQuery(OrchestrationStateQuery query)
+        //{
+        //    ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
+        //    {
+        //        while (true)
+        //        {
+        //            Thread.Sleep(5000);
+
+        //        }
+        //    }));
+        //}
 
         //public TaskHubClient createTaskHubClient(bool createInstanceStore = true)
         //{
@@ -163,158 +169,51 @@ namespace Daenet.DurableTaskMicroservices.Core
         //}
         #endregion
 
-        #region State Transition Listener Implementation
-
-        private static Dictionary<string, OrchestrationState> m_Instances = new Dictionary<string, OrchestrationState>();
-
-        private static OrchestrationStateQuery m_Query;
-
-        public void RegisterStatusChanges(string instanceId, Action<OrchestrationState> state)
-        {
-            throw new NotImplementedException();
-
-            // List<string>
-        }
-
-        public void RegisterStatusChanges(Type taskOrchestration, Action<OrchestrationState> state)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RegisterStatusChanges(Action<OrchestrationState> state)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void startQuery(OrchestrationStateQuery query)
-        {
-            ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(5000);
-
-                }
-            }));
-        }
-
-
-        /// <summary>
-        /// Checks if at least one orchestration instance is already running.
-        /// </summary>
-        /// <remarks>If the instance store is NOT configured this method will always return FALSE.</remarks>
-        /// <param name="orchestrationFullName">Full qualified name of orchestration. i.e.: Type.FullName</param>
-        /// <returns>List of running instances.</returns>
-        private async Task<List<MicroserviceInstance>> loadRunningInstancesAsync(string orchestrationFullName)
-        {
-            List<MicroserviceInstance> runningInstances = new List<MicroserviceInstance>();
-
-            if (m_InstanceStoreService != null)
-            {
-                var oStates = await loadStatesAsync(orchestrationFullName, true);
-
-                runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running ||
-                o.OrchestrationStatus == OrchestrationStatus.ContinuedAsNew ||
-                o.OrchestrationStatus == OrchestrationStatus.Pending).
-                    Select(i => i.OrchestrationInstance).Select(oi => new MicroserviceInstance()
-                    {
-                        OrchestrationInstance = oi
-                    }).ToList();
-            }
-
-            return runningInstances;
-        }
-
-        private async Task<IEnumerable<OrchestrationState>> loadStatesAsync(string orchestrationFullName, bool runningOnly = true)
-        {
-            List<OrchestrationState> list = new List<OrchestrationState>();
-
-            if (m_InstanceStoreService != null)
-            {
-                var records = await m_InstanceStoreService.GetJumpStartEntitiesAsync(10000);
-                foreach (var item in records)
-                {
-                    list.Add(item.State);
-                }
-                //var byNameQuery = new OrchestrationStateQuery();
-                //byNameQuery.AddNameVersionFilter(orchestrationFullName);
-                //if (runningOnly)
-                //    byNameQuery.AddStatusFilter(OrchestrationStatus.Running);
-
-                //var oStates = await m_HubClient.hiGetOrchestrationStateAsync("TODO");
-
-                return list;
-            }
-            else
-                return list;
-        }
-
         #endregion
 
+        #region Public Members
+        /// <summary>
+        /// Restarts an eventually running instance of the microservice service (orchestration).
+        /// </summary>
+        /// <param name="orchestrationFullQualifiedName"></param>
+        /// <param name="inputArgs">Input arguments.</param>
+        /// <returns></returns>
+        public async Task<MicroserviceInstance> RestartServiceAsync(string orchestrationFullQualifiedName, object inputArgs, Dictionary<string, object> context)
+        {
+            await StopServiceAsync(orchestrationFullQualifiedName);
+
+            return await StartServiceAsync(orchestrationFullQualifiedName, inputArgs, context);
+        }
+
 
         /// <summary>
-        /// Loads activity types from Assembly Qualified names.
+        /// Stops the running service instances.
         /// </summary>
-        /// <param name="services">List of services which have to be initialized.</param>
-        private static void loadServiceActivityTypes(ICollection<Microservice> services)
+        /// <param name="orchestrationFullQualifiedName"></param>
+        public async Task StopServiceAsync(string orchestrationFullQualifiedName)
         {
-            foreach (var svc in services)
+            var tp = Type.GetType(orchestrationFullQualifiedName);
+
+            List<MicroserviceInstance> runningInstances;
+
+            runningInstances = await loadRunningInstancesAsync(tp.FullName);
+
+
+            foreach (var inst in runningInstances)
             {
-                if (svc.Activities == null)
-                {
-                    var activities = new List<Type>();
+                await this.m_HubClient.TerminateInstanceAsync(inst.OrchestrationInstance);
+            }
 
-                    foreach (var act in svc.ActivityQNames)
-                    {
-                        activities.Add(Type.GetType(act));
-                    }
-
-                    svc.Activities = activities.ToArray();
-                }
+            while (true)
+            {
+                runningInstances = await loadRunningInstancesAsync(tp.FullName);
+                if (runningInstances.Count == 0)
+                    break;
             }
         }
 
-        /// <summary>
-        /// Loads activity types from Assembly Qualified names.
-        /// </summary>
-        /// <param name="services">List of services which have to be initialized.</param>
-        private static void loadOrchestrationTypes(ICollection<Microservice> services)
-        {
-            foreach (var svc in services)
-            {
-                if (svc.OrchestrationQName != null)
-                {
-                    svc.Orchestration = Type.GetType(svc.OrchestrationQName);
-                    if (svc.Orchestration == null)
-                        throw new TypeMissingException($"The type {svc.OrchestrationQName} cannot be found. Please be sure that AssemblyQualifiedName is correctlly specified in the configuration file.");
-                }
-            }
-        }
-
-        //        private static Dictionary<Type, object> m_SvcConfigs = new Dictionary<Type, object>();
 
 
-        /// <summary>
-        /// Gets the key, which uniquely identifies the orchestration (service).
-        /// </summary>
-        ///<param name="config">Specifies the instance of activity (task) type.</param>
-        /// <returns></returns>
-        //private static string getConfigKey(IConfig config)
-        //{
-        //    return getConfigKey(config.Name, config.Type);
-        //}
-
-
-        /// <summary>
-        /// Gets the key, which uniquely identifies the orchestration (service).
-        /// </summary>
-        ///<param name="typeName">Specifies the type of activity (task) type instance.</param>
-        //////<param name="name">Specifies the name of activity (task) type instance.</param>
-        /// <returns></returns>
-        private static string getConfigKey(string name, object typeName)
-        {
-            return String.Format("{0}-{1}", name, typeName);
-        }
 
         /// <summary>
         /// Adds or updates the service configuration.
@@ -401,6 +300,7 @@ namespace Daenet.DurableTaskMicroservices.Core
         }
 
 
+
         /// <summary>
         /// Gets the logger instance.
         /// </summary>
@@ -434,12 +334,12 @@ namespace Daenet.DurableTaskMicroservices.Core
         {
             string activityId = Guid.NewGuid().ToString();
 
-            if (context.ContainsKey(cActivityIdCtxName))
+            if (context.ContainsKey(MicroserviceBase.cActivityIdCtxName))
             {
-                activityId = context[cActivityIdCtxName] as string;
+                activityId = context[MicroserviceBase.cActivityIdCtxName] as string;
             }
             else
-                context.Add(cActivityIdCtxName, activityId);
+                context.Add(MicroserviceBase.cActivityIdCtxName, activityId);
 
             return activityId;
         }
@@ -589,8 +489,8 @@ namespace Daenet.DurableTaskMicroservices.Core
                 }
                 else
                 {
-                    m_Logger?.LogInformation("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
-                    throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
+                    m_Logger?.LogWarning("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
+                    //throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
                 }
 
                 return instances;
@@ -670,138 +570,15 @@ namespace Daenet.DurableTaskMicroservices.Core
                 m_TaskHubWorker.AddTaskActivities(serviceConfiguraton.Activities);
 
             RegisterServiceConfiguration(serviceConfiguraton);
-
-            //List<MicroserviceInstance> runningInstances;
-
-            //bool isRunning = loadRunningInstances(serviceConfiguraton.OrchestrationQName, out runningInstances);
-
-            //return runningInstances;
         }
 
-
-        /// <summary>
-        /// Restarts an eventually running instance of the microservice service (orchestration).
-        /// </summary>
-        /// <param name="orchestrationFullQualifiedName"></param>
-        /// <param name="inputArgs">Input arguments.</param>
-        /// <returns></returns>
-        public async Task<MicroserviceInstance> RestartServiceAsync(string orchestrationFullQualifiedName, object inputArgs, Dictionary<string, object> context)
-        {
-            await StopServiceAsync(orchestrationFullQualifiedName);
-
-            return await createServiceInstanceAsync(orchestrationFullQualifiedName, inputArgs, context);
-        }
-
-
-        /// <summary>
-        /// Stops the running service instances.
-        /// </summary>
-        /// <param name="orchestrationFullQualifiedName"></param>
-        public async Task StopServiceAsync(string orchestrationFullQualifiedName)
-        {
-            var tp = Type.GetType(orchestrationFullQualifiedName);
-
-            List<MicroserviceInstance> runningInstances;
-
-            runningInstances = await loadRunningInstancesAsync(tp.FullName);
-
-
-            foreach (var inst in runningInstances)
-            {
-                await this.m_HubClient.TerminateInstanceAsync(inst.OrchestrationInstance);
-            }
-
-            while (true)
-            {
-                runningInstances = await loadRunningInstancesAsync(tp.FullName);
-                if (runningInstances.Count == 0)
-                    break;
-            }
-        }
 
 
         public void WaitOnStatus(List<MicroserviceInstance> runningInstances, OrchestrationState state)
         {
             foreach (var inst in runningInstances)
             {
-                this.m_HubClient.TerminateInstanceAsync(inst.OrchestrationInstance);
-            }
-        }
-
-
-
-        /// <summary>
-        /// Starts the new instance of the microservice by passing input arguments.
-        /// This method will start the new instance of orchestration
-        /// </summary>
-        /// <param name="orchestrationQualifiedName">The full qualified name of orchestration to be started.</param>
-        /// <param name="inputArgs">Input arguments.</param>
-        /// <returns></returns>
-        public Task<MicroserviceInstance> StartServiceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context = null)
-        {
-            return StartServiceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
-        }
-
-
-        /// <summary>
-        /// Starts the new instance of the microservice by passing input arguments.
-        /// This method will start the new instance of orchestration
-        /// </summary>
-        /// <param name="orchestration">The type of orchestration to be started.</param>
-        /// <param name="inputArgs">Input arguments.</param>
-        /// <returns></returns>
-        public Task<MicroserviceInstance> StartServiceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context = null)
-        {
-            return createServiceInstanceAsync(orchestration, inputArgs, context);
-        }
-
-
-        private Task<MicroserviceInstance> createServiceInstanceAsync(string orchestrationQualifiedName, object inputArgs, Dictionary<string, object> context)
-        {
-            return createServiceInstanceAsync(Type.GetType(orchestrationQualifiedName), inputArgs, context);
-        }
-
-        /// <summary>
-        /// Here we create a context and ensure that ActivityId is provided.
-        /// </summary>
-        /// <param name="orchestration"></param>
-        /// <param name="inputArgs"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private async Task<MicroserviceInstance> createServiceInstanceAsync(Type orchestration, object inputArgs, Dictionary<string, object> context)
-        {
-            OrchestrationInput orchestrationInput = inputArgs as OrchestrationInput;
-
-            if (orchestrationInput != null)
-            {
-                if(orchestrationInput.Context == null)
-                    orchestrationInput.Context = new Dictionary<string, object>(context);
-
-                if (orchestrationInput.Context.ContainsKey(cActivityIdCtxName) == false)
-                    orchestrationInput.Context.Add(cActivityIdCtxName, Guid.NewGuid().ToString());
-            }
-
-            var ms = new MicroserviceInstance()
-            {
-                OrchestrationInstance = await m_HubClient.CreateOrchestrationInstanceAsync(orchestration, inputArgs),
-            };
-            return ms;
-        }
-
-        private Microservice deserializeService(string configFile, IEnumerable<Type> knownTypes)
-        {
-            try
-            {
-                using (XmlReader writer = XmlReader.Create(configFile))
-                {
-                    DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), knownTypes);
-                    object svc = ser.ReadObject(writer);
-                    return svc as Microservice;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to deserialize file: {configFile}", ex);
+                m_HubClient.TerminateInstanceAsync(inst.OrchestrationInstance);
             }
         }
 
@@ -828,35 +605,6 @@ namespace Daenet.DurableTaskMicroservices.Core
             return res.Count;
         }
 
-
-        /// <summary>
-        /// Wait on single instance.
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <param name="wait"></param>
-        /// <returns></returns>
-        public async Task WaitOnInstanceAsync(MicroserviceInstance instance, int wait = int.MaxValue)
-        {
-            await this.m_HubClient.WaitForOrchestrationAsync(instance.OrchestrationInstance, TimeSpan.FromMilliseconds(wait));
-        }
-
-
-        /// <summary>
-        /// Wait on multiple instances.
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="microservices"></param>
-        public void WaitOnInstances(ServiceHost host, List<MicroserviceInstance> microservices)
-        {
-            List<Task> waitingTasks = new List<Task>();
-
-            foreach (var microservice in microservices)
-            {
-                waitingTasks.Add(host.WaitOnInstanceAsync(microservice));
-            }
-
-            Task.WaitAll(waitingTasks.ToArray());
-        }
 
 
         /// <summary>
@@ -885,6 +633,25 @@ namespace Daenet.DurableTaskMicroservices.Core
             await m_TaskHubWorker.StartAsync();
         }
 
+        /// <summary>
+        /// Instance of event receiver.
+        /// </summary>
+        ObservableEventListener m_EventListener;
+
+        /// <summary>
+        /// Subscribes receiver for DTF internal trace events. The caller can define a callback function,
+        /// which will receive all internally created events.
+        /// </summary>
+        /// <param name="eventLevel">Level of events to be used.</param>
+        /// <param name="onEvent">Action to be registered as event subscriber.</param>
+        /// <param name="filter">If null, then all events will be received.
+        /// If you want to recieve errors, only pass string "errors" in this parameter.</param>
+        public void SubscribeEvents(EventLevel eventLevel, Action<string> onEvent, object filter)
+        {
+            m_EventListener = new ObservableEventListener();
+            m_EventListener.Subscribe(new TraceEventReceiver(onEvent, filter));
+            m_EventListener.EnableEvents(DefaultEventSource.Log, eventLevel);
+        }
 
         /// <summary>
         /// Closes (stops) the hub.
@@ -899,6 +666,43 @@ namespace Daenet.DurableTaskMicroservices.Core
             await m_TaskHubWorker.StopAsync();
         }
 
+
+        /// <summary>
+        /// Wait on multiple instances to enter one ofterminal states.
+        /// Instance is running if it is in one of Pending, ContinuedAsNew or Running states.
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="microservices">The instancea of the service to wait on.</param>
+        public void WaitOnInstances(ServiceHost host, List<MicroserviceInstance> microservices)
+        {
+            List<Task> waitingTasks = new List<Task>();
+
+            foreach (var microservice in microservices)
+            {
+                waitingTasks.Add(host.WaitOnInstanceAsync(microservice));
+            }
+
+            Task.WaitAll(waitingTasks.ToArray());
+        }
+        #endregion
+
+        #region Private Members
+        private Microservice deserializeService(string configFile, IEnumerable<Type> knownTypes)
+        {
+            try
+            {
+                using (XmlReader writer = XmlReader.Create(configFile))
+                {
+                    DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), knownTypes);
+                    object svc = ser.ReadObject(writer);
+                    return svc as Microservice;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to deserialize file: {configFile}", ex);
+            }
+        }
 
         private static void loadTypesFromQualifiedNames(ICollection<Microservice> services)
         {
@@ -924,14 +728,18 @@ namespace Daenet.DurableTaskMicroservices.Core
         }
 
 
-
+        /// <summary>
+        /// Loads all assemblies from specified folder with specified extension and
+        /// custom attribute IntegrationAssemblyAttribute.
+        /// </summary>
+        /// <param name="directory">Folder from which assemblies have to be loaded.</param>
+        /// <returns>List of types, which will be used fro deserialization.</returns>
         private Type[] loadKnownTypes(string directory)
         {
             List<Type> types = new List<Type>();
 
             foreach (var assemblyFile in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).Where(f => f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")))
             {
-
                 try
                 {
                     Assembly asm = Assembly.LoadFile(assemblyFile);
@@ -955,5 +763,124 @@ namespace Daenet.DurableTaskMicroservices.Core
 
             return types.ToArray();
         }
+
+
+        /// <summary>
+        /// Checks if at least one orchestration instance is already running.
+        /// </summary>
+        /// <remarks>If the instance store is NOT configured this method will always return FALSE.</remarks>
+        /// <param name="orchestrationFullName">Full qualified name of orchestration. i.e.: Type.FullName</param>
+        /// <returns>List of running instances.</returns>
+        private async Task<List<MicroserviceInstance>> loadRunningInstancesAsync(string orchestrationFullName)
+        {
+            List<MicroserviceInstance> runningInstances = new List<MicroserviceInstance>();
+
+            if (m_InstanceStoreService != null)
+            {
+                var oStates = await loadStatesAsync(orchestrationFullName, true);
+
+                runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running ||
+                o.OrchestrationStatus == OrchestrationStatus.ContinuedAsNew ||
+                o.OrchestrationStatus == OrchestrationStatus.Pending).
+                    Select(i => i.OrchestrationInstance).Select(oi => new MicroserviceInstance()
+                    {
+                        OrchestrationInstance = oi
+                    }).ToList();
+            }
+
+            return runningInstances;
+        }
+
+        private async Task<IEnumerable<OrchestrationState>> loadStatesAsync(string orchestrationFullName, bool runningOnly = true)
+        {
+            List<OrchestrationState> list = new List<OrchestrationState>();
+
+            if (m_InstanceStoreService != null)
+            {
+                var records = await m_InstanceStoreService.GetJumpStartEntitiesAsync(10000);
+                foreach (var item in records)
+                {
+                    list.Add(item.State);
+                }
+                //var byNameQuery = new OrchestrationStateQuery();
+                //byNameQuery.AddNameVersionFilter(orchestrationFullName);
+                //if (runningOnly)
+                //    byNameQuery.AddStatusFilter(OrchestrationStatus.Running);
+
+                //var oStates = await m_HubClient.hiGetOrchestrationStateAsync("TODO");
+
+                return list;
+            }
+            else
+                return list;
+        }
+
+
+
+
+        /// <summary>
+        /// Loads activity types from Assembly Qualified names.
+        /// </summary>
+        /// <param name="services">List of services which have to be initialized.</param>
+        private static void loadServiceActivityTypes(ICollection<Microservice> services)
+        {
+            foreach (var svc in services)
+            {
+                if (svc.Activities == null)
+                {
+                    var activities = new List<Type>();
+
+                    foreach (var act in svc.ActivityQNames)
+                    {
+                        activities.Add(Type.GetType(act));
+                    }
+
+                    svc.Activities = activities.ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads activity types from Assembly Qualified names.
+        /// </summary>
+        /// <param name="services">List of services which have to be initialized.</param>
+        private static void loadOrchestrationTypes(ICollection<Microservice> services)
+        {
+            foreach (var svc in services)
+            {
+                if (svc.OrchestrationQName != null)
+                {
+                    svc.Orchestration = Type.GetType(svc.OrchestrationQName);
+                    if (svc.Orchestration == null)
+                        throw new TypeMissingException($"The type {svc.OrchestrationQName} cannot be found. Please be sure that AssemblyQualifiedName is correctlly specified in the configuration file.");
+                }
+            }
+        }
+
+        //        private static Dictionary<Type, object> m_SvcConfigs = new Dictionary<Type, object>();
+
+
+        /// <summary>
+        /// Gets the key, which uniquely identifies the orchestration (service).
+        /// </summary>
+        ///<param name="config">Specifies the instance of activity (task) type.</param>
+        /// <returns></returns>
+        //private static string getConfigKey(IConfig config)
+        //{
+        //    return getConfigKey(config.Name, config.Type);
+        //}
+
+
+        /// <summary>
+        /// Gets the key, which uniquely identifies the orchestration (service).
+        /// </summary>
+        ///<param name="typeName">Specifies the type of activity (task) type instance.</param>
+        //////<param name="name">Specifies the name of activity (task) type instance.</param>
+        /// <returns></returns>
+        private static string getConfigKey(string name, object typeName)
+        {
+            return String.Format("{0}-{1}", name, typeName);
+        }
+        #endregion
     }
 }

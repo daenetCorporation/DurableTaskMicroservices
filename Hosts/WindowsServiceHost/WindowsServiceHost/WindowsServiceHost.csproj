@@ -82,6 +82,7 @@
     <None Include="App.config" />
     <None Include="ConnectionStrings.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Scripts\InstallService.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
