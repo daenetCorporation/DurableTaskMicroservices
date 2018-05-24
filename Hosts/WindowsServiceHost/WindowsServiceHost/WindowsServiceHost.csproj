@@ -116,9 +116,9 @@
       <Project>{8a811d48-7dc5-4e4b-acf6-f607dbeaf196}</Project>
       <Name>Daenet.DurableTaskMicroservices.Host</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj">
-      <Project>{83492b07-b5dc-4c59-b4d1-fe7a70b6261b}</Project>
-      <Name>Daenet.DurableTaskMicroservices</Name>
+    <ProjectReference Include="..\..\..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Core.csproj">
+      <Project>{799A8965-985F-4931-B045-5D09C429B593}</Project>
+      <Name>Daenet.DurableTaskMicroservices.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj" />
-    <ProjectReference Include="..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.csproj" />
+    <ProjectReference Include="..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

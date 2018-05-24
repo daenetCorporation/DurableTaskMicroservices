@@ -24,14 +24,13 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.3.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.3.0" />
     <PackageReference Include="System.Configuration.Abstractions" Version="2.0.2.26" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\Daenet.DurableTaskMicroservices.DotNetUnitTests.csproj" />
     <ProjectReference Include="..\..\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj" />
     <ProjectReference Include="..\Daenet.DurableTaskMicroservices.Common\Daenet.DurableTaskMicroservices.Common.csproj" />
   </ItemGroup>
@@ -48,9 +47,6 @@
     </None>
     <None Update="sqlloggersettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TweetOrchestration.config.xml">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

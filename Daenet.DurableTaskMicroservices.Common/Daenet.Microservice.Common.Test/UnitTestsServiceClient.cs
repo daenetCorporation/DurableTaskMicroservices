@@ -1,30 +1,15 @@
+using Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration;
 using Daenet.DurableTaskMicroservices.Core;
-using Daenet.DurableTaskMicroservices.Common.Extensions;
 using Daenet.DurableTaskMicroservices.Host;
 using DurableTask.Core;
-using Microsoft.Extensions.Configuration;
+using DurableTask.Core.Tracing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Daenet.Common.Logging.Sql;
-using Daenet.DurableTaskMicroservices.UnitTests;
-using System.Runtime.Serialization;
-using System.Xml;
-using System;
-using System.Reflection;
-using System.Linq;
-using System.Diagnostics;
-using DurableTask.Core.Tracing;
 using System.Diagnostics.Tracing;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
-using Daenet.DurableTaskMicroservices.Common;
-using Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration;
-using Daenet.DurableTaskMicroservices.Core;
-using Daenet.DurableTaskMicroservices.Tests;
+using System.IO;
 
 namespace Daenet.Microservice.Common.Test
 {

@@ -13,7 +13,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration
         {
             logger.LogInformation($"Orchestration Input: {input.HelloText}. IsReplaying: {context.IsReplaying}");
 
-            await this.ScheduleTask<Null>(typeof(DurableTaskMicroservices.Tests.UnitTests), new Task1Input { Text = input.HelloText });
+            await this.ScheduleTask<Null>(typeof(Task1), new Task1Input { Text = input.HelloText });
 
             return new Null();
         }
