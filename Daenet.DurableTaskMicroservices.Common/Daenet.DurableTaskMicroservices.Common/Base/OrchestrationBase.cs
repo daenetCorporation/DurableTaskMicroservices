@@ -89,11 +89,12 @@ namespace Daenet.DurableTaskMicroservices.Common.Base
 
             string activityId = ServiceHost.GetActivityIdFromContext(orchestrationInput.Context);
 
-            var logger = ServiceHost.GetLogger(this.GetType(), activityId);
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict.Add("ActId", activityId);
+            dict.Add("InstId", context.OrchestrationInstance.InstanceId);
+            dict.Add("ExecId", context.OrchestrationInstance.ExecutionId);
 
-            logger.BeginScope(context.OrchestrationInstance.InstanceId);
-
-            logger.BeginScope(context.OrchestrationInstance.ExecutionId);
+            var logger = ServiceHost.GetLogger(this.GetType(), dict);
 
             try
             {
