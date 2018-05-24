@@ -27,8 +27,8 @@ namespace Daenet.Microservice.Common.Test
         /// Full qualified name of orchestration has to be specified. Note, we do not need a reference to orchestration imlementation
         /// in order to be able to start it.
         /// </summary>
-        private const string cSvcName = "Daenet.Microservice.Common.Test.HelloWorldOrchestration.HelloWorldOrchestration";
-
+        internal const string cHelloWorlSvcName = "Daenet.DurableTaskMicroservices.Common.Test.HelloWorldOrchestration.HelloWorldOrchestration";
+       
         private static ILoggerFactory getDebugLoggerFactory()
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
@@ -65,7 +65,7 @@ namespace Daenet.Microservice.Common.Test
 
             ServiceClient client = ClientHelperExtensions.CreateMicroserviceClient(ServiceBusConnectionString, StorageConnectionString, nameof(SelfHostServiceClientTest));
 
-            var svc = client.StartServiceAsync(cSvcName, new HelloWorldOrchestrationInput { HelloText = "SelfHostServiceClientTestInputArg" }).Result;
+            var svc = client.StartServiceAsync(cHelloWorlSvcName, new HelloWorldOrchestrationInput { HelloText = "SelfHostServiceClientTestInputArg" }).Result;
 
             microservices.Add(svc);
 
@@ -103,9 +103,7 @@ namespace Daenet.Microservice.Common.Test
 
             var microservices = host.StartServiceHostAsync(Path.Combine(), runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
-            string svcName = "Daenet.Microservice.Common.Test.HelloWorldOrchestration.HelloWorldOrchestration";
-
-            var svc = host.StartServiceAsync(svcName, "invalid input").Result;
+            var svc = host.StartServiceAsync(cHelloWorlSvcName, "invalid input").Result;
 
             microservices.Add(svc);
 
@@ -127,7 +125,7 @@ namespace Daenet.Microservice.Common.Test
                 Context = new Dictionary<string, object> { { "ActivityId", "SelfHostServiceClientTestWithHubName" } }
             };
 
-            var svc = client.StartServiceAsync(cSvcName, orchestrationInput).Result;
+            var svc = client.StartServiceAsync(cHelloWorlSvcName, orchestrationInput).Result;
 
             Assert.IsTrue(svc != null);
         }

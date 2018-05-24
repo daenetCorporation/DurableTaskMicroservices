@@ -29,6 +29,10 @@ namespace Daenet.DurableTaskMicroservices.Tests
     [TestClass]
     public class UtilsTests
     {
+        /// <summary>
+        /// Serializes orchetrsation as XML.
+        /// </summary>
+        /// <param name="fileName"></param>
         [TestMethod]
         [DataRow("CounterOrchestrationSvc.xml")]
         public void SerializeXmlConfigTest(string fileName)
@@ -38,6 +42,11 @@ namespace Daenet.DurableTaskMicroservices.Tests
             xmlSerializeService(service, GetPathForFile(fileName));
         }
 
+
+        /// <summary>
+        /// Serializes orchestration as JSON.
+        /// </summary>
+        /// <param name="fileName"></param>
         [TestMethod]
         [DataRow("CounterOrchestrationSvc.json")]
         public void SerializeJsonConfigTest(string fileName)
@@ -48,6 +57,30 @@ namespace Daenet.DurableTaskMicroservices.Tests
 
             File.WriteAllText(GetPathForFile(fileName), jsonString);
         }
+
+
+        /// <summary>
+        /// Tests if deserialization of orchestration from file works as expected.
+        /// </summary>
+        /// <param name="configFile"></param>
+        [TestMethod]
+        [DataRow(@"TestConfiguration\CounterOrchestration.config.xml")]
+        public void DeserializeService(string configFile)
+        {
+            using (XmlReader writer = XmlReader.Create(configFile))
+            {
+                DataContractSerializerSettings sett = new DataContractSerializerSettings();
+                DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), loadKnownTypes());
+                object svc = ser.ReadObject(writer);
+                Assert.IsNotNull(svc as Microservice);
+            }
+        }
+
+        internal static string GetPathForFile(string fileName)
+        {
+            return Path.Combine(Environment.CurrentDirectory, $"TestConfiguration\\{fileName}");
+        }
+
 
         private static Microservice getMicroService()
         {
@@ -79,20 +112,7 @@ namespace Daenet.DurableTaskMicroservices.Tests
                 ser.WriteObject(writer, (Microservice)svc);
             }
         }
-
-        [TestMethod]
-        [DataRow(@"C:\Users\hvetter\Source\Repos\DurableTaskMicroservices\Daenet.DurableTaskMicroservices\Daenet.DurableTaskMicroservices.DotNetUnitTests\bin\Debug\TestConfiguration\CounterOrchestration.config.xml")]
-        public void DeserializeService(string configFile)
-        {
-            using (XmlReader writer = XmlReader.Create(configFile))
-            {
-                DataContractSerializerSettings sett = new DataContractSerializerSettings();
-                DataContractSerializer ser = new DataContractSerializer(typeof(Microservice), loadKnownTypes());
-                object svc = ser.ReadObject(writer);
-                Assert.IsNotNull(svc as Microservice);
-            }
-        }
-
+        
         private static Type[] loadKnownTypes()
         {
             List<Type> types = new List<Type>();
@@ -116,9 +136,6 @@ namespace Daenet.DurableTaskMicroservices.Tests
             return types.ToArray();
         }
 
-        internal static string GetPathForFile(string fileName)
-        {
-            return Path.Combine(Environment.CurrentDirectory, $"TestConfiguration\\{fileName}");
-        }
+
     }
 }

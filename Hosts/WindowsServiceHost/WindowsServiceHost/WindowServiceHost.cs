@@ -27,6 +27,9 @@ using Daenet.DurableTaskMicroservices.Core;
 
 namespace WindowsServiceHost
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class WindowServiceHost : ServiceBase
     {
 

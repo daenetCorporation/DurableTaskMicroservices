@@ -96,10 +96,9 @@ namespace Daenet.DurableTaskMicroservices.Tests
 
 
         /// <summary>
-        /// Runs the orchestration with SQL Instance store.
-        /// </summary>
+        /// Runs the orches        /// </summary>
         [TestMethod]
-        public void OpenAndStartServiceHostTestWithSql()
+        public void RunHostWIthSqlInstanceStoreTestWithSql()
         {
             var host = getMicroServiceWithSqlInstanceStoreHost();
 
@@ -112,9 +111,7 @@ namespace Daenet.DurableTaskMicroservices.Tests
 
             service.OrchestrationQName = typeof(CounterOrchestration).AssemblyQualifiedName;
 
-            service.ActivityQNames = new string[]{
-                typeof(Task1).AssemblyQualifiedName,  typeof(Task2).AssemblyQualifiedName,
-            };
+            service.ActivityQNames = new string[]{ typeof(Task1).AssemblyQualifiedName,  typeof(Task2).AssemblyQualifiedName,        };
 
             host.LoadService(service);
 

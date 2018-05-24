@@ -668,7 +668,7 @@ namespace Daenet.DurableTaskMicroservices.Core
 
 
         /// <summary>
-        /// Wait on multiple instances to enter one ofterminal states.
+        /// Wait on multiple instances to enter one of terminal states.
         /// Instance is running if it is in one of Pending, ContinuedAsNew or Running states.
         /// </summary>
         /// <param name="host"></param>
