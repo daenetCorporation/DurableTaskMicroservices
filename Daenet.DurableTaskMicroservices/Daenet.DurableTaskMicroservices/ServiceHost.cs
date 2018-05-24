@@ -728,14 +728,18 @@ namespace Daenet.DurableTaskMicroservices.Core
         }
 
 
-
+        /// <summary>
+        /// Loads all assemblies from specified folder with specified extension and
+        /// custom attribute IntegrationAssemblyAttribute.
+        /// </summary>
+        /// <param name="directory">Folder from which assemblies have to be loaded.</param>
+        /// <returns>List of types, which will be used fro deserialization.</returns>
         private Type[] loadKnownTypes(string directory)
         {
             List<Type> types = new List<Type>();
 
             foreach (var assemblyFile in Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).Where(f => f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")))
             {
-
                 try
                 {
                     Assembly asm = Assembly.LoadFile(assemblyFile);

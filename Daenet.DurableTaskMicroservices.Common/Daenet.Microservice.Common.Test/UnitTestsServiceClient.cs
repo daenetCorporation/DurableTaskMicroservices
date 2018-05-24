@@ -8,6 +8,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.IO;
 
