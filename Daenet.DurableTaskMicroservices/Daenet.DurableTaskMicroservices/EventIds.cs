@@ -13,7 +13,6 @@ namespace Daenet.DurableTaskMicroservices.Core
             public const int ServiceStarted = Base;
             public const int ConfigLoaded = Base + 1;
             public const int InstanceCreated = Base + 2;
-
             public const int InstanceCreationFailed = Base + 3;
             public const int HostCreated = Base + 4;
             public const int NoConfigFilesFound = Base + 5;
