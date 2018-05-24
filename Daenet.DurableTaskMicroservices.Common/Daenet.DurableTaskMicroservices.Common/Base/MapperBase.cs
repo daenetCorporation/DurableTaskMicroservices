@@ -16,7 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
+namespace Daenet.DurableTaskMicroservices.Common.Base
 {
     public abstract class MapperBase : IAdapterMapper
     {

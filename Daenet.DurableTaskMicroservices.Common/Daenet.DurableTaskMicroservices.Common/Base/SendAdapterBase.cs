@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 using System;
 
 
-namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
+namespace Daenet.DurableTaskMicroservices.Common.Base
 {
     public abstract class SendAdapterBase<TInput, TAdapterOutput> : TaskBase<TInput, TAdapterOutput>
         where TInput : TaskInput

@@ -1,4 +1,4 @@
-﻿using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+﻿using Daenet.DurableTaskMicroservices.Common.Base;
 using Daenet.DurableTaskMicroservices.Common.Test.CounterOrchestration;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;

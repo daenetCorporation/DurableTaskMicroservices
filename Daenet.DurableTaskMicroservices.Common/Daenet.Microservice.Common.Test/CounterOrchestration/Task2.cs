@@ -10,7 +10,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
-using Daenet.DurableTaskMicroservices.Common.BaseClasses;
+using Daenet.DurableTaskMicroservices.Common.Base;
 using Daenet.DurableTaskMicroservices.Core;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;

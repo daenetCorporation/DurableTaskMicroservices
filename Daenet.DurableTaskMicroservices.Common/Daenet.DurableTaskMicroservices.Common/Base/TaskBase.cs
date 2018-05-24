@@ -18,7 +18,7 @@ using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
+namespace Daenet.DurableTaskMicroservices.Common.Base
 {
     /// <summary>
     /// Base class for tasks, which run as daenet.integration tasks.

@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
+namespace Daenet.DurableTaskMicroservices.Common.Base
 {
     /// <summary>
     /// Used as base class for all orchestrations. It extends DTF original TaskOrchestration
