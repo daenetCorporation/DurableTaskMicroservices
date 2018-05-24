@@ -639,7 +639,8 @@ namespace Daenet.DurableTask.Microservices
         ObservableEventListener m_EventListener;
 
         /// <summary>
-        /// Subscribes receiver for DTF internal trace events.
+        /// Subscribes receiver for DTF internal trace events. The caller can define a callback function,
+        /// which will receive all internally created events.
         /// </summary>
         /// <param name="eventLevel">Level of events to be used.</param>
         /// <param name="onEvent">Action to be registered as event subscriber.</param>
