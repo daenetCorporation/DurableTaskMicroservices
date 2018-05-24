@@ -224,7 +224,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }
             catch (Exception ex)
             {
-                logger?.LogError($"{ex}");
+                logger?.LogError(ex, "Task failed.");
                 throw;                
             }
             finally

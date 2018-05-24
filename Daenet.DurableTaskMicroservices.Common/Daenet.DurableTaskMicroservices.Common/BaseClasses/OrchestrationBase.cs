@@ -111,7 +111,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex.ToString());
+                logger?.LogError(ex, "Orchestration failed.");
                 throw;
             }
            
