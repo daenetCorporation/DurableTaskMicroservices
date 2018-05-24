@@ -947,8 +947,9 @@ namespace Daenet.DurableTaskMicroservices.Core
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    m_Logger.LogWarning(ex, "Failed to load Assembly: {assembly}", assemblyFile);
                 }
             }
 
