@@ -1,10 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Daenet.DurableTaskMicroservices.Core</RootNamespace>
-    <VersionPrefix>0.0.2</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <PackageId>Daenet.DurableTask.Microservices</PackageId>
     <Authors>daenet</Authors>
     <Company>daenet Gesellschaft für Informationstechnologie mbH</Company>
@@ -15,13 +14,12 @@
     <PackageTags>durabletask</PackageTags>
     <Description>Microservice Framework based on Durable Task Framework</Description>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.0.8</Version>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/12556447?v=4&amp;s=200</PackageIconUrl>
     <AssemblyName>Daenet.DurableTaskMicroservices.Core</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DurableTask.Core" Version="2.0.0.4-preview5" />
+    <PackageReference Include="DurableTask.Core" Version="2.0.0.6" />
     <PackageReference Include="EnterpriseLibrary.SemanticLogging" Version="2.0.1406.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

@@ -127,7 +127,7 @@
       <Version>1.0.5</Version>
     </PackageReference>
     <PackageReference Include="DurableTask.ServiceBus">
-      <Version>2.0.0.4-preview5</Version>
+      <Version>2.0.0.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json">
       <Version>2.0.1</Version>
