@@ -44,6 +44,17 @@ namespace Daenet.DurableTaskMicroservices.Core
         /// </summary>
         private static Dictionary<string, Dictionary<string, object>> m_SvcConfigs = new Dictionary<string, Dictionary<string, object>>();
 
+        /// <summary>
+        /// List of scopes, which will automatically be added to the logger.
+        /// </summary>
+        private static Dictionary<string, string> m_Scopes = new Dictionary<string, string>();
+
+        /// <summary>
+        /// If true then scopes are added on the begining of all scopes.
+        /// If false, then scopes are added at the end of scopes.
+        /// Default value is false = appended.
+        /// </summary>
+        private static bool m_insertOrAppendScopes;
 
         private TaskHubWorker m_TaskHubWorker;
         private IOrchestrationServiceInstanceStore m_InstanceStoreService;
@@ -54,7 +65,15 @@ namespace Daenet.DurableTaskMicroservices.Core
 
         #region Initialization Code
 
-
+        /// <summary>
+        /// Creates the instance of the host.
+        /// </summary>
+        /// <param name="orchestrationService"></param>
+        /// <param name="orchestrationClient"></param>
+        /// <param name="instanceStore"></param>
+        /// <param name="resetHub"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="scopes">List of scopes, which will be appended to logger scopes, every time</param>
         public ServiceHost(IOrchestrationService orchestrationService,
             IOrchestrationServiceClient orchestrationClient,
             IOrchestrationServiceInstanceStore instanceStore,
@@ -70,7 +89,6 @@ namespace Daenet.DurableTaskMicroservices.Core
                 m_LoggerFactory = loggerFactory;
                 m_Logger = m_LoggerFactory.CreateLogger<ServiceHost>();
             }
-
 
             if (resetHub)
                 orchestrationService.DeleteAsync().Wait();
@@ -172,6 +190,22 @@ namespace Daenet.DurableTaskMicroservices.Core
         #endregion
 
         #region Public Members
+
+
+
+        /// <summary>
+        /// Sets the list of scopes to be used by logger.
+        /// </summary>
+        /// <param name="scopes">List of default scopes used by logger.</param>
+        /// <param name="insertOrAppend">If true then scopes are added on the begining of all scopes.
+        /// If false, then scopes are added at the end of scopes.
+        /// Default value is false = appended.</param>
+        public void AddDefaultLoggercSopes(Dictionary<string, string> scopes, bool insertOrAppend = false)
+        {
+            Scopes = scopes;
+            m_insertOrAppendScopes = insertOrAppend;
+        }
+
         /// <summary>
         /// Restarts an eventually running instance of the microservice service (orchestration).
         /// </summary>
@@ -612,6 +646,7 @@ namespace Daenet.DurableTaskMicroservices.Core
         /// </summary>
         /// <param name="microserviceStateQuery"></param>
         /// <returns>List of microservice states.</returns>
+        /// 
         //public IEnumerable<MicroserviceState> QueryServices(MicroserviceStateQuery microserviceStateQuery)
         //{
         //    var result = m_HubClient.QueryOrchestrationStates(microserviceStateQuery.Query)
@@ -637,6 +672,11 @@ namespace Daenet.DurableTaskMicroservices.Core
         /// Instance of event receiver.
         /// </summary>
         ObservableEventListener m_EventListener;
+
+        /// <summary>
+        /// List of scopes, which will automatically be added to the logger.
+        /// </summary>
+        public static Dictionary<string, string> Scopes { get => m_Scopes; set => m_Scopes = value; }
 
         /// <summary>
         /// Subscribes receiver for DTF internal trace events. The caller can define a callback function,

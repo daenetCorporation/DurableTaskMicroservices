@@ -25,7 +25,7 @@ using System.Threading.Tasks;
        
 namespace Daenet.DurableTaskMicroservices.UnitTests
 {
-    public class Null { }
+    public class TstNull { }
 
     public class CounterOrchestration : TaskOrchestration<int, TestOrchestrationInput>
     {
@@ -33,9 +33,9 @@ namespace Daenet.DurableTaskMicroservices.UnitTests
         {
             Debug.WriteLine($"Orchestration Input: {input.Counter}. IsReplaying: {context.IsReplaying}");
 
-            await context.ScheduleTask<Null>(typeof(Tests.TaskOrchestration.CounterOrchestration.Task1), "Input1");
+            await context.ScheduleTask<TstNull>(typeof(Tests.TaskOrchestration.CounterOrchestration.Task1), "Input1");
 
-            await context.ScheduleTask<Null>(typeof(Task2), "Input1");
+            await context.ScheduleTask<TstNull>(typeof(Task2), "Input1");
 
             Task.Delay(100).Wait();
 
