@@ -432,7 +432,7 @@ namespace Daenet.DurableTaskMicroservices.Core
         {
             try
             {
-                m_Logger?.LogInformation("Service started. Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                m_Logger?.LogInformation(EventIds.ServiceHost.ServiceStarted, "Service started. Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
                 if (String.IsNullOrEmpty(directory))
                     directory = Environment.CurrentDirectory;
@@ -443,7 +443,7 @@ namespace Daenet.DurableTaskMicroservices.Core
 
                 if (configFiles.Length > 0)
                 {
-                    m_Logger?.LogInformation("Loaded {0} configuration files.", configFiles.Length);
+                    m_Logger?.LogInformation(EventIds.ServiceHost.ConfigLoaded, "Loaded {0} configuration files.", configFiles.Length);
 
                     List<Type> knownTypes = new List<Type>();
 
@@ -472,7 +472,7 @@ namespace Daenet.DurableTaskMicroservices.Core
 
                             instances.Add(newInst);
 
-                            m_Logger?.LogInformation($"New instance created {newInst.OrchestrationInstance.InstanceId}");
+                            m_Logger?.LogInformation(EventIds.ServiceHost.InstanceCreated, "New instance with InstanceId '{instanceId}' created", newInst.OrchestrationInstance.InstanceId);
                         }
                         else
                         {
@@ -480,16 +480,16 @@ namespace Daenet.DurableTaskMicroservices.Core
 
                             instances.Add(new MicroserviceInstance() { OrchestrationInstance = alreadyRunningInstance.OrchestrationInstance });
 
-                            m_Logger?.LogInformation($"Service instance of {svc.OrchestrationQName} not started, because it is singleton and it is running already under instanceId = {alreadyRunningInstance.OrchestrationInstance.InstanceId}.");
+                            m_Logger?.LogInformation(EventIds.ServiceHost.InstanceCreationFailed, "Service instance of '{orchestration}' not started, because it is singleton and it is running already under instanceId '{instanceId}'.", svc.OrchestrationQName, alreadyRunningInstance.OrchestrationInstance.InstanceId);
                         }
                     }
                     await OpenAsync();
 
-                    m_Logger?.LogInformation("Host created successfully.");
+                    m_Logger?.LogInformation(EventIds.ServiceHost.HostCreated, "Host created successfully.");
                 }
                 else
                 {
-                    m_Logger?.LogWarning("No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
+                    m_Logger?.LogWarning(EventIds.ServiceHost.NoConfigFilesFound, "No {searchPattern} files found in folder: {folder}.", searchPattern, directory);
                     //throw new Exception(String.Format("No {0} files found in folder: {1}.", searchPattern, directory));
                 }
 
@@ -497,7 +497,7 @@ namespace Daenet.DurableTaskMicroservices.Core
             }
             catch (Exception ex)
             {
-                m_Logger?.LogError(ex, "Failed to start the Host.");
+                m_Logger?.LogError(EventIds.ServiceHost.HostFailed, ex, "Failed to start the Host.");
 
                 throw;
             }
@@ -755,8 +755,9 @@ namespace Daenet.DurableTaskMicroservices.Core
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    m_Logger.LogWarning(EventIds.ServiceHost.AssemblyLoadingFailed, ex, "Failed to load Assembly: {assembly}", assemblyFile);
                 }
             }
 
