@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
-namespace Daenet.DurableTask.Microservices
+namespace Daenet.DurableTaskMicroservices.Core
 {
     /// <summary>
     /// Implements observer of events traced by DTF framework internally.

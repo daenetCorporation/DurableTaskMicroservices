@@ -11,7 +11,7 @@
 //  limitations under the License.
 //  ----------------------------------------------------------------------------------
 
-using Daenet.DurableTaskMicroservices.Common.Entities;
+
 using DurableTask.Core;
 using DurableTask.Core.Exceptions;
 using DurableTask.Core.Tracing;

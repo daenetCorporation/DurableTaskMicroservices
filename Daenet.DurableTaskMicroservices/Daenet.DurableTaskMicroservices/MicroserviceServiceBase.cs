@@ -7,7 +7,7 @@ using Daenet.DurableTaskMicroservices.Core;
 using DurableTask;
 using DurableTask.Core;
 
-namespace Daenet.DurableTask.Microservices
+namespace Daenet.DurableTaskMicroservices.Core
 {
     /// <summary>
     /// Base class for common Service and Client functionality. 
