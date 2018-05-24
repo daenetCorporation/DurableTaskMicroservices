@@ -107,6 +107,6 @@ namespace Daenet.DurableTaskMicroservices.Common.Test
             microservices.Add(svc);
 
             host.WaitOnInstances(host, microservices);
-        }     
+        }
     }
 }

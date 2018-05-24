@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F587E0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{E9C667F9-C83C-41DC-A4F7-CFAD14AA36FF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTask.SqlInstanceStore", "Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj", "{A20B2B3F-4391-40E2-9E07-13F0A83719B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daenet.DurableTask.SqlInstanceStoreProvider", "Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStoreProvider.csproj", "{A20B2B3F-4391-40E2-9E07-13F0A83719B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

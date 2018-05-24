@@ -144,9 +144,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStore.csproj">
+    <ProjectReference Include="..\..\Daenet.DurableTask.SqlStateProvider\Daenet.DurableTask.SqlInstanceStoreProvider.csproj">
       <Project>{a20b2b3f-4391-40e2-9e07-13f0a83719b2}</Project>
-      <Name>Daenet.DurableTask.SqlInstanceStore</Name>
+      <Name>Daenet.DurableTask.SqlInstanceStoreProvider</Name>
     </ProjectReference>
     <ProjectReference Include="..\Daenet.DurableTaskMicroservices.Host\Daenet.DurableTaskMicroservices.Host.csproj">
       <Project>{3c8dc93d-9e5c-4262-9679-478c90961427}</Project>
