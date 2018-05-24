@@ -203,11 +203,11 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
 
             try
             {
-                logger?.LogDebug("TaskBase: '{Task}' started successfully", this.GetType().FullName);
+                logger?.LogDebug(EventIds.TaskBase.TaskStarted, "TaskBase: '{Task}' started successfully", this.GetType().FullName);
                 
                 result = RunTask(context, taskInputArgs, logger);
 
-                logger?.LogDebug("TaskBase: '{Task}' exited successfully", this.GetType().FullName);
+                logger?.LogDebug(EventIds.TaskBase.TaskEnded, "TaskBase: '{Task}' exited successfully", this.GetType().FullName);
             }
             catch (ValidationRuleException validationException)
             {
@@ -224,7 +224,7 @@ namespace Daenet.DurableTaskMicroservices.Common.BaseClasses
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, "Task failed.");
+                logger?.LogError(EventIds.TaskBase.TaskFailed, ex, "Task failed.");
                 throw;                
             }
             finally
