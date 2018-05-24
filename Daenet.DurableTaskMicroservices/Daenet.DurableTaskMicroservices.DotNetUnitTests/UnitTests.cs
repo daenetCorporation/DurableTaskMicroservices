@@ -99,7 +99,7 @@ namespace Daenet.DurableTaskMicroservices.Tests
         /// Runs the orchestration
         /// </summary>
         [TestMethod]
-        public void RunHostWIthSqlInstanceStoreTestWithSql()
+        public void RunHostWithSqlInstanceStoreTest()
         {
             var host = getMicroServiceWithSqlInstanceStoreHost();
 
