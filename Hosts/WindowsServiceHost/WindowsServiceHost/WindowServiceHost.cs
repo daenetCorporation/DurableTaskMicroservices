@@ -24,6 +24,7 @@ using Microsoft.Extensions.Logging;
 using Daenet.Common.Logging.Sql;
 using Microsoft.Extensions.Configuration;
 using Daenet.DurableTaskMicroservices.Core;
+using System.Diagnostics.Tracing;
 
 namespace WindowsServiceHost
 {
@@ -77,27 +78,18 @@ namespace WindowsServiceHost
 
                 ServiceHost host = HostHelpersExtensions.CreateMicroserviceHost(m_ServiceBusConnectionString, m_StorageConnectionString, m_TaskHubName, false, out runningInstances, loggerFact);
 
+                //
+                // This method subscribes all errors, which happen internally on host.
+                host.SubscribeEvents(EventLevel.LogAlways,
+                    (msg) =>
+                    {
+                        Debug.WriteLine(msg);
+                        m_ELog?.WriteEntry("DTF internal Error", EventLogEntryType.Error, 2);                      
+                    }, "errors");
+
                 var microservices = host.StartServiceHostAsync(AppDomain.CurrentDomain.BaseDirectory, runningInstances: runningInstances, context: new Dictionary<string, object>() { { "company", "daenet" } }).Result;
 
-                //host.WaitOnInstances(host, microservices);
-
-
-                //AzureTableInstanceStore instanceStore = new AzureTableInstanceStore(m_TaskHubName, m_StorageConnectionString);
-                //ServiceBusOrchestrationService orchestrationServiceAndClient =
-                //   new ServiceBusOrchestrationService(m_ServiceBusConnectionString, m_TaskHubName, instanceStore, null, null);
-
-                //orchestrationServiceAndClient.CreateIfNotExistsAsync().Wait();
-
-                //TaskHubClient taskHubClient = new TaskHubClient(orchestrationServiceAndClient);
-                //TaskHubWorker taskHub = new TaskHubWorker(orchestrationServiceAndClient);
-
-                //ServiceHost host;
-
-                //host = new ServiceHost(orchestrationServiceAndClient, orchestrationServiceAndClient, instanceStore, false);
-
-                //var runningInstances = instanceStore.GetRunningInstances();
-
-                //host.StartServiceHostAsync(Environment.CurrentDirectory, runningInstances: runningInstances).Wait();
+         
             }
             catch (Exception ex)
             {
