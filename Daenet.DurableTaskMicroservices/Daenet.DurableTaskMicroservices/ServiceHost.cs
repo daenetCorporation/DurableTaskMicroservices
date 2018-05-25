@@ -339,22 +339,50 @@ namespace Daenet.DurableTaskMicroservices.Core
         /// Gets the logger instance.
         /// </summary>
         /// <param name="type">Type which defines logger category.</param>
-        /// <param name="scopeId">Activity identifier.</param>
+        /// <param name="scopes">Scopes to add to the ILogger</param>
         /// <returns></returns>
-        public static ILogger GetLogger(Type type, string scopeId = null)
+        public static ILogger GetLogger(Type type, params object[] scopes)
         {
             lock (m_LoggerFactory)
             {
                 if (m_LoggerFactory != null)
                 {
                     var logger = m_LoggerFactory.CreateLogger(type.FullName);
-                    if (scopeId != null)
-                        logger.BeginScope(scopeId);
+
+                    // Decides if we first add the AdditionalScopes or append them afterwards.
+                    if (m_insertOrAppendScopes)
+                        BeginScopes(logger, m_Scopes);
+
+                    BeginScopes(logger, scopes);
+
+                    if (!m_insertOrAppendScopes)
+                        BeginScopes(logger, m_Scopes);
 
                     return logger;
                 }
                 else
                     return null;
+            }
+        }
+
+        private static void BeginScopes(ILogger logger, params object[] scopes)
+        {
+            if (scopes == null || logger == null)
+                return;
+
+            foreach (var scope in scopes)
+            {
+                if (scope is IDictionary<string, string> dict)
+                {
+                    foreach (var item in dict)
+                    {
+                        var s = $"{item.Key}:{item.Value}";
+                        logger.BeginScope(s);
+                    }
+                    
+                }
+                else
+                logger.BeginScope(scope);
             }
         }
 

@@ -17,6 +17,7 @@ using Daenet.DurableTaskMicroservices.Core;
 using DurableTask.Core;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace Daenet.DurableTaskMicroservices.Common.Base
 {
@@ -160,7 +161,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Base
 
         //        if (parentLoggingContext == null)
         //            parentLoggingContext = new LoggingContext();
-                
+
         //        //
         //        // If log trace source name is specified in the configuration it will be used even if the context contains a parent logtrace source name.
         //        var cfg = this.GetConfiguration(inputArg.Orchestration);
@@ -195,16 +196,17 @@ namespace Daenet.DurableTaskMicroservices.Common.Base
 
             string activityId = ServiceHost.GetActivityIdFromContext(taskInputArgs.Context);
 
-            var logger = ServiceHost.GetLogger(this.GetType(), activityId);
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict.Add("ActId", activityId);
+            dict.Add("InstId", context.OrchestrationInstance.InstanceId);
+            dict.Add("ExecId", context.OrchestrationInstance.ExecutionId);
 
-            logger.BeginScope(context.OrchestrationInstance.InstanceId);
-
-            logger.BeginScope(context.OrchestrationInstance.ExecutionId);
+            var logger = ServiceHost.GetLogger(this.GetType(), dict);
 
             try
             {
                 logger?.LogDebug(EventIds.TaskBase.TaskStarted, "TaskBase: '{Task}' started successfully", this.GetType().FullName);
-                
+
                 result = RunTask(context, taskInputArgs, logger);
 
                 logger?.LogDebug(EventIds.TaskBase.TaskEnded, "TaskBase: '{Task}' exited successfully", this.GetType().FullName);
@@ -225,7 +227,7 @@ namespace Daenet.DurableTaskMicroservices.Common.Base
             catch (Exception ex)
             {
                 logger?.LogError(EventIds.TaskBase.TaskFailed, ex, "Task failed.");
-                throw;                
+                throw;
             }
             finally
             {
