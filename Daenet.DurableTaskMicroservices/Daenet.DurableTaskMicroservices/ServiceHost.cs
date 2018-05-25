@@ -845,7 +845,7 @@ namespace Daenet.DurableTaskMicroservices.Core
 
             if (m_InstanceStoreService != null)
             {
-                var oStates = await loadStatesAsync(orchestrationFullName, true);
+                var oStates = await loadStatesAsync(orchestrationFullName);
 
                 runningInstances = oStates.Where(o => o.OrchestrationStatus == OrchestrationStatus.Running ||
                 o.OrchestrationStatus == OrchestrationStatus.ContinuedAsNew ||
@@ -859,7 +859,7 @@ namespace Daenet.DurableTaskMicroservices.Core
             return runningInstances;
         }
 
-        private async Task<IEnumerable<OrchestrationState>> loadStatesAsync(string orchestrationFullName, bool runningOnly = true)
+        private async Task<IEnumerable<OrchestrationState>> loadStatesAsync(string orchestrationFullName)
         {
             List<OrchestrationState> list = new List<OrchestrationState>();
 
