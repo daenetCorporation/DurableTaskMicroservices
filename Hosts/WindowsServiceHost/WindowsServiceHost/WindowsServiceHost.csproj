@@ -124,7 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Daenet.Common.Logging.Sql">
-      <Version>1.0.5</Version>
+      <Version>1.0.6</Version>
     </PackageReference>
     <PackageReference Include="DurableTask.ServiceBus">
       <Version>2.0.0.6</Version>
