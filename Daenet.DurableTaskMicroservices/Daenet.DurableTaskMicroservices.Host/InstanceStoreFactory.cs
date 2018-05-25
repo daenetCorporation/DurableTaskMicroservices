@@ -14,7 +14,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         {
             IOrchestrationServiceInstanceStore instanceStore;
 
-            if (storageConnectionString.ToLower().Contains("server="))
+            if (storageConnectionString.ToLower().Contains("server=") || storageConnectionString.ToLower().Contains("data source="))
             {
                 instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
             }

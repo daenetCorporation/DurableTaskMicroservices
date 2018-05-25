@@ -25,14 +25,7 @@ namespace Daenet.DurableTaskMicroservices.Host
         {
             IOrchestrationServiceInstanceStore instanceStore;
 
-            if (storageConnectionString.ToLower().Contains("server="))
-            {
-                instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
-            }
-            else
-            {
-                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
-            }
+            instanceStore = InstanceStoreFactory.CreateInstanceStore(hubName, storageConnectionString);
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                  new ServiceBusOrchestrationService(serviceBusConnectionString, hubName, instanceStore, null, null);
@@ -44,4 +37,5 @@ namespace Daenet.DurableTaskMicroservices.Host
             return client;
         }
     }
+
 }

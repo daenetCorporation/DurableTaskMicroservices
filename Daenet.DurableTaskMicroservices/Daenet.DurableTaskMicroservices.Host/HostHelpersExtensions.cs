@@ -33,17 +33,9 @@ namespace Daenet.DurableTaskMicroservices.Host
         public static ServiceHost CreateMicroserviceHost(string serviceBusConnectionString, string storageConnectionString, string hubName,
            bool recreateHubAndStore, out List<OrchestrationState> runningInstances, ILoggerFactory loggerFactory = null)
         {
-
             IOrchestrationServiceInstanceStore instanceStore;
 
-            //
-            // Try to determine if ConnectionString is SQL or TableStorage
-            if (storageConnectionString.ToLower().Contains("server="))
-            {
-                instanceStore = new SqlInstanceStore(hubName, storageConnectionString);
-            }
-            else
-                instanceStore = new AzureTableInstanceStore(hubName, storageConnectionString);
+            instanceStore = InstanceStoreFactory.CreateInstanceStore(hubName, storageConnectionString, recreateHubAndStore);
 
             ServiceBusOrchestrationService orchestrationServiceAndClient =
                  new ServiceBusOrchestrationService(serviceBusConnectionString, hubName, instanceStore, null, null);
@@ -54,12 +46,6 @@ namespace Daenet.DurableTaskMicroservices.Host
 
             try
             {
-                //if (purgeStore)
-                //{
-                //    instanceStore.InitializeStoreAsync(false).Wait();
-                //    instanceStore.PurgeOrchestrationHistoryEventsAsync(DateTime.Now.AddYears(1), OrchestrationStateTimeRangeFilterType.OrchestrationCreatedTimeFilter).Wait();
-                //}
-
                 // Not available on interface yet.
                 if (instanceStore is AzureTableInstanceStore)
                     runningInstances = ((AzureTableInstanceStore)instanceStore).GetRunningInstances();
